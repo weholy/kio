@@ -103,6 +103,7 @@ private enum NLBoolSetting: String {
     case disableOnlineStatus
     case disableTypingStatus
     case disableVCMessageRecordingStatus
+    case disableVCMessageUploadingStatus
     case disableUploadingFileStatus
     case disableUploadingPhotoStatus
     case disableUploadingVideoStatus
@@ -308,7 +309,7 @@ private enum NLHubCategory: String, CaseIterable {
         case .hubGhost: return .ghost
         case .hubOther: return .other
         case .hubSearch: return .search
-        case .none, .onlineHistory: return nil
+        case .none, .onlineHistory, .ghostDetailsToggle, .fakeLocationPicker: return nil
         }
     }
 }
@@ -448,6 +449,7 @@ private struct NLControllerState: Equatable {
 // MARK: - Entry type
 
 private typealias NLEntry = SGItemListUIEntry<NLSectionId, NLBoolSetting, NLSliderSetting, NLOneFromManySetting, NLDisclosureLink, NLAction>
+private typealias NLArguments = SGItemListArguments<NLBoolSetting, NLSliderSetting, NLOneFromManySetting, NLDisclosureLink, NLAction>
 
 // MARK: - Build Entries
 
@@ -487,7 +489,7 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
             return entries
         }
         for result in results {
-            entries.append(.disclosure(
+            entries.append(.disclosureDetail(
                 id: id.count,
                 section: .items,
                 link: result.category.disclosure,
@@ -798,7 +800,7 @@ private func namelessFeaturesControllerImpl(context: AccountContext, initialCate
 
     let simplePromise = ValuePromise(true, ignoreRepeated: false)
 
-    let arguments = SGItemListArguments<NLBoolSetting, NLSliderSetting, NLOneFromManySetting, NLDisclosureLink, NLAction>(
+    let arguments: NLArguments = SGItemListArguments<NLBoolSetting, NLSliderSetting, NLOneFromManySetting, NLDisclosureLink, NLAction>(
         context: context,
         setBoolValue: { setting, value in
             let s = SGSimpleSettings.shared
@@ -1169,7 +1171,7 @@ private func namelessFeaturesControllerImpl(context: AccountContext, initialCate
     )
 
     let signal = combineLatest(simplePromise.get(), statePromise.get(), context.sharedContext.presentationData)
-    |> map { _, state, presentationData -> (ItemListControllerState, (ItemListNodeState, Any)) in
+    |> map { _, state, presentationData -> (ItemListControllerState, (ItemListNodeState, NLArguments)) in
         let entries = nlBuildEntries(presentationData: presentationData, state: state, simpleUpdated: true)
         let title = state.hubCategory?.titleRu ?? ""
         let cs = ItemListControllerState(presentationData: ItemListPresentationData(presentationData), title: .text(title.isEmpty ? "nameless" : title), leftNavigationButton: nil, rightNavigationButton: nil, backNavigationButton: ItemListBackButton(title: presentationData.strings.Common_Back))
