@@ -77,6 +77,16 @@ jobs:
             sed -i '' 's/sgWebSettings\.global\.canGrant/(context.currentAppConfiguration.with { $0 }).sgWebSettings.global.canGrant/' "$PEER_SETTINGS"
           fi
 
+      - name: Patch rules_swift for Bazel 8 root-module compatibility
+        run: |
+          set -euo pipefail
+          SOURCE_DIR=/Users/Shared/telegram-ios
+          RULES_SWIFT="$SOURCE_DIR/build-system/bazel-rules/rules_swift/MODULE.bazel"
+          if [ -f "$RULES_SWIFT" ]; then
+            sed -i '' '/^include("\/\/examples\/cross_compilation\/android_app:/d' "$RULES_SWIFT"
+            sed -i '' '/^include("\/\/examples\/cross_compilation\/wasm:/d' "$RULES_SWIFT"
+          fi
+
       - name: Import fake certificates
         run: |
           cd /Users/Shared/telegram-ios
