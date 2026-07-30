@@ -347,7 +347,7 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
             return entries
         }
         for result in results {
-            entries.append(.disclosure(
+            entries.append(.disclosureDetail(
                 id: id.count,
                 section: .items,
                 link: result.category.disclosure,
