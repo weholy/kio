@@ -28,6 +28,7 @@ jobs:
           path: |
             /private/var/tmp/_bazel_containerhost
             /Users/Shared/telegram-ios/build-input
+            /Users/Shared/telegram-bazel-cache
           key: bazel-${{ runner.os }}-xcode26-${{ hashFiles('MODULE.bazel', 'MODULE.bazel.lock', 'versions.json') }}
           restore-keys: |
             bazel-${{ runner.os }}-xcode26-
@@ -61,10 +62,20 @@ jobs:
         run: |
           set -euo pipefail
           SOURCE_DIR=/Users/Shared/telegram-ios
-          sed -i '' '/reordered_opaque/d' "$SOURCE_DIR/third-party/webrtc/webrtc/modules/video_coding/codecs/h264/h264_decoder_impl.cc"
-          # PeerInfo uses namelessFeaturesController (SGSettingsUI); luxGram hub stays excluded until BUILD-ready
-          sed -i '' 's/PresentationResourcesSettings.nameless.withRenderingMode(.alwaysOriginal)/PresentationResourcesSettings.nameless?.withRenderingMode(.alwaysOriginal)/' "$SOURCE_DIR/submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/ListItems/PeerInfoScreenCommentItem.swift"
-          sed -i '' 's/sgWebSettings\.global\.canGrant/(context.currentAppConfiguration.with { $0 }).sgWebSettings.global.canGrant/' "$SOURCE_DIR/submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoSettingsItems.swift"
+          H264_FILE=$(find "$SOURCE_DIR/third-party/webrtc" -type f -name h264_decoder_impl.cc -print -quit 2>/dev/null || true)
+          if [ -n "$H264_FILE" ]; then
+            sed -i '' '/reordered_opaque/d' "$H264_FILE"
+          else
+            echo "H264 decoder source is not present; skipping FFmpeg compatibility patch"
+          fi
+          PEER_COMMENT="$SOURCE_DIR/submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/ListItems/PeerInfoScreenCommentItem.swift"
+          if [ -f "$PEER_COMMENT" ]; then
+            sed -i '' 's/PresentationResourcesSettings.nameless.withRenderingMode(.alwaysOriginal)/PresentationResourcesSettings.nameless?.withRenderingMode(.alwaysOriginal)/' "$PEER_COMMENT"
+          fi
+          PEER_SETTINGS="$SOURCE_DIR/submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoSettingsItems.swift"
+          if [ -f "$PEER_SETTINGS" ]; then
+            sed -i '' 's/sgWebSettings\.global\.canGrant/(context.currentAppConfiguration.with { $0 }).sgWebSettings.global.canGrant/' "$PEER_SETTINGS"
+          fi
 
       - name: Import fake certificates
         run: |
@@ -97,6 +108,7 @@ jobs:
           set +e
           python3 -u build-system/Make/Make.py \
             --bazelUserRoot="$BAZEL_USER_ROOT" \
+            --cacheDir="/Users/Shared/telegram-bazel-cache" \
             build \
             --configurationPath="build-system/ci-configuration.json" \
             --codesigningInformationPath=build-system/fake-codesigning \
