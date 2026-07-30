@@ -144,33 +144,34 @@ private func actionFromActivity(_ activity: PeerInputActivity?) -> Api.SendMessa
 
 private func shouldSuppressActivity(_ activity: PeerInputActivity) -> Bool {
     let settings = SGSimpleSettings.shared
-    // Master ghost mode forces full TGExtra-style suppress
-    let ghostAll = settings.ghostModeEnabled
+    guard settings.ghostModeEnabled else {
+        return false
+    }
     switch activity {
     case .typingText:
-        return ghostAll || settings.disableTypingStatus
+        return settings.disableTypingStatus
     case .recordingVoice:
-        return ghostAll || settings.disableVCMessageRecordingStatus
+        return settings.disableVCMessageRecordingStatus || settings.disableVCMessageUploadingStatus
     case .playingGame:
-        return ghostAll || settings.disablePlayingGameStatus
+        return settings.disablePlayingGameStatus
     case .uploadingFile:
-        return ghostAll || settings.disableUploadingFileStatus
+        return settings.disableUploadingFileStatus
     case .uploadingPhoto:
-        return ghostAll || settings.disableUploadingPhotoStatus
+        return settings.disableUploadingPhotoStatus
     case .uploadingVideo:
-        return ghostAll || settings.disableUploadingVideoStatus || settings.disableRecordingVideoStatus
+        return settings.disableUploadingVideoStatus || settings.disableRecordingVideoStatus
     case .recordingInstantVideo:
-        return ghostAll || settings.disableRecordingRoundVideoStatus
+        return settings.disableRecordingRoundVideoStatus
     case .uploadingInstantVideo:
-        return ghostAll || settings.disableUploadingRoundVideoStatus
+        return settings.disableUploadingRoundVideoStatus
     case .speakingInGroupCall:
-        return ghostAll || settings.disableSpeakingInGroupCallStatus
+        return settings.disableSpeakingInGroupCallStatus
     case .choosingSticker:
-        return ghostAll || settings.disableChoosingStickerStatus
+        return settings.disableChoosingStickerStatus
     case .interactingWithEmoji:
-        return ghostAll || settings.disableEmojiInteractionStatus
+        return settings.disableEmojiInteractionStatus
     case .seeingEmojiInteraction:
-        return ghostAll || settings.disableEmojiAcknowledgementStatus
+        return settings.disableEmojiAcknowledgementStatus
     }
 }
 

@@ -387,8 +387,13 @@ public extension SGSimpleSettings {
     var enableOnlineStatusRecording: Bool { get { storage.namelessBool(NamelessSettingsKey.enableOnlineStatusRecording, default: true) } set { storage.set(newValue, forKey: NamelessSettingsKey.enableOnlineStatusRecording) } }
     var onlineStatusRecordingIntervalMinutes: Int32 { get { storage.namelessInt32(NamelessSettingsKey.onlineStatusRecordingIntervalMinutes, default: 10) } set { storage.set(Int(newValue), forKey: NamelessSettingsKey.onlineStatusRecordingIntervalMinutes) } }
     var ghostModeMessageSendDelaySeconds: Int32 { get { storage.namelessInt32(NamelessSettingsKey.ghostModeMessageSendDelaySeconds) } set { storage.set(Int(newValue), forKey: NamelessSettingsKey.ghostModeMessageSendDelaySeconds) } }
-    /// Master ghost mode toggle — when ON, enables ALL individual ghost sub-settings at once
+    /// Master ghost mode toggle. Individual switches retain their own values.
     var ghostModeEnabled: Bool { get { storage.namelessBool(NamelessSettingsKey.ghostModeEnabled) } set { storage.set(newValue, forKey: NamelessSettingsKey.ghostModeEnabled) } }
+
+    /// Whether at least one Lead-compatible Ghost Mode subfeature is selected.
+    var hasGhostModeSubfeatureEnabled: Bool {
+        return disableOnlineStatus || disableTypingStatus || disableVCMessageRecordingStatus || disableVCMessageUploadingStatus || disableUploadingVideoStatus || disableRecordingVideoStatus || disableUploadingPhotoStatus || disableUploadingFileStatus || disableChoosingLocationStatus || disableChoosingContactStatus || disablePlayingGameStatus || disableRecordingRoundVideoStatus || disableUploadingRoundVideoStatus || disableSpeakingInGroupCallStatus || disableChoosingStickerStatus || disableEmojiInteractionStatus || disableEmojiAcknowledgementStatus || disableMessageReadReceipt || disableStoryReadReceipt
+    }
     /// Fake typing — show "typing..." to contact even when not typing
     var ghostModeFakeTyping: Bool { get { storage.namelessBool(NamelessSettingsKey.ghostModeFakeTyping) } set { storage.set(newValue, forKey: NamelessSettingsKey.ghostModeFakeTyping) } }
     /// Anti-spam: auto-delete messages from non-contacts
@@ -400,35 +405,10 @@ public extension SGSimpleSettings {
     var ghostModeAutoCleanDays: Int32 { get { storage.namelessInt32(NamelessSettingsKey.ghostModeAutoCleanDays, default: 30) } set { storage.set(Int(newValue), forKey: NamelessSettingsKey.ghostModeAutoCleanDays) } }
     /// Always show online status (overrides disableOnlineStatus)
     var ghostModeAlwaysOnline: Bool { get { storage.namelessBool(NamelessSettingsKey.ghostModeAlwaysOnline) } set { storage.set(newValue, forKey: NamelessSettingsKey.ghostModeAlwaysOnline) } }
-    /// Convenience: activate every "disable status" flag in one shot (TGExtra-style full ghost)
+
+    /// Changes only the Ghost Mode master switch, preserving individual feature choices.
     func applyGhostModeAll(enabled: Bool) {
         ghostModeEnabled = enabled
-        disableOnlineStatus = enabled
-        disableTypingStatus = enabled
-        disableVCMessageRecordingStatus = enabled
-        disableUploadingVideoStatus = enabled
-        disableRecordingVideoStatus = enabled
-        disableUploadingPhotoStatus = enabled
-        disableUploadingFileStatus = enabled
-        disableChoosingLocationStatus = enabled
-        disableChoosingContactStatus = enabled
-        disablePlayingGameStatus = enabled
-        disableRecordingRoundVideoStatus = enabled
-        disableUploadingRoundVideoStatus = enabled
-        disableSpeakingInGroupCallStatus = enabled
-        disableChoosingStickerStatus = enabled
-        disableEmojiInteractionStatus = enabled
-        disableEmojiAcknowledgementStatus = enabled
-        disableMessageReadReceipt = enabled
-        disableStoryReadReceipt = enabled
-        ghostModeHideVideoWatch = enabled
-        if enabled {
-            // Default send delay when turning ghost on (TGExtra-style: less noticeable actions)
-            if ghostModeMessageSendDelaySeconds <= 0 {
-                ghostModeMessageSendDelaySeconds = 12
-            }
-            ghostModeAlwaysOnline = false
-        }
         NotificationCenter.default.post(name: NSNotification.Name("nameless.ghostModeDidChange"), object: nil)
     }
     var giftIdEnabled: Bool { get { storage.namelessBool(NamelessSettingsKey.giftIdEnabled) } set { storage.set(newValue, forKey: NamelessSettingsKey.giftIdEnabled) } }

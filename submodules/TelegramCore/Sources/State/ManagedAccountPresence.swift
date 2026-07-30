@@ -54,7 +54,8 @@ private final class AccountPresenceManagerImpl {
     }
     
     private func updatePresence(_ isOnline: Bool) {
-        let blocked = SGSimpleSettings.shared.disableOnlineStatus && !SGSimpleSettings.shared.ghostModeAlwaysOnline
+        let settings = SGSimpleSettings.shared
+        let blocked = settings.ghostModeEnabled && settings.disableOnlineStatus && !settings.ghostModeAlwaysOnline
         let effectiveIsOnline = isOnline && !blocked
         let request: Signal<Api.Bool, MTRpcError>
         if effectiveIsOnline {

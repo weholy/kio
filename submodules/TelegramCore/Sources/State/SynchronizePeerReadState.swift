@@ -226,7 +226,7 @@ private func validatePeerReadState(network: Network, postbox: Postbox, stateMana
 }
 
 private func pushPeerReadState(network: Network, postbox: Postbox, stateManager: AccountStateManager, peerId: PeerId, readState: PeerReadState) -> Signal<PeerReadState, PeerReadStateValidationError> {
-    if SGSimpleSettings.shared.disableMessageReadReceipt {
+    if SGSimpleSettings.shared.ghostModeEnabled && SGSimpleSettings.shared.disableMessageReadReceipt {
         return .single(readState)
     }
     if peerId.namespace == Namespaces.Peer.SecretChat {
@@ -378,7 +378,7 @@ private func pushPeerReadState(network: Network, postbox: Postbox, stateManager:
 }
 
 func synchronizePeerReadState(network: Network, postbox: Postbox, stateManager: AccountStateManager, peerId: PeerId, push: Bool, validate: Bool) -> Signal<Never, PeerReadStateValidationError> {
-    if SGSimpleSettings.shared.disableMessageReadReceipt && !push {
+    if SGSimpleSettings.shared.ghostModeEnabled && SGSimpleSettings.shared.disableMessageReadReceipt && !push {
         return postbox.transaction { transaction -> Void in
             transaction.confirmSynchronizedIncomingReadState(peerId)
         }
@@ -390,7 +390,7 @@ func synchronizePeerReadState(network: Network, postbox: Postbox, stateManager: 
         signal = signal
         |> then(pushPeerReadState(network: network, postbox: postbox, stateManager: stateManager, peerId: peerId))
     }
-    if validate && !SGSimpleSettings.shared.disableMessageReadReceipt {
+    if validate && !(SGSimpleSettings.shared.ghostModeEnabled && SGSimpleSettings.shared.disableMessageReadReceipt) {
         signal = signal
         |> then(validatePeerReadState(network: network, postbox: postbox, stateManager: stateManager, peerId: peerId))
     }
