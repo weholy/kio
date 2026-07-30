@@ -116,7 +116,7 @@ public struct SGDeletedMessages {
         transformAttributes: ((Message, inout [MessageAttribute]) -> Void)? = nil,
         transformMedia: ((Message, [Media]) -> [Media])? = nil
     ) -> Set<MessageId> {
-        guard showDeletedMessages, !ids.isEmpty else { return Set() }
+        guard (showDeletedMessages || SGSimpleSettings.shared.enableSavingSelfDestructingMessages), !ids.isEmpty else { return Set() }
         
         var result = Set<MessageId>()
         result.reserveCapacity(ids.count)
@@ -137,7 +137,7 @@ public struct SGDeletedMessages {
         transformAttributes: ((Message, inout [MessageAttribute]) -> Void)? = nil,
         transformMedia: ((Message, [Media]) -> [Media])? = nil
     ) {
-        guard showDeletedMessages else { return }
+        guard (showDeletedMessages || SGSimpleSettings.shared.enableSavingSelfDestructingMessages) else { return }
         for globalId in globalIds {
             if let id = transaction.messageIdsForGlobalIds([globalId]).first {
                 _ = saveSnapshotIfPossible(originalId: id, transaction: transaction, shouldSave: shouldSave, transformAttributes: transformAttributes, transformMedia: transformMedia)

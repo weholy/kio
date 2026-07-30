@@ -27,12 +27,19 @@ func addMessageMediaResourceIdsToRemove(message: Message, resourceIds: inout [Me
 public func _internal_deleteMessages(transaction: Transaction, mediaBox: MediaBox, ids: [MessageId], deleteMedia: Bool = true, manualAddMessageThreadStatsDifference: ((MessageThreadKey, Int, Int) -> Void)? = nil) {
     // nameless: keep deleted messages visible (mark + optional snapshot)
     var idsToErase = ids
-    if SGSimpleSettings.shared.showDeletedMessages {
+    let shouldKeepDeleted = SGSimpleSettings.shared.showDeletedMessages || SGSimpleSettings.shared.enableSavingSelfDestructingMessages
+    if shouldKeepDeleted {
         var keepLocal: [MessageId] = []
         for id in ids {
             guard let message = transaction.getMessage(id) else { continue }
-            if SGSimpleSettings.shared.hideMyDeleted && !message.flags.contains(.Incoming) { continue }
-            if SGSimpleSettings.shared.hideBotDeleted, let author = message.author as? TelegramUser, author.botInfo != nil { continue }
+            let isSelfDestructing = message.isSelfExpiring || message.containsSecretMedia
+            if SGSimpleSettings.shared.enableSavingSelfDestructingMessages && !isSelfDestructing {
+                continue
+            }
+            if SGSimpleSettings.shared.showDeletedMessages {
+                if SGSimpleSettings.shared.hideMyDeleted && !message.flags.contains(.Incoming) { continue }
+                if SGSimpleSettings.shared.hideBotDeleted, let author = message.author as? TelegramUser, author.botInfo != nil { continue }
+            }
 
             transaction.updateSGDeletedAttribute(messageId: id) { attr in
                 attr.isDeleted = true
@@ -46,7 +53,10 @@ public func _internal_deleteMessages(transaction: Transaction, mediaBox: MediaBo
             ids: keepLocal,
             transaction: transaction,
             transformMedia: { _, media in
-                SGSimpleSettings.shared.saveDeletedMessagesMedia ? media : []
+                if SGSimpleSettings.shared.enableSavingSelfDestructingMessages {
+                    return media
+                }
+                return SGSimpleSettings.shared.saveDeletedMessagesMedia ? media : []
             }
         )
         // Keep marked messages in history (show 🗑). Only erase ones we skipped.

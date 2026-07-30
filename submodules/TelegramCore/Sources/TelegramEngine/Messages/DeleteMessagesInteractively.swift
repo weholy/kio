@@ -107,12 +107,19 @@ func deleteMessagesInteractively(transaction: Transaction, stateManager: Account
     }
     let idsToProcess = messageIds.map(\.messageId)
 
-    // nameless: keep deleted messages visible locally with red-trash mark
-    if SGSimpleSettings.shared.showDeletedMessages {
+    let shouldKeepDeleted = SGSimpleSettings.shared.showDeletedMessages || SGSimpleSettings.shared.enableSavingSelfDestructingMessages
+    if shouldKeepDeleted {
+        var keptIds: [MessageId] = []
         for id in idsToProcess {
             guard let message = transaction.getMessage(id) else { continue }
-            if SGSimpleSettings.shared.hideMyDeleted && !message.flags.contains(.Incoming) { continue }
-            if SGSimpleSettings.shared.hideBotDeleted, let author = message.author as? TelegramUser, author.botInfo != nil { continue }
+            let isSelfDestructing = message.isSelfExpiring || message.containsSecretMedia
+            if SGSimpleSettings.shared.enableSavingSelfDestructingMessages && !isSelfDestructing {
+                continue
+            }
+            if SGSimpleSettings.shared.showDeletedMessages {
+                if SGSimpleSettings.shared.hideMyDeleted && !message.flags.contains(.Incoming) { continue }
+                if SGSimpleSettings.shared.hideBotDeleted, let author = message.author as? TelegramUser, author.botInfo != nil { continue }
+            }
 
             transaction.updateSGDeletedAttribute(messageId: id) { attr in
                 attr.isDeleted = true
@@ -122,9 +129,24 @@ func deleteMessagesInteractively(transaction: Transaction, stateManager: Account
                 attr.originalNamespace = id.namespace
                 attr.originalId = id.id
             }
-            _ = SGDeletedMessages.saveSnapshots(ids: [id], transaction: transaction)
+            keptIds.append(id)
         }
+        _ = SGDeletedMessages.saveSnapshots(
+            ids: keptIds,
+            transaction: transaction,
+            transformMedia: { _, media in
+                if SGSimpleSettings.shared.enableSavingSelfDestructingMessages {
+                    return media
+                }
+                return SGSimpleSettings.shared.saveDeletedMessagesMedia ? media : []
+            }
+        )
         // Keep local copies; remote delete ops already enqueued above
+        let keptSet = Set(keptIds)
+        let idsToErase = idsToProcess.filter { !keptSet.contains($0) }
+        if !idsToErase.isEmpty {
+            _internal_deleteMessages(transaction: transaction, mediaBox: postbox.mediaBox, ids: idsToErase)
+        }
         stateManager?.notifyDeletedMessages(messageIds: idsToProcess)
         if !uniqueIds.isEmpty && removeIfPossiblyDelivered {
             stateManager?.removePossiblyDeliveredMessages(uniqueIds: uniqueIds)

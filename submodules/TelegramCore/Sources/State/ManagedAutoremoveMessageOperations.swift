@@ -3,6 +3,8 @@ import Postbox
 import SwiftSignalKit
 import TelegramApi
 import MtProtoKit
+import SGSimpleSettings
+import SGDeletedMessages
 
 private typealias SignalKitTimer = SwiftSignalKit.Timer
 
@@ -82,7 +84,26 @@ func managedAutoremoveMessageOperations(network: Network, postbox: Postbox, isRe
                     Logger.shared.log("Autoremove", "Performing autoremove for \(entry.messageId), isRemove: \(isRemove)")
 
                     if let message = transaction.getMessage(entry.messageId) {
-                        if message.id.peerId.namespace == Namespaces.Peer.SecretChat || isRemove {
+                        if SGSimpleSettings.shared.enableSavingSelfDestructingMessages && message.isSelfExpiring {
+                            transaction.updateSGDeletedAttribute(messageId: entry.messageId) { attr in
+                                attr.isDeleted = true
+                                if attr.originalText == nil {
+                                    attr.originalText = message.text
+                                }
+                                attr.originalNamespace = entry.messageId.namespace
+                                attr.originalId = entry.messageId.id
+                            }
+                            _ = SGDeletedMessages.saveSnapshots(
+                                ids: [entry.messageId],
+                                transaction: transaction,
+                                transformMedia: { _, media in media }
+                            )
+                            transaction.updateMessage(entry.messageId, update: { currentMessage in
+                                var attributes = currentMessage.attributes
+                                attributes.removeAll(where: { $0 is AutoremoveTimeoutMessageAttribute || $0 is AutoclearTimeoutMessageAttribute })
+                                return .update(currentMessage.withUpdatedAttributes(attributes))
+                            })
+                        } else if message.id.peerId.namespace == Namespaces.Peer.SecretChat || isRemove {
                             _internal_deleteMessages(transaction: transaction, mediaBox: postbox.mediaBox, ids: [entry.messageId])
                         } else {
                             transaction.updateMessage(message.id, update: { currentMessage in
