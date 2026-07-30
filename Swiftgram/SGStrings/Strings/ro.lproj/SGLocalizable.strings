@@ -1,0 +1,152 @@
+﻿"Settings.ContentSettings" = "SetДѓri ConИ›inut";
+
+"Settings.Tabs.Header" = "FERESTRE";
+"Settings.Tabs.HideTabBar" = "Ascunde bara de filДѓ";
+"Settings.Tabs.ShowContacts" = "Vizualizare contacte";
+"Settings.Tabs.ShowNames" = "AratДѓ Fereastra cu Numele";
+
+"Settings.Folders.BottomTab" = "Dosare de jos";
+"Settings.Folders.BottomTabStyle" = "Stil directoare de jos";
+
+/* Do not translate */
+"Settings.Folders.BottomTabStyle.ios" = "iOS";
+/* Do not translate */
+"Settings.Folders.BottomTabStyle.telegram" = "TelegramДѓ";
+/* Example: Hide "All Chats" */
+"Settings.Folders.AllChatsHidden" = "AscundeИ›i вЂћ%@\"";
+"Settings.Folders.RememberLast" = "DeschideИ›i ultimul dosar";
+"Settings.Folders.RememberLast.Notice" = "nameless va deschide ultimul folder utilizat atunci cГўnd reporniИ›i aplicaИ›ia sau schimbaИ›i conturile.";
+
+"Settings.Folders.CompactNames" = "SpaИ›iere mai micДѓ";
+"Settings.Folders.AllChatsTitle" = "Titlul \"Toate conversaИ›iile\"";
+"Settings.Folders.AllChatsTitle.short" = "Scurt";
+"Settings.Folders.AllChatsTitle.long" = "LungДѓ";
+/* Default behaviour for All Chats Folder Title. "All Chats" title: Default */
+"Settings.Folders.AllChatsTitle.none" = "Implicit";
+
+
+"Settings.ChatList.Header" = "LISTA CHAT";
+"Settings.CompactChatList" = "Lista compactДѓ de Chat";
+
+"Settings.Profiles.Header" = "PROFILES";
+
+"Settings.Stories.Hide" = "Ascunde povestiri";
+"Settings.Stories.WarnBeforeView" = "ГЋntreabДѓ Г®nainte de vizualizare";
+"Settings.Stories.DisableSwipeToRecord" = "DezactiveazДѓ glisarea pentru Г®nregistrare";
+
+"Settings.Translation.QuickTranslateButton" = "Butonul Traducere RapidДѓ";
+
+"Stories.Warning.Author" = "Autor";
+"Stories.Warning.ViewStory" = "Vezi povestirea?";
+/* Author will be able to see that you viewed their Story */
+"Stories.Warning.Notice" = "%@ VOR FI ACД‚ SД‚ VEDEИљI cДѓ le-aИ›i vДѓzut povestea lor.";
+"Stories.Warning.NoticeStealth" = "%@ nu va putea vedea povestea lor.";
+
+"Settings.Photo.Quality.Notice" = "Calitatea fotografiilor И™i povestirilor Г®ncДѓrcate.";
+"Settings.Photo.SendLarge" = "Trimite fotografii mari";
+"Settings.Photo.SendLarge.Notice" = "CreИ™te limita lateralДѓ a imaginilor comprimate la 2560px.";
+
+"Settings.VideoNotes.Header" = "VIDEO ROTUND";
+"Settings.VideoNotes.StartWithRearCam" = "ГЋncepe cu camera posterioarДѓ";
+
+"Settings.CustomColors.Header" = "COLORTURI DE CONT";
+"Settings.CustomColors.Saturation" = "SATURARE";
+/* Make sure to escape Percentage sign % */
+"Settings.CustomColors.Saturation.Notice" = "SetaИ›i la 0%% pentru a dezactiva culorile contului.";
+
+"Settings.UploadsBoost" = "Accelerare ГЋncДѓrcare";
+"Settings.DownloadsBoost" = "Impuls descДѓrcare";
+"Settings.DownloadsBoost.Notice" = "CreИ™te numДѓrul de conexiuni paralele И™i dimensiunea fragmentelor de fiИ™ier. DacДѓ reИ›eaua ta nu poate gestiona Г®ncДѓrcДѓtura, Г®ncearcДѓ diferite opИ›iuni care se potrivesc conexiunii tale.";
+"Settings.DownloadsBoost.none" = "Dezactivat";
+"Settings.DownloadsBoost.medium" = "Medie";
+"Settings.DownloadsBoost.maximum" = "Maxim";
+
+"Settings.ShowProfileID" = "AratДѓ ID-ul profilului";
+"Settings.ShowDC" = "AratДѓ Centrul de date";
+"Settings.ShowCreationDate" = "AratДѓ data creДѓrii chat-ului";
+"Settings.ShowCreationDate.Notice" = "Data creДѓrii poate fi necunoscutДѓ pentru unele conversaИ›ii.";
+
+"Settings.ShowRegDate" = "AratДѓ data Г®nregistrДѓrii";
+"Settings.ShowRegDate.Notice" = "Data Г®nregistrДѓrii este aproximativДѓ.";
+
+"Settings.SendWithReturnKey" = "Trimite cu cheia \"Returnare\"";
+"Settings.HidePhoneInSettingsUI" = "Ascunde telefonul din setДѓri";
+"Settings.HidePhoneInSettingsUI.Notice" = "Acest lucru va ascunde numДѓrul de telefon din interfaИ›a de setДѓri. Pentru a-l ascunde de alИ›ii, mergi la confidenИ›ialitate И™i securitate.";
+
+"PasscodeSettings.AutoLock.InFiveSeconds" = "DacДѓ este plecat timp de 5 secunde";
+
+"ProxySettings.UseSystemDNS" = "UtilizaИ›i DNS sistem";
+"ProxySettings.UseSystemDNS.Notice" = "UtilizaИ›i DNS pentru a ocoli timeout-ul dacДѓ nu aveИ›i acces la Google DNS";
+
+/* Preserve markdown asterisks! Example: You **don't** need Telegram Premium! */
+"Common.NoTelegramPremiumNeeded" = "Nu ai nevoie de ** %@!";
+"Common.RestartRequired" = "Repornire necesarДѓ";
+"Common.RestartNow" = "ReporneИ™te acum";
+"Common.OpenTelegram" = "Deschide telegrama";
+"Common.UseTelegramForPremium" = "VДѓ rugДѓm sДѓ reЕЈineЕЈi cДѓ, pentru a obЕЈine Telegram Premium, trebuie sДѓ utilizaЕЈi aplicaЕЈia oficialДѓ Telegram. OdatДѓ ce ai obЕЈinut Telegram Premium, toate caracteristicile sale vor deveni disponibile Г®n nameless.";
+
+"Message.HoldToShowOrReport" = "ИљineИ›i apДѓsat pentru a afiИ™a sau raporta.";
+
+"Auth.AccountBackupReminder" = "AsiguraИ›i-vДѓ cДѓ aveИ›i o metodДѓ de acces de rezervДѓ. PДѓstraИ›i un SIM pentru SMS sau o sesiune adiИ›ionalДѓ conectatДѓ pentru a evita blocarea.";
+"Auth.UnofficialAppCodeTitle" = "PoИ›i obИ›ine codul doar cu aplicaИ›ia oficialДѓ";
+
+"Settings.SmallReactions" = "ReacЕЈii mici";
+"Settings.HideReactions" = "Ascunde ReacИ›iile";
+
+"ContextMenu.SaveToCloud" = "SalveazДѓ Г®n Cloud";
+"ContextMenu.SelectFromUser" = "SelectaИ›i din autor";
+
+"Settings.ContextMenu" = "MENIU CONTEXTUAL";
+"Settings.ContextMenu.Notice" = "IntrДѓrile dezactivate vor fi disponibile Г®n submeniul 'nameless'.";
+
+
+"Settings.ChatSwipeOptions" = "OpИ›iuni de glisare a chatului";
+"Settings.DeleteChatSwipeOption" = "GlisaИ›i pentru И™tergere chat";
+/* Re-word like this string on offical app https://translations.telegram.org/en/ios/groups_and_channels/Chat.NextChannelSameLocationSwipeProgress */
+"Settings.PullToNextChannel" = "TrageЕЈi pentru urmДѓtorul canal necitit";
+/* Re-word like this string on offical app https://translations.telegram.org/en/ios/groups_and_channels/Chat.NextUnreadTopicSwipeProgress */
+"Settings.PullToNextTopic" = "TrageИ›i cДѓtre UrmДѓtorul Subiect";
+"Settings.GalleryCamera" = "CamerДѓ foto Г®n Galerie";
+/* "Send Message As..." button */
+"Settings.SendAsButton" = "Butonul \"%@\"";
+"Settings.SnapDeletionEffect" = "Efecte И™tergere mesaj";
+
+"Settings.Stickers.Size" = "MISIUNE";
+"Settings.Stickers.Timestamp" = "AratДѓ Ora";
+
+"Settings.RecordingButton" = "Butonul ГЋnregistrare Voce";
+
+"Settings.DefaultEmojisFirst" = "Prioritize emoticoanele standard";
+"Settings.DefaultEmojisFirst.Notice" = "AfiИ™aИ›i emoticoanele standard Г®nainte de cele premium Г®n tastatura emoji";
+
+/* Date when chat was created. "created: 24 May 2016" */
+"Chat.Created" = "creat: %@";
+
+/* Date when user joined the chat. "Joined nameless Chat" */
+"Chat.JoinedDateTitle" = "S-a alДѓturat %@";
+/* Date when user registered in Telegram. Will be shown like "Registered\n24 May 2016" */
+"Chat.RegDate" = "ГЋnregistrat";
+
+"Settings.messageDoubleTapActionOutgoingEdit" = "ApДѓsaИ›i de douДѓ ori pentru a edita mesajul";
+
+"Settings.wideChannelPosts" = "PostДѓri late Г®n canale";
+"Settings.ForceEmojiTab" = "TastaturДѓ emoji implicitДѓ";
+
+"Settings.forceBuiltInMic" = "ForИ›eazДѓ Microfon Dispozitiv";
+"Settings.forceBuiltInMic.Notice" = "DacДѓ este activat, aplicaИ›ia va folosi doar microfonul dispozitivului chiar dacДѓ sunt conectate cДѓИ™tile.";
+
+"Settings.hideChannelBottomButton" = "AscundeИ›i panoul de jos al canalului";
+
+"Settings.CallConfirmation" = "Confirmare apel";
+"Settings.CallConfirmation.Notice" = "nameless va solicita confirmarea dumneavoastrДѓ Г®nainte de a efectua un apel.";
+
+/* Confirmation before making a Call */
+"CallConfirmation.Audio.Title" = "EИ™ti sigur cДѓ vrei sДѓ faci un apel?";
+
+/* Confirmation before making a Video Call */
+"CallConfirmation.Video.Title" = "EИ™ti sigur cДѓ vrei sДѓ faci un apel video?";
+
+"MutualContact.Label" = "contact mutual";
+
+"Settings.swipeForVideoPIP" = "Video PIP cu gestul de glisare";
+"Settings.swipeForVideoPIP.Notice" = "DacДѓ este activat, glisarea video va deschide Г®n modul imagine Г®n imagine.";

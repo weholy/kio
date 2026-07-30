@@ -1,0 +1,245 @@
+﻿"Settings.ContentSettings" = "Ustawienia zawartoЕ›ci";
+
+"Settings.Tabs.Header" = "ZAKЕЃADKI";
+"Settings.Tabs.HideTabBar" = "Ukryj pasek zakЕ‚adek";
+"Settings.Tabs.ShowContacts" = "PokaЕј zakЕ‚adkД™ kontakty";
+"Settings.Tabs.ShowNames" = "PokaЕј nazwy zakЕ‚adek";
+
+"Settings.Folders.BottomTab" = "Foldery na dole";
+"Settings.Folders.BottomTabStyle" = "Styl folderГіw na dole";
+
+/* Do not translate */
+"Settings.Folders.BottomTabStyle.ios" = "iOS";
+/* Do not translate */
+"Settings.Folders.BottomTabStyle.telegram" = "Telegram";
+/* Example: Hide "All Chats" */
+"Settings.Folders.AllChatsHidden" = "Ukryj \"%@\"";
+"Settings.Folders.RememberLast" = "OtwГіrz ostatni folder";
+"Settings.Folders.RememberLast.Notice" = "nameless otworzy ostatnio uЕјywany folder po ponownym uruchomieniu lub zmianie konta";
+
+"Settings.Folders.CompactNames" = "Mniejszy odstД™p";
+"Settings.Folders.AllChatsTitle" = "TytuЕ‚ \"Wszystkie czaty\"";
+"Settings.Folders.AllChatsTitle.short" = "KrГіtki";
+"Settings.Folders.AllChatsTitle.long" = "DЕ‚ugi";
+/* Default behaviour for All Chats Folder Title. "All Chats" title: Default */
+"Settings.Folders.AllChatsTitle.none" = "DomyЕ›lny";
+
+
+"Settings.ChatList.Header" = "LISTA CZATU";
+"Settings.CompactChatList" = "Kompaktowa lista czatГіw";
+
+"Settings.Profiles.Header" = "PROFILE";
+
+"Settings.Stories.Hide" = "Ukryj relacje";
+"Settings.Stories.WarnBeforeView" = "Pytaj przed wyЕ›wietleniem";
+"Settings.Stories.DisableSwipeToRecord" = "WyЕ‚Д…cz przeciД…gnij, aby nagraД‡";
+
+"Settings.Translation.QuickTranslateButton" = "Przycisk Szybkie tЕ‚umaczenie";
+
+"Stories.Warning.Author" = "Autor";
+"Stories.Warning.ViewStory" = "PokazaД‡ relacjД™?";
+/* Author will be able to see that you viewed their Story */
+"Stories.Warning.Notice" = "%@ BДDZIE WIEDZIAЕЃ, Ејe obejrzano jego relacjД™.";
+"Stories.Warning.NoticeStealth" = "%@ nie bД™dzie wiedziaЕ‚, Ејe obejrzano jego relacjД™.";
+
+"Settings.Photo.Quality.Notice" = "JakoЕ›Д‡ wysyЕ‚anych zdjД™Д‡ i fotorelacji";
+"Settings.Photo.SendLarge" = "WyЕ›lij duЕјe zdjД™cia";
+"Settings.Photo.SendLarge.Notice" = "ZwiД™ksz limit rozmiaru skompresowanych obrazГіw do 2560px";
+
+"Settings.VideoNotes.Header" = "OKRД„GЕЃE WIDEO";
+"Settings.VideoNotes.StartWithRearCam" = "Uruchom z tylnД… kamerД…";
+
+"Settings.CustomColors.Header" = "KOLORY KONTA";
+"Settings.CustomColors.Saturation" = "NASYCENIE";
+/* Make sure to escape Percentage sign % */
+"Settings.CustomColors.Saturation.Notice" = "Ustaw nasycenie na 0%%, aby wyЕ‚Д…czyД‡ kolory konta";
+
+"Settings.UploadsBoost" = "PrzyЕ›pieszenie wysyЕ‚ania";
+"Settings.DownloadsBoost" = "PrzyЕ›pieszenie pobierania";
+"Settings.DownloadsBoost.Notice" = "ZwiД™ksza liczbД™ rГіwnolegЕ‚ych poЕ‚Д…czeЕ„ oraz rozmiar fragmentГіw plikГіw. JeЕ›li twoja sieД‡ nie jest w stanie znieЕ›Д‡ obciД…Ејenia, wyprГіbuj rГіЕјne opcje, ktГіre pasujД… do twojego poЕ‚Д…czenia.";
+"Settings.DownloadsBoost.none" = "WyЕ‚Д…czone";
+"Settings.DownloadsBoost.medium" = "Ељrednie";
+"Settings.DownloadsBoost.maximum" = "Maksymalne";
+
+"Settings.ShowProfileID" = "PokaЕј ID";
+"Settings.ShowDC" = "PokaЕј centrum danych";
+"Settings.ShowCreationDate" = "PokaЕј datД™ utworzenia czatu";
+"Settings.ShowCreationDate.Notice" = "Dla niektГіrych czatГіw data utworzenia moЕјe byД‡ nieznana.";
+
+"Settings.ShowRegDate" = "PokaЕј datД™ rejestracji";
+"Settings.ShowRegDate.Notice" = "Data rejestracji jest przybliЕјona.";
+
+"Settings.SendWithReturnKey" = "WyЕ›lij klawiszem вЂћreturnвЂќ";
+"Settings.HidePhoneInSettingsUI" = "Ukryj numer telefonu w ustawieniach";
+"Settings.HidePhoneInSettingsUI.Notice" = "TwГіj numer zostanie ukryty tylko w interfejsie uЕјytkownika. Aby ukryД‡ go przed innymi, uЕјyj ustawieЕ„ prywatnoЕ›ci.";
+
+"PasscodeSettings.AutoLock.InFiveSeconds" = "JeЕ›li nieobecny przez 5 sekund";
+
+"ProxySettings.UseSystemDNS" = "UЕјyj systemowego DNS";
+"ProxySettings.UseSystemDNS.Notice" = "UЕјyj systemowego DNS, aby ominД…Д‡ limit czasu, jeЕ›li nie masz dostД™pu do Google DNS";
+
+/* Preserve markdown asterisks! Example: You **don't** need Telegram Premium! */
+"Common.NoTelegramPremiumNeeded" = "Nie **potrzebujesz** %@!";
+"Common.RestartRequired" = "Wymagany restart";
+"Common.RestartNow" = "Uruchom teraz ponownie";
+"Common.OpenTelegram" = "OtwГіrz Telegram";
+"Common.UseTelegramForPremium" = "Aby otrzymaД‡ Telegram Premium, musisz skorzystaД‡ z oficjalnej aplikacji Telegram. Po uzyskaniu Telegram Premium wszystkie jego funkcje stanД… siД™ dostД™pne w nameless.";
+"Common.UpdateOS" = "Wymagana aktualizacja iOS";
+
+"Message.HoldToShowOrReport" = "Przytrzymaj, aby PokazaД‡ lub ZgЕ‚osiД‡.";
+
+"Auth.AccountBackupReminder" = "Upewnij siД™, Ејe masz zapasowД… metodД™ dostД™pu. Zachowaj SIM do SMS-Гіw lub zalogowanД… dodatkowД… sesjД™, aby uniknД…Д‡ zablokowania.";
+"Auth.UnofficialAppCodeTitle" = "Kod moЕјna uzyskaД‡ tylko za pomocД… oficjalnej aplikacji";
+
+"Settings.SmallReactions" = "MaЕ‚e reakcje";
+"Settings.HideReactions" = "Ukryj reakcje";
+
+"ContextMenu.SaveToCloud" = "Zapisz w chmurze";
+"ContextMenu.SelectFromUser" = "Zaznacz od autora";
+
+"Settings.ContextMenu" = "MENU KONTEKSTOWE";
+"Settings.ContextMenu.Notice" = "WyЕ‚Д…czone wpisy bД™dД… dostД™pne w podmenu вЂћnamelessвЂќ.";
+
+
+"Settings.ChatSwipeOptions" = "Opcje przesuwania listy czatГіw";
+"Settings.DeleteChatSwipeOption" = "PrzesuЕ„, aby usunД…Д‡ czat";
+/* Re-word like this string on offical app https://translations.telegram.org/en/ios/groups_and_channels/Chat.NextChannelSameLocationSwipeProgress */
+"Settings.PullToNextChannel" = "PociД…gnij вћќ nastД™pny kanaЕ‚";
+/* Re-word like this string on offical app https://translations.telegram.org/en/ios/groups_and_channels/Chat.NextUnreadTopicSwipeProgress */
+"Settings.PullToNextTopic" = "PrzeciД…gnij, aby przejЕ›Д‡ do nastД™pnego tematu";
+"Settings.GalleryCamera" = "Aparat w galerii";
+"Settings.GalleryCameraPreview" = "PodglД…d aparatu w galerii";
+/* "Send Message As..." button */
+"Settings.SendAsButton" = "Przycisk вЂћ%@вЂќ";
+"Settings.SnapDeletionEffect" = "Efekty usuwania wiadomoЕ›ci";
+
+"Settings.Stickers.Size" = "WIELKOЕљД†";
+"Settings.Stickers.Timestamp" = "PokaЕј znak czasu";
+
+"Settings.RecordingButton" = "Przycisk gЕ‚oЕ›noЕ›ci nagrywania";
+
+"Settings.DefaultEmojisFirst" = "Wybierz standardowe emoji";
+"Settings.DefaultEmojisFirst.Notice" = "Na klawiaturze emoji pokaЕј standardowe emoji przed Premium";
+
+/* Date when chat was created. "created: 24 May 2016" */
+"Chat.Created" = "utworzony: %@";
+
+/* Date when user joined the chat. "Joined nameless Chat" */
+"Chat.JoinedDateTitle" = "DoЕ‚Д…czono %@";
+/* Date when user registered in Telegram. Will be shown like "Registered\n24 May 2016" */
+"Chat.RegDate" = "Zarejestrowano";
+
+"Settings.messageDoubleTapActionOutgoingEdit" = "PodwГіjne stukniД™cie, aby edytowaД‡ wiadomoЕ›Д‡";
+
+"Settings.wideChannelPosts" = "Szerokie wpisy w kanaЕ‚ach";
+"Settings.ForceEmojiTab" = "Klawiatura emoji domyЕ›lnie";
+
+"Settings.forceBuiltInMic" = "WymuЕ› mikrofon urzД…dzenia";
+"Settings.forceBuiltInMic.Notice" = "JeЕ›li ta opcja jest wЕ‚Д…czona, aplikacja bД™dzie korzystaД‡ tylko z mikrofonu urzД…dzenia, nawet jeЕ›li sД… podЕ‚Д…czone sЕ‚uchawki.";
+
+"Settings.showChannelBottomButton" = "Dolny panel kanaЕ‚u";
+
+"Settings.secondsInMessages" = "Sekundy w wiadomoЕ›ciach";
+
+"Settings.CallConfirmation" = "Potwierdzenie poЕ‚Д…czenia";
+"Settings.CallConfirmation.Notice" = "nameless poprosi o twoje potwierdzenie przed wykonaniem poЕ‚Д…czenia.";
+
+/* Confirmation before making a Call */
+"CallConfirmation.Audio.Title" = "WykonaД‡ poЕ‚Д…czenie?";
+
+/* Confirmation before making a Video Call */
+"CallConfirmation.Video.Title" = "WykonaД‡ poЕ‚Д…czenie wideo?";
+
+"MutualContact.Label" = "wzajemny kontakt";
+
+"Settings.swipeForVideoPIP" = "Wideo PIP po przesuniД™ciu";
+"Settings.swipeForVideoPIP.Notice" = "JeЕ›li wЕ‚Д…czone, przesuniД™cie palcem otworzy film w trybie obrazu w obrazie.";
+
+"SessionBackup.Title" = "Kopia zapasowa kont";
+"SessionBackup.Sessions.Title" = "Sesje";
+"SessionBackup.Actions.Backup" = "Kopia zapasowa do pД™ku kluczy";
+"SessionBackup.Actions.Restore" = "PrzywrГіД‡ z pД™ku kluczy";
+"SessionBackup.Actions.DeleteAll" = "UsuЕ„ kopiД™ zapasowД… pД™ku kluczy";
+"SessionBackup.Actions.DeleteOne" = "UsuЕ„ z kopii zapasowej";
+"SessionBackup.Actions.RemoveFromApp" = "UsuЕ„ z aplikacji";
+"SessionBackup.LastBackupAt" = "Ostatnia kopia zapasowa: %@";
+"SessionBackup.RestoreOK" = "OK. PrzywrГіcono sesje: %@";
+"SessionBackup.LoggedIn" = "Zalogowano";
+"SessionBackup.LoggedOut" = "Wylogowano";
+"SessionBackup.DeleteAll.Title" = "UsunД…Д‡ wszystkie sesje?";
+"SessionBackup.DeleteAll.Text" = "Wszystkie sesje zostanД… usuniД™te z pД™ku kluczy.\n\nKonta nie zostanД… wylogowane ze nameless.";
+"SessionBackup.DeleteSingle.Title" = "UsunД…Д‡ 1 (jednД…) sesjД™?";
+"SessionBackup.DeleteSingle.Text" = "%@ sesja zostanie usuniД™ta z pД™ku kluczy.\n\nKonto nie zostanie wylogowane ze nameless.";
+"SessionBackup.RemoveFromApp.Title" = "UsunД…Д‡ konto z aplikacji?";
+"SessionBackup.RemoveFromApp.Text" = "%@ sesja ZOSTANIE USUNIДTA ze nameless! Sesja pozostanie aktywna, wiД™c moЕјesz jД… pГіЕєniej przywrГіciД‡.";
+"SessionBackup.Notice" = "Sesje sД… szyfrowane i przechowywane w pД™ku kluczy urzД…dzenia. Sesje nigdy nie opuszczajД… urzД…dzenia.\n\nWAЕ»NE: Aby przywrГіciД‡ sesje na nowym urzД…dzeniu lub po zresetowaniu systemu operacyjnego, MUSISZ wЕ‚Д…czyД‡ szyfrowane kopie zapasowe, w przeciwnym razie pД™k kluczy nie zostanie przeniesiony.\n\nUWAGA: Sesje mogД… zostaД‡ uniewaЕјnione przez Telegram lub z innego urzД…dzenia.";
+
+"MessageFilter.Title" = "Filtr wiadomoЕ›ci";
+"MessageFilter.SubTitle" = "UsuЕ„ elementy rozpraszajД…ce uwagД™ i zmniejsz widocznoЕ›Д‡ wiadomoЕ›ci zawierajД…cych poniЕјsze sЕ‚owa kluczowe.\nW sЕ‚owach kluczowych rozrГіЕјniana jest wielkoЕ›Д‡ liter.";
+"MessageFilter.Keywords.Title" = "SЕ‚owa kluczowe";
+"MessageFilter.InputPlaceholder" = "Wpisz sЕ‚owo kluczowe";
+
+"InputToolbar.Title" = "Panel formatowania";
+
+"Notifications.MentionsAndReplies.Title" = "@Wzmianki i odpowiedzi";
+"Notifications.MentionsAndReplies.value.default" = "DomyЕ›lne";
+"Notifications.MentionsAndReplies.value.silenced" = "Wyciszone";
+"Notifications.MentionsAndReplies.value.disabled" = "WyЕ‚Д…czone";
+"Notifications.PinnedMessages.Title" = "PrzypiД™te wiadomoЕ›ci";
+"Notifications.PinnedMessages.value.default" = "DomyЕ›lne";
+"Notifications.PinnedMessages.value.silenced" = "Wyciszone";
+"Notifications.PinnedMessages.value.disabled" = "WyЕ‚Д…czone";
+
+
+"PayWall.Text" = "DoЕ‚adowany funkcjami Pro";
+
+"PayWall.SessionBackup.Title" = "Kopia zapasowa sesji";
+"PayWall.SessionBackup.Notice" = "PrzywrГіД‡ sesje z zaszyfrowanej lokalnej kopii zapasowej pД™ku kluczy Apple.";
+"PayWall.SessionBackup.Description" = "Zmiana urzД…dzenia lub usuniД™cie namelessa nie jest juЕј problemem. PrzywrГіД‡ wszystkie sesje, ktГіre sД… nadal aktywne na serwerach Telegrama.";
+
+"PayWall.MessageFilter.Title" = "Filtr wiadomoЕ›ci";
+"PayWall.MessageFilter.Notice" = "Zmniejsz widocznoЕ›Д‡ SPAM-u, promocji i irytujД…cych wiadomoЕ›ci.";
+"PayWall.MessageFilter.Description" = "UtwГіrz listД™ sЕ‚Гіw kluczowych, ktГіrych nie chcesz czД™sto widzieД‡, a nameless zredukuje liczbД™ elementГіw rozpraszajД…cych uwagД™.";
+
+"PayWall.Notifications.Title" = "WyЕ‚Д…cz @wzmianki i odpowiedzi";
+"PayWall.Notifications.Notice" = "Ukryj lub wycisz nieistotne powiadomienia.";
+"PayWall.Notifications.Description" = "Koniec z przypietymi wiadomoЕ›ciami i @wzmiankami, gdy potrzebujesz odrobiny spokoju.";
+
+"PayWall.InputToolbar.Title" = "Panel formatowania";
+"PayWall.InputToolbar.Notice" = "OszczД™dЕє czas na przygotowywaniu wpisГіw dziД™ki panelowi tuЕј nad klawiaturД….";
+"PayWall.InputToolbar.Description" = "Zastosuj i wyczyЕ›Д‡ formatowanie lub wstaw nowe wiersze jak profesjonalista.";
+
+"PayWall.AppIcons.Title" = "Unikalne ikony aplikacji";
+"PayWall.AppIcons.Notice" = "Dostosuj wyglД…d nameless na ekranie gЕ‚Гіwnym.";
+
+"PayWall.About.Title" = "O nameless Pro";
+"PayWall.About.Notice" = "BezpЕ‚atna wersja nameless oferuje dziesiД…tki funkcji i ulepszeЕ„ w stosunku do aplikacji Telegram. Innowacje i synchronizacja nameless z miesiД™cznymi aktualizacjami Telegram to ogromny wysiЕ‚ek, ktГіry wymaga duЕјo czasu i drogiego sprzД™tu.\n\nnameless to aplikacja typu open source, ktГіra szanuje twojД… prywatnoЕ›Д‡ i nie przeszkadza ci reklamami. SubskrybujД…c nameless Pro uzyskujesz dostД™p do ekskluzywnych funkcji i wspierasz niezaleЕјnego programistД™.";
+/* DO NOT TRANSLATE */
+"PayWall.About.Signature" = "@Kylmakalle";
+/* DO NOT TRANSLATE */
+"PayWall.About.SignatureURL" = "https://t.me/Kylmakalle";
+
+"PayWall.ProSupport.Title" = "Problemy z pЕ‚atnoЕ›ciД…?";
+"PayWall.ProSupport.Contact" = "Nie martw siД™!";
+
+"PayWall.RestorePurchases" = "PrzywrГіД‡ zakup";
+"PayWall.Terms" = "Warunki korzystania z usЕ‚ugi";
+"PayWall.Privacy" = "Polityka prywatnoЕ›ci";
+"PayWall.TermsURL" = "https://swiftgram.app/terms";
+"PayWall.PrivacyURL" = "https://swiftgram.app/privacy";
+"PayWall.Notice.Markdown" = "SubskrybujД…c nameless Pro akceptujesz [Warunki korzystania z usЕ‚ugi](%1$@) i [PolitykД™ prywatnoЕ›ci](%2$@) nameless.";
+"PayWall.Notice.Raw" = "SubskrybujД…c nameless Pro akceptujesz Warunki korzystania z usЕ‚ugi i PolitykД™ prywatnoЕ›ci nameless.";
+
+"PayWall.Button.OpenPro" = "UЕјywaj funkcji Pro";
+"PayWall.Button.Purchasing" = "KupowanieвЂ¦";
+"PayWall.Button.Restoring" = "Przywracanie zakupuвЂ¦";
+"PayWall.Button.Validating" = "Weryfikacja zakupuвЂ¦";
+"PayWall.Button.PaymentsUnavailable" = "PЕ‚atnoЕ›ci niedostД™pne";
+"PayWall.Button.BuyInAppStore" = "Subskrybuj w wersji z App Store";
+"PayWall.Button.Subscribe" = "Subskrybuj za %@ / miesiД…c";
+"PayWall.Button.ContactingAppStore" = "Kontakt z App StoreвЂ¦";
+
+"Paywall.Error.Title" = "BЕ‚Д…d";
+"PayWall.ValidationError" = "BЕ‚Д…d weryfikacji";
+"PayWall.ValidationError.TryAgain" = "CoЕ› poszЕ‚o nie tak podczas weryfikacji zakupu. Nie martw siД™! SprГіbuj przywrГіciД‡ zakupy trochД™ pГіЕєniej.";
+"PayWall.ValidationError.Expired" = "Twoja subskrypcja wygasЕ‚a. Subskrybuj ponownie, aby odzyskaД‡ dostД™p do funkcji Pro.";

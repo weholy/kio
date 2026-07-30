@@ -1,0 +1,152 @@
+﻿"Settings.ContentSettings" = "Innholdsinnstillinger";
+
+"Settings.Tabs.Header" = "FANER";
+"Settings.Tabs.HideTabBar" = "Skjul fanelinjen";
+"Settings.Tabs.ShowContacts" = "Vis kontakter-fane";
+"Settings.Tabs.ShowNames" = "Show Tab Names";
+
+"Settings.Folders.BottomTab" = "Mapper pГҐ bunnen";
+"Settings.Folders.BottomTabStyle" = "Stil for nedre mapper";
+
+/* Do not translate */
+"Settings.Folders.BottomTabStyle.ios" = "iOS";
+/* Do not translate */
+"Settings.Folders.BottomTabStyle.telegram" = "Telegram";
+/* Example: Hide "All Chats" */
+"Settings.Folders.AllChatsHidden" = "Skjul \"%@\"";
+"Settings.Folders.RememberLast" = "Г…pne siste mappe";
+"Settings.Folders.RememberLast.Notice" = "nameless vil ГҐpne den sist brukte mappen nГҐr du starter appen pГҐ nytt eller bytter kontoer.";
+
+"Settings.Folders.CompactNames" = "Mindre avstand";
+"Settings.Folders.AllChatsTitle" = "\"Alle chater\" tittel";
+"Settings.Folders.AllChatsTitle.short" = "Kort";
+"Settings.Folders.AllChatsTitle.long" = "Lang";
+/* Default behaviour for All Chats Folder Title. "All Chats" title: Default */
+"Settings.Folders.AllChatsTitle.none" = "Standard";
+
+
+"Settings.ChatList.Header" = "CHAT LIST";
+"Settings.CompactChatList" = "Kompakt liste";
+
+"Settings.Profiles.Header" = "PROFILES";
+
+"Settings.Stories.Hide" = "Skjul Historier";
+"Settings.Stories.WarnBeforeView" = "SpГёr fГёr visning";
+"Settings.Stories.DisableSwipeToRecord" = "Deaktiver sveip for ГҐ ta opp";
+
+"Settings.Translation.QuickTranslateButton" = "Hurtigoversettelsesknapp";
+
+"Stories.Warning.Author" = "Forfatter";
+"Stories.Warning.ViewStory" = "Se Historie?";
+/* Author will be able to see that you viewed their Story */
+"Stories.Warning.Notice" = "%@ VIL SE at du har sett deres Historie.";
+"Stories.Warning.NoticeStealth" = "%@ vil ikke kunne se at du har sett deres Historie.";
+
+"Settings.Photo.Quality.Notice" = "Kvalitet pГҐ opplastede bilder og historier.";
+"Settings.Photo.SendLarge" = "Send store bilder";
+"Settings.Photo.SendLarge.Notice" = "Гk grensen for komprimerte bilder til 2560 piksler.";
+
+"Settings.VideoNotes.Header" = "RUNDE VIDEOER";
+"Settings.VideoNotes.StartWithRearCam" = "Start med bakkamera";
+
+"Settings.CustomColors.Header" = "KONTOFARGER";
+"Settings.CustomColors.Saturation" = "METNING";
+/* Make sure to escape Percentage sign % */
+"Settings.CustomColors.Saturation.Notice" = "Satt til 0%% for ГҐ deaktivere kontofarger.";
+
+"Settings.UploadsBoost" = "Гѓ k opplastingshastighet";
+"Settings.DownloadsBoost" = "Last ned boost";
+"Settings.DownloadsBoost.Notice" = "Гker antallet av parallelle forbindelser og stГёrrelsen pГҐ filbiter. Hvis nettverket ditt ikke kan hГҐndtere belastningen, prГёv forskjellige alternativer som passer til tilkoblingen din.";
+"Settings.DownloadsBoost.none" = "Deaktivert";
+"Settings.DownloadsBoost.medium" = "Middels";
+"Settings.DownloadsBoost.maximum" = "Maksimum";
+
+"Settings.ShowProfileID" = "Vis profil-ID";
+"Settings.ShowDC" = "Vis datasenter";
+"Settings.ShowCreationDate" = "Vis chat opprettet dato";
+"Settings.ShowCreationDate.Notice" = "Opprettelsesdatoen kan vГ¦re ukjent for noen chat.";
+
+"Settings.ShowRegDate" = "Vis registreringsdato";
+"Settings.ShowRegDate.Notice" = "Registreringsdatoen er ca.";
+
+"Settings.SendWithReturnKey" = "Send med 'retur'-tasten";
+"Settings.HidePhoneInSettingsUI" = "Skjul telefonen i innstillinger";
+"Settings.HidePhoneInSettingsUI.Notice" = "Dette vil bare skjule ditt telefonnummer for instillinger. For ГҐ skjule det for andre, gГҐ til Personvern og Sikkerhet.";
+
+"PasscodeSettings.AutoLock.InFiveSeconds" = "Hvis borte i 5 sekunder";
+
+"ProxySettings.UseSystemDNS" = "Bruk system DNS";
+"ProxySettings.UseSystemDNS.Notice" = "Bruk system DNS for ГҐ omgГҐ timeout hvis du ikke har tilgang til Google DNS";
+
+/* Preserve markdown asterisks! Example: You **don't** need Telegram Premium! */
+"Common.NoTelegramPremiumNeeded" = "Du **trenger ikke** %@!";
+"Common.RestartRequired" = "Omstart kreves";
+"Common.RestartNow" = "Omstart NГҐ";
+"Common.OpenTelegram" = "Г…pne Telegram";
+"Common.UseTelegramForPremium" = "VГ¦r oppmerksom pГҐ at for ГҐ fГҐ Telegram Premium, mГҐ du bruke den offisielle Telegram-appen. NГҐr du har tatt Telegram Premium, vil alle funksjonene bli tilgjengelige i nameless.";
+
+"Message.HoldToShowOrReport" = "Hold for ГҐ vise eller rapportere.";
+
+"Auth.AccountBackupReminder" = "SГёrg for at du har en sikkerhetskopiert tilgangsmetode. Oppretthold en SIM for SMS eller en ekstra Гёkt logget inn for ГҐ unngГҐ ГҐ bli lГҐst ute.";
+"Auth.UnofficialAppCodeTitle" = "Du kan bare fГҐ koden med den offisielle appen";
+
+"Settings.SmallReactions" = "Liten Reaksjon";
+"Settings.HideReactions" = "Skjul Reaksjoner";
+
+"ContextMenu.SaveToCloud" = "Lagre til skyen";
+"ContextMenu.SelectFromUser" = "Velg fra forfatter";
+
+"Settings.ContextMenu" = "KONTEKSTMENY";
+"Settings.ContextMenu.Notice" = "Deaktiverte oppfГёringer vil vГ¦re tilgjengelige i 'nameless'-undermenyen.";
+
+
+"Settings.ChatSwipeOptions" = "Chat liste sveip alternativer";
+"Settings.DeleteChatSwipeOption" = "Sveip for ГҐ slette samtalen";
+/* Re-word like this string on offical app https://translations.telegram.org/en/ios/groups_and_channels/Chat.NextChannelSameLocationSwipeProgress */
+"Settings.PullToNextChannel" = "Dra til neste uleste kanal";
+/* Re-word like this string on offical app https://translations.telegram.org/en/ios/groups_and_channels/Chat.NextUnreadTopicSwipeProgress */
+"Settings.PullToNextTopic" = "Dra til neste emne";
+"Settings.GalleryCamera" = "Kamera i galleri";
+/* "Send Message As..." button */
+"Settings.SendAsButton" = "\"%@\" knapp";
+"Settings.SnapDeletionEffect" = "Sletting av melding effekter";
+
+"Settings.Stickers.Size" = "STГRRELSE";
+"Settings.Stickers.Timestamp" = "Vis tidsstempel";
+
+"Settings.RecordingButton" = "Tale opptaksknapp";
+
+"Settings.DefaultEmojisFirst" = "Prioriter standard emojis";
+"Settings.DefaultEmojisFirst.Notice" = "Vis standard emojis fГёr premium pГҐ emoji-tastaturet";
+
+/* Date when chat was created. "created: 24 May 2016" */
+"Chat.Created" = "opprettet: %@";
+
+/* Date when user joined the chat. "Joined nameless Chat" */
+"Chat.JoinedDateTitle" = "Ble med %@";
+/* Date when user registered in Telegram. Will be shown like "Registered\n24 May 2016" */
+"Chat.RegDate" = "Registrert";
+
+"Settings.messageDoubleTapActionOutgoingEdit" = "Dobbelttrykk for ГҐ redigere meldingen";
+
+"Settings.wideChannelPosts" = "Brede innlegg i kanaler";
+"Settings.ForceEmojiTab" = "Emoji-tastatur som standard";
+
+"Settings.forceBuiltInMic" = "Tving Mikrofon pГҐ enheten";
+"Settings.forceBuiltInMic.Notice" = "Hvis aktivert, vil appen bare bruke enhetens mikrofon selv om hodetelefoner er tilkoblet.";
+
+"Settings.hideChannelBottomButton" = "Skjul Kanal Bunnerpanel";
+
+"Settings.CallConfirmation" = "Ringebekreftelse";
+"Settings.CallConfirmation.Notice" = "nameless vil spГёrre om din bekreftelse fГёr det foretas et anrop.";
+
+/* Confirmation before making a Call */
+"CallConfirmation.Audio.Title" = "Vil du ringe?";
+
+/* Confirmation before making a Video Call */
+"CallConfirmation.Video.Title" = "Vil du ta en videosamtale?";
+
+"MutualContact.Label" = "gjensidig kontakt";
+
+"Settings.swipeForVideoPIP" = "Video PIP med sveip";
+"Settings.swipeForVideoPIP.Notice" = "Hvis aktivert, vil sveipingen av video ГҐpne den i bilde-i-bilde-modus.";

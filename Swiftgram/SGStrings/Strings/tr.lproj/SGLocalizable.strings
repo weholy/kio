@@ -1,0 +1,152 @@
+﻿"Settings.ContentSettings" = "Д°Г§erik AyarlarД±";
+
+"Settings.Tabs.Header" = "SEKMELER";
+"Settings.Tabs.HideTabBar" = "Sekme Г§ubuДџunu gizle";
+"Settings.Tabs.ShowContacts" = "KiЕџiler Sekmesini GГ¶ster";
+"Settings.Tabs.ShowNames" = "Sekme isimlerini gГ¶ster";
+
+"Settings.Folders.BottomTab" = "Altta klasГ¶rler";
+"Settings.Folders.BottomTabStyle" = "Alt klasГ¶r stili";
+
+/* Do not translate */
+"Settings.Folders.BottomTabStyle.ios" = "iOS";
+/* Do not translate */
+"Settings.Folders.BottomTabStyle.telegram" = "Telegram";
+/* Example: Hide "All Chats" */
+"Settings.Folders.AllChatsHidden" = "\"%@\" Gizle";
+"Settings.Folders.RememberLast" = "Son klasГ¶rГј aГ§";
+"Settings.Folders.RememberLast.Notice" = "nameless, yeniden baЕџlatД±ldД±ktan ya da hesap deДџiЕџiminden sonra son kullanД±lan klasГ¶rГј aГ§acaktД±r";
+
+"Settings.Folders.CompactNames" = "Daha kГјГ§Гјk aralД±k";
+"Settings.Folders.AllChatsTitle" = "\"TГјm Sohbetler\" baЕџlД±ДџД±";
+"Settings.Folders.AllChatsTitle.short" = "KД±sa";
+"Settings.Folders.AllChatsTitle.long" = "Uzun";
+/* Default behaviour for All Chats Folder Title. "All Chats" title: Default */
+"Settings.Folders.AllChatsTitle.none" = "VarsayД±lan";
+
+
+"Settings.ChatList.Header" = "SOHBET LД°STESД°";
+"Settings.CompactChatList" = "Kompakt Sohbet Listesi";
+
+"Settings.Profiles.Header" = "PROFД°LLER";
+
+"Settings.Stories.Hide" = "Hikayeleri Gizle";
+"Settings.Stories.WarnBeforeView" = "GГ¶rГјntГјlemeden Г¶nce sor";
+"Settings.Stories.DisableSwipeToRecord" = "Kaydetmek iГ§in kaydД±rmayД± devre dД±ЕџД± bД±rak";
+
+"Settings.Translation.QuickTranslateButton" = "HД±zlД± Г‡eviri butonu";
+
+"Stories.Warning.Author" = "Yazar";
+"Stories.Warning.ViewStory" = "Hikayeyi GГ¶rГјntГјle?";
+/* Author will be able to see that you viewed their Story */
+"Stories.Warning.Notice" = "%@, Hikayesini gГ¶rГјntГјlediДџinizi GГ–REBД°LECEK.";
+"Stories.Warning.NoticeStealth" = "%@, hikayesini gГ¶rГјntГјlediДџinizi gГ¶remeyecek.";
+
+"Settings.Photo.Quality.Notice" = "GГ¶nderilen fotoДџraflarД±n ve foto-hikayelerin kalitesi";
+"Settings.Photo.SendLarge" = "BГјyГјk fotoДџraflar gГ¶nder";
+"Settings.Photo.SendLarge.Notice" = "SД±kД±ЕџtД±rД±lmД±Еџ resimlerdeki kenar sД±nД±rД±nД± 2560 piksele Г§Д±kar";
+
+"Settings.VideoNotes.Header" = "YUVARLAK VД°DEOLAR";
+"Settings.VideoNotes.StartWithRearCam" = "Arka kamerayla baЕџlat";
+
+"Settings.CustomColors.Header" = "HESAP RENKLERД°";
+"Settings.CustomColors.Saturation" = "DOYUM";
+/* Make sure to escape Percentage sign % */
+"Settings.CustomColors.Saturation.Notice" = "Hesap renklerini devre dД±ЕџД± bД±rakmak iГ§in doyumu 0%%'a ayarlayД±n";
+
+"Settings.UploadsBoost" = "KarЕџД±ya yГјklemeleri hД±zlandД±r";
+"Settings.DownloadsBoost" = "Д°ndirmeleri hД±zlandД±r";
+"Settings.DownloadsBoost.Notice" = "Paralel baДџlantД±larД±n sayД±sД±nД± ve dosya parГ§alarД±nД±n boyutunu artД±rД±r. AДџa yГјk bindiДџinde eaДџa diДџer baДџlantД± seГ§eneklerini deneyin.";
+"Settings.DownloadsBoost.none" = "Devre dД±ЕџД±";
+"Settings.DownloadsBoost.medium" = "Orta";
+"Settings.DownloadsBoost.maximum" = "En fazla";
+
+"Settings.ShowProfileID" = "Profil ID'sini GГ¶ster";
+"Settings.ShowDC" = "Veri Merkezini GГ¶ster";
+"Settings.ShowCreationDate" = "Sohbet OluЕџturma Tarihini GГ¶ster";
+"Settings.ShowCreationDate.Notice" = "BazД± sohbetler iГ§in oluЕџturma tarihi bilinmeyebilir.";
+
+"Settings.ShowRegDate" = "Kaydolma Tarihini GГ¶ster";
+"Settings.ShowRegDate.Notice" = "Kaydolma tarihi yaklaЕџД±k olarak belirtilmiЕџtir.";
+
+"Settings.SendWithReturnKey" = "\"enter\" tuЕџu ile gГ¶nder";
+"Settings.HidePhoneInSettingsUI" = "Ayarlarda numarayД± gizle";
+"Settings.HidePhoneInSettingsUI.Notice" = "NumaranД±z sadece arayГјzde gizlenecek. DiДџerlerinden gizlemek iГ§in, lГјtfen Gizlilik ayarlarД±nД± kullanД±n.";
+
+"PasscodeSettings.AutoLock.InFiveSeconds" = "5 saniye uzakta kalД±rsanД±z";
+
+"ProxySettings.UseSystemDNS" = "Sistem DNS'sini kullan";
+"ProxySettings.UseSystemDNS.Notice" = "Google DNS'ye eriЕџiminiz yoksa, zaman aЕџД±mД±nД± aЕџmak iГ§in sistem DNS'sini kullanД±n";
+
+/* Preserve markdown asterisks! Example: You **don't** need Telegram Premium! */
+"Common.NoTelegramPremiumNeeded" = "%@ **gerekmez**!";
+"Common.RestartRequired" = "Yeniden baЕџlatma gerekli";
+"Common.RestartNow" = "Ећimdi Yeniden BaЕџlat";
+"Common.OpenTelegram" = "Telegram'Д± AГ§";
+"Common.UseTelegramForPremium" = "UnutmayД±n ki Telegram Premium'u edinmek iГ§in resmГ® Telegram uygulamasД±nД± kullanmanД±z gerekmektedir. Telegram Premium sahibi olduktan sonra onun tГјm Г¶zellikleri nameless'da mevcut olacaktД±r.";
+
+"Message.HoldToShowOrReport" = "GГ¶stermek veya Bildirmek iГ§in BasД±lД± Tutun.";
+
+"Auth.AccountBackupReminder" = "Yedek eriЕџim yГ¶nteminiz olduДџundan emin olun. Kilitlenmeden kaГ§Д±nmak iГ§in bir SIM kartД± saklayД±n veya ek bir oturum aГ§Д±n.";
+"Auth.UnofficialAppCodeTitle" = "Kodu yalnД±zca resmi uygulamadan edinebilirsiniz";
+
+"Settings.SmallReactions" = "KГјГ§Гјk tepkiler";
+"Settings.HideReactions" = "Tepkileri Gizle";
+
+"ContextMenu.SaveToCloud" = "Buluta Kaydet";
+"ContextMenu.SelectFromUser" = "Yazardan SeГ§";
+
+"Settings.ContextMenu" = "BAДћLAM MENГњSГњ";
+"Settings.ContextMenu.Notice" = "Devre dД±ЕџД± bД±rakД±lmД±Еџ giriЕџler \"nameless\" alt menГјsГјnde mevcut olacaktД±r.";
+
+
+"Settings.ChatSwipeOptions" = "Sohbet listesi kaydД±rma seГ§enekleri";
+"Settings.DeleteChatSwipeOption" = "Sohbete Silmek Д°Г§in KaydД±rД±n";
+/* Re-word like this string on offical app https://translations.telegram.org/en/ios/groups_and_channels/Chat.NextChannelSameLocationSwipeProgress */
+"Settings.PullToNextChannel" = "Sonraki okunmamД±Еџ kanal iГ§in Г§ekin";
+/* Re-word like this string on offical app https://translations.telegram.org/en/ios/groups_and_channels/Chat.NextUnreadTopicSwipeProgress */
+"Settings.PullToNextTopic" = "Bir Sonraki Konuya Г‡ek";
+"Settings.GalleryCamera" = "Galeride kamera";
+/* "Send Message As..." button */
+"Settings.SendAsButton" = "\"%@\" butonu";
+"Settings.SnapDeletionEffect" = "Mesaj silme efektleri";
+
+"Settings.Stickers.Size" = "BOYUT";
+"Settings.Stickers.Timestamp" = "Zaman DamgasД±nД± GГ¶ster";
+
+"Settings.RecordingButton" = "Ses KaydД± DГјДџmesi";
+
+"Settings.DefaultEmojisFirst" = "Standart emojileri Г¶nceliklendirin";
+"Settings.DefaultEmojisFirst.Notice" = "Emoji klavyesinde premiumdan Г¶nce standart emojileri gГ¶ster";
+
+/* Date when chat was created. "created: 24 May 2016" */
+"Chat.Created" = "oluЕџturuldu: %@";
+
+/* Date when user joined the chat. "Joined nameless Chat" */
+"Chat.JoinedDateTitle" = "KatД±ldД±: %@";
+/* Date when user registered in Telegram. Will be shown like "Registered\n24 May 2016" */
+"Chat.RegDate" = "KayД±tlД±";
+
+"Settings.messageDoubleTapActionOutgoingEdit" = "MesajД± dГјzenlemek iГ§in Г§ift dokunun";
+
+"Settings.wideChannelPosts" = "Kanallardaki geniЕџ gГ¶nderiler";
+"Settings.ForceEmojiTab" = "VarsayД±lan olarak Emoji klavyesi";
+
+"Settings.forceBuiltInMic" = "Cihaz Mikrofonunu Zorla";
+"Settings.forceBuiltInMic.Notice" = "EtkinleЕџtirildiДџinde, uygulama kulaklД±klar baДџlД± olsa bile sadece cihaz mikrofonunu kullanacaktД±r.";
+
+"Settings.hideChannelBottomButton" = "Kanal Alt Panelini Gizle";
+
+"Settings.CallConfirmation" = "Arama OnayД±";
+"Settings.CallConfirmation.Notice" = "nameless, arama yapmadan Г¶nce onayД±nД±zД± isteyecek.";
+
+/* Confirmation before making a Call */
+"CallConfirmation.Audio.Title" = "Arama Yapmak mД±?";
+
+/* Confirmation before making a Video Call */
+"CallConfirmation.Video.Title" = "Video AramasД± Yapmak mД±?";
+
+"MutualContact.Label" = "karЕџД±lД±klД± iletiЕџim";
+
+"Settings.swipeForVideoPIP" = "Videoyu kaydД±rarak PIP";
+"Settings.swipeForVideoPIP.Notice" = "EДџer etkinleЕџtirildi ise videoyu kaydД±rmak, Piksel iГ§inde Piksel modunda aГ§Д±lacaktД±r.";

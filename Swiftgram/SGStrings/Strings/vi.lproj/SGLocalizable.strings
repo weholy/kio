@@ -1,0 +1,152 @@
+﻿"Settings.ContentSettings" = "CГ i Д‘бє·t nб»™i dung";
+
+"Settings.Tabs.Header" = "THбєє";
+"Settings.Tabs.HideTabBar" = "бєЁn thanh Tab";
+"Settings.Tabs.ShowContacts" = "Hiб»‡n LiГЄn hб»‡";
+"Settings.Tabs.ShowNames" = "Hiб»‡n tГЄn cГЎc thбє»";
+
+"Settings.Folders.BottomTab" = "Дђбє·t thЖ° mб»Ґc tin nhбєЇn б»џ dЖ°б»›i cГ№ng";
+"Settings.Folders.BottomTabStyle" = "Kiб»ѓu ThЖ° mб»Ґc dЖ°б»›i cГ№ng";
+
+/* Do not translate */
+"Settings.Folders.BottomTabStyle.ios" = "iOS";
+/* Do not translate */
+"Settings.Folders.BottomTabStyle.telegram" = "Telegram";
+/* Example: Hide "All Chats" */
+"Settings.Folders.AllChatsHidden" = "бєЁn \"%@\"";
+"Settings.Folders.RememberLast" = "Mб»џ thЖ° mб»Ґc gбє§n Д‘Гўy";
+"Settings.Folders.RememberLast.Notice" = "nameless sбєЅ mб»џ thЖ° mб»Ґc gбє§n nhбєҐt sau khi khб»џi Д‘б»™ng lбєЎi hoбє·c chuyб»ѓn tГ i khoбєЈn";
+
+"Settings.Folders.CompactNames" = "KhoбєЈng cГЎch nhб»Џ hЖЎn";
+"Settings.Folders.AllChatsTitle" = "TiГЄu Д‘б»Ѓ \"TбєҐt cбєЈ Chat\"";
+"Settings.Folders.AllChatsTitle.short" = "NgбєЇn";
+"Settings.Folders.AllChatsTitle.long" = "DГ i";
+/* Default behaviour for All Chats Folder Title. "All Chats" title: Default */
+"Settings.Folders.AllChatsTitle.none" = "Mбє·c Д‘б»‹nh";
+
+
+"Settings.ChatList.Header" = "DANH SГЃCH CHAT";
+"Settings.CompactChatList" = "Danh sГЎch Chat Nhб»Џ gб»Ќn";
+
+"Settings.Profiles.Header" = "Hб»’ SЖ ";
+
+"Settings.Stories.Hide" = "бєЁn Tin";
+"Settings.Stories.WarnBeforeView" = "Hб»Џi trЖ°б»›c khi xem";
+"Settings.Stories.DisableSwipeToRecord" = "TбєЇt vuб»‘t Д‘б»ѓ quay";
+
+"Settings.Translation.QuickTranslateButton" = "Hiб»‡n nГєt dб»‹ch nhanh";
+
+"Stories.Warning.Author" = "TГЎc giбєЈ";
+"Stories.Warning.ViewStory" = "Xem Tin?";
+/* Author will be able to see that you viewed their Story */
+"Stories.Warning.Notice" = "%@ Sбєј CГ“ THб»‚ THбє¤Y bбєЎn Д‘ГЈ xem Tin cб»§a hб»Ќ.";
+"Stories.Warning.NoticeStealth" = "%@ sбєЅ khГґng biбєїt bбєЎn Д‘ГЈ xem Tin cб»§a hб»Ќ.";
+
+"Settings.Photo.Quality.Notice" = "ChбєҐt lЖ°б»Јng cб»§a бєЈnh gб»­i Д‘i vГ  бєЈnh Tin";
+"Settings.Photo.SendLarge" = "Gб»­i бєЈnh lб»›n";
+"Settings.Photo.SendLarge.Notice" = "TДѓng giб»›i hбєЎn kГ­ch thЖ°б»›c bГЄn trГЄn cб»§a hГ¬nh бєЈnh nГ©n lГЄn 2560px";
+
+"Settings.VideoNotes.Header" = "VIDEO TRГ’N";
+"Settings.VideoNotes.StartWithRearCam" = "BбєЇt Д‘бє§u vб»›i camera sau";
+
+"Settings.CustomColors.Header" = "MГЂU TГЂI KHOбєўN";
+"Settings.CustomColors.Saturation" = "Дђб» BГѓO HГ’A";
+/* Make sure to escape Percentage sign % */
+"Settings.CustomColors.Saturation.Notice" = "Дђбє·t Д‘б»™ bГЈo hГІa thГ nh 0%% Д‘б»ѓ tбєЇt mГ u tГ i khoбєЈn";
+
+"Settings.UploadsBoost" = "TДѓng tб»‘c tбєЈi lГЄn";
+"Settings.DownloadsBoost" = "TДѓng tб»‘c tбєЈi xuб»‘ng";
+"Settings.DownloadsBoost.Notice" = "TДѓng sб»‘ lЖ°б»Јng kбєїt nб»‘i song song vГ  kГ­ch thЖ°б»›c cГЎc khб»‘i tб»‡p. Nбєїu mбєЎng cб»§a bбєЎn khГґng thб»ѓ xб»­ lГЅ tбєЈi, hГЈy thб»­ cГЎc tГ№y chб»Ќn khГЎc phГ№ hб»Јp vб»›i kбєїt nб»‘i cб»§a bбєЎn.";
+"Settings.DownloadsBoost.none" = "TбєЇt";
+"Settings.DownloadsBoost.medium" = "Trung bГ¬nh";
+"Settings.DownloadsBoost.maximum" = "Tб»‘i Д‘a";
+
+"Settings.ShowProfileID" = "Hiб»‡n ID hб»“ sЖЎ";
+"Settings.ShowDC" = "Hiб»ѓn thб»‹ Trung tГўm Dб»Ї liб»‡u";
+"Settings.ShowCreationDate" = "Hiб»ѓn thб»‹ NgГ y TбєЎo Chat";
+"Settings.ShowCreationDate.Notice" = "NgГ y tбєЎo cГі thб»ѓ khГґng biбєїt Д‘Ж°б»Јc Д‘б»‘i vб»›i mб»™t sб»‘ cuб»™c trГІ chuyб»‡n.";
+
+"Settings.ShowRegDate" = "Hiб»ѓn thб»‹ NgГ y ДђДѓng kГЅ";
+"Settings.ShowRegDate.Notice" = "NgГ y Д‘Дѓng kГЅ lГ  xбєҐp xб»‰.";
+
+"Settings.SendWithReturnKey" = "Gб»­i tГ­n nhбєЇn bбє±ng nГєt \"Nhбє­p\"";
+"Settings.HidePhoneInSettingsUI" = "бєЁn sб»‘ Д‘iб»‡n thoбєЎi trong cГ i Д‘бє·t";
+"Settings.HidePhoneInSettingsUI.Notice" = "Sб»‘ Д‘iб»‡n thoбєЎi cб»§a bбєЎn sбєЅ chб»‰ бє©n Д‘i trong cГ i Д‘бє·t. Дђбєїn cГ i Д‘бє·t \"RiГЄng tЖ° vГ  BбєЈo mбє­t\" Д‘б»ѓ бє©n Д‘б»‘i vб»›i ngЖ°б»ќi khГЎc\".";
+
+"PasscodeSettings.AutoLock.InFiveSeconds" = "Nбєїu rб»ќi Д‘i trong 5 giГўy";
+
+"ProxySettings.UseSystemDNS" = "Sб»­ dб»Ґng DNS hб»‡ thб»‘ng";
+"ProxySettings.UseSystemDNS.Notice" = "Sб»­ dб»Ґng DNS hб»‡ thб»‘ng Д‘б»ѓ bб»Џ qua thб»ќi gian chб»ќ nбєїu bбєЎn khГґng cГі quyб»Ѓn truy cбє­p vГ o DNS cб»§a Google";
+
+/* Preserve markdown asterisks! Example: You **don't** need Telegram Premium! */
+"Common.NoTelegramPremiumNeeded" = "BбєЎn **khГґng cбє§n** %@!";
+"Common.RestartRequired" = "YГЄu cбє§u khб»џi Д‘б»™ng lбєЎi";
+"Common.RestartNow" = "Khб»џi Д‘б»™ng lбєЎi";
+"Common.OpenTelegram" = "Mб»џ Telegram";
+"Common.UseTelegramForPremium" = "Vui lГІng lЖ°u ГЅ rбє±ng Д‘б»ѓ cГі Д‘Ж°б»Јc Telegram Premium, bбєЎn phбєЈi sб»­ dб»Ґng б»©ng dб»Ґng Telegram chГ­nh thб»©c. Sau khi bбєЎn Д‘ГЈ cГі Telegram Premium, tбєҐt cбєЈ cГЎc tГ­nh nДѓng cб»§a nГі sбєЅ trб»џ nГЄn cГі sбєµn trong nameless.";
+
+"Message.HoldToShowOrReport" = "NhбєҐn giб»Ї Д‘б»ѓ Hiб»ѓn thб»‹ hoбє·c BГЎo cГЎo.";
+
+"Auth.AccountBackupReminder" = "HГЈy Д‘бєЈm bбєЈo bбєЎn cГі mб»™t phЖ°ЖЎng phГЎp truy cбє­p dб»± phГІng. Giб»Ї lбєЎi mб»™t SIM Д‘б»ѓ nhбє­n SMS hoбє·c mб»™t phiГЄn Д‘Дѓng nhбє­p bб»• sung Д‘б»ѓ trГЎnh bб»‹ khГіa tГ i khoбєЈn.";
+"Auth.UnofficialAppCodeTitle" = "BбєЎn chб»‰ cГі thб»ѓ nhбє­n Д‘Ж°б»Јc mГЈ thГґng qua б»©ng dб»Ґng chГ­nh thб»©c";
+
+"Settings.SmallReactions" = "Thu nhб»Џ biб»ѓu tЖ°б»Јng cбєЈm xГєc";
+"Settings.HideReactions" = "бєЁn Biб»ѓu tЖ°б»Јng cбєЈm xГєc";
+
+"ContextMenu.SaveToCloud" = "LЖ°u vГ o ДђГЎm mГўy";
+"ContextMenu.SelectFromUser" = "Chб»Ќn tб»« TГЎc giбєЈ";
+
+"Settings.ContextMenu" = "MENU NGб»® CбєўNH";
+"Settings.ContextMenu.Notice" = "Mб»Ґc nhбє­p Д‘ГЈ vГґ hiб»‡u hГіa sбєЅ cГі sбєµn trong menu phб»Ґ 'nameless'.";
+
+
+"Settings.ChatSwipeOptions" = "Tuб»і chб»Ќn LЖ°б»›t Danh sГЎch Chat";
+"Settings.DeleteChatSwipeOption" = "Vuб»‘t Д‘б»ѓ xГіa Cuб»™c trГІ chuyб»‡n";
+/* Re-word like this string on offical app https://translations.telegram.org/en/ios/groups_and_channels/Chat.NextChannelSameLocationSwipeProgress */
+"Settings.PullToNextChannel" = "KГ©o xuб»‘ng Д‘бєїn kГЄnh chЖ°a Д‘б»Ќc";
+/* Re-word like this string on offical app https://translations.telegram.org/en/ios/groups_and_channels/Chat.NextUnreadTopicSwipeProgress */
+"Settings.PullToNextTopic" = "KГ©o Дђб»ѓ Дђбєїn Chб»§ Дђб»Ѓ Tiбєїp Theo";
+"Settings.GalleryCamera" = "MГЎy бєЈnh trong thЖ° viб»‡n";
+/* "Send Message As..." button */
+"Settings.SendAsButton" = "\"%@\" NГєt";
+"Settings.SnapDeletionEffect" = "Hiб»‡u б»Ёng XГіa Tin NhбєЇn";
+
+"Settings.Stickers.Size" = "KГЌCH THЖЇб»љC";
+"Settings.Stickers.Timestamp" = "Hiб»‡n mб»‘c thб»ќi gian";
+
+"Settings.RecordingButton" = "NГєt Ghi Г‚m Giб»Ќng NГіi";
+
+"Settings.DefaultEmojisFirst" = "ЖЇu tiГЄn biб»ѓu tЖ°б»Јng cбєЈm xГєc tiГЄu chuбє©n";
+"Settings.DefaultEmojisFirst.Notice" = "Hiб»ѓn thб»‹ biб»ѓu tЖ°б»Јng cбєЈm xГєc tiГЄu chuбє©n trЖ°б»›c biб»ѓu tЖ°б»Јng cбєЈm xГєc cao cбєҐp trГЄn bГ n phГ­m biб»ѓu tЖ°б»Јng cбєЈm xГєc";
+
+/* Date when chat was created. "created: 24 May 2016" */
+"Chat.Created" = "Д‘ГЈ tбєЎo: %@";
+
+/* Date when user joined the chat. "Joined nameless Chat" */
+"Chat.JoinedDateTitle" = "ДђГЈ tham gia %@";
+/* Date when user registered in Telegram. Will be shown like "Registered\n24 May 2016" */
+"Chat.RegDate" = "ДђГЈ Д‘Дѓng kГЅ";
+
+"Settings.messageDoubleTapActionOutgoingEdit" = "Double-tap Д‘б»ѓ chб»‰nh sб»­a tin nhбєЇn";
+
+"Settings.wideChannelPosts" = "BГ i Д‘Дѓng rб»™ng trong cГЎc kГЄnh";
+"Settings.ForceEmojiTab" = "BГ n phГ­m Emoji mбє·c Д‘б»‹nh";
+
+"Settings.forceBuiltInMic" = "Buб»™c Micro Дђiб»‡n ThoбєЎi";
+"Settings.forceBuiltInMic.Notice" = "Nбєїu Д‘Ж°б»Јc kГ­ch hoбєЎt, б»©ng dб»Ґng sбєЅ chб»‰ sб»­ dб»Ґng micro Д‘iб»‡n thoбєЎi cб»§a thiбєїt bб»‹ ngay cбєЈ khi tai nghe Д‘Ж°б»Јc kбєїt nб»‘i.";
+
+"Settings.hideChannelBottomButton" = "бєЁn thanh dЖ°б»›i cГ№ng cб»§a kГЄnh";
+
+"Settings.CallConfirmation" = "XГЎc nhбє­n cuб»™c gб»Ќi";
+"Settings.CallConfirmation.Notice" = "nameless sбєЅ yГЄu cбє§u bбєЎn xГЎc nhбє­n trЖ°б»›c khi thб»±c hiб»‡n cuб»™c gб»Ќi.";
+
+/* Confirmation before making a Call */
+"CallConfirmation.Audio.Title" = "Thб»±c hiб»‡n cuб»™c gб»Ќi?";
+
+/* Confirmation before making a Video Call */
+"CallConfirmation.Video.Title" = "Thб»±c hiб»‡n cuб»™c gб»Ќi video?";
+
+"MutualContact.Label" = "liГЄn hб»‡ chung";
+
+"Settings.swipeForVideoPIP" = "Video PIP vб»›i Vuб»‘t";
+"Settings.swipeForVideoPIP.Notice" = "Nбєїu Д‘Ж°б»Јc kГ­ch hoбєЎt, viб»‡c vuб»‘t video sбєЅ mб»џ nГі б»џ chбєї Д‘б»™ HГ¬nh trong hГ¬nh.";

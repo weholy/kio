@@ -1,0 +1,21 @@
+From 929479648182b3e5b3a84c46065f7520146902f6 Mon Sep 17 00:00:00 2001
+From: Ali <>
+Date: Thu, 21 Apr 2022 18:10:43 +0400
+Subject: [PATCH] Support arm64 simulator platform
+
+---
+ configure | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/configure b/configure
+index beea65032..f29c9f327 100755
+--- a/configure
++++ b/configure
+@@ -100,6 +100,7 @@ EOF
+ all_platforms="${all_platforms} arm64-android-gcc"
+ all_platforms="${all_platforms} arm64-darwin-gcc"
+ all_platforms="${all_platforms} arm64-darwin20-gcc"
++all_platforms="${all_platforms} arm64-iphonesimulator-gcc"
+ all_platforms="${all_platforms} arm64-darwin21-gcc"
+ all_platforms="${all_platforms} arm64-darwin22-gcc"
+ all_platforms="${all_platforms} arm64-darwin23-gcc"

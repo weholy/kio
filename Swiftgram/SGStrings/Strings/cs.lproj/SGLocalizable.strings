@@ -1,0 +1,152 @@
+﻿"Settings.ContentSettings" = "NastavenГ­ obsahu";
+
+"Settings.Tabs.Header" = "ZГЃLOЕЅKY";
+"Settings.Tabs.HideTabBar" = "SkrГЅt zГЎloЕѕku";
+"Settings.Tabs.ShowContacts" = "Zobrazit zГЎloЕѕku kontaktЕЇ";
+"Settings.Tabs.ShowNames" = "Zobrazit nГЎzvy zГЎloЕѕek";
+
+"Settings.Folders.BottomTab" = "SloЕѕky dole";
+"Settings.Folders.BottomTabStyle" = "Styl dolnГ­ sloЕѕky";
+
+/* Do not translate */
+"Settings.Folders.BottomTabStyle.ios" = "iOS";
+/* Do not translate */
+"Settings.Folders.BottomTabStyle.telegram" = "Telegram";
+/* Example: Hide "All Chats" */
+"Settings.Folders.AllChatsHidden" = "SkrГЅt \"%@\"";
+"Settings.Folders.RememberLast" = "OtevЕ™Г­t poslednГ­ sloЕѕku";
+"Settings.Folders.RememberLast.Notice" = "nameless otevЕ™e poslednГ­ pouЕѕitou sloЕѕku po restartu nebo pЕ™epnutГ­ ГєДЌtu.";
+
+"Settings.Folders.CompactNames" = "MenЕЎГ­ vzdГЎlenost";
+"Settings.Folders.AllChatsTitle" = "NГЎzev \"VЕЎechny chaty\"";
+"Settings.Folders.AllChatsTitle.short" = "KrГЎtkГЅ";
+"Settings.Folders.AllChatsTitle.long" = "DlouhГЎ";
+/* Default behaviour for All Chats Folder Title. "All Chats" title: Default */
+"Settings.Folders.AllChatsTitle.none" = "VГЅchozГ­";
+
+
+"Settings.ChatList.Header" = "CHAT SEZNAM";
+"Settings.CompactChatList" = "KompaktnГ­ seznam chatu";
+
+"Settings.Profiles.Header" = "PROFILES";
+
+"Settings.Stories.Hide" = "SkrГЅt pЕ™Г­bД›hy";
+"Settings.Stories.WarnBeforeView" = "Upozornit pЕ™ed zobrazenГ­m";
+"Settings.Stories.DisableSwipeToRecord" = "ZakГЎzat pЕ™ejetГ­ prstem pro nahrГЎvГЎnГ­";
+
+"Settings.Translation.QuickTranslateButton" = "TlaДЌГ­tko pro rychlГЅ pЕ™eklad";
+
+"Stories.Warning.Author" = "Autor";
+"Stories.Warning.ViewStory" = "Zobrazit pЕ™Г­bД›h?";
+/* Author will be able to see that you viewed their Story */
+"Stories.Warning.Notice" = "%@ BUDE VIDДљT, Еѕe jste si prohlГ©dl jejich pЕ™Г­bД›h.";
+"Stories.Warning.NoticeStealth" = "%@ bude moci vidД›t, Еѕe jste si prohlГ©dl jejich pЕ™Г­bД›h.";
+
+"Settings.Photo.Quality.Notice" = "Kvalita odchozГ­ch fotografiГ­ a foto-pЕ™Г­bД›hЕЇ.";
+"Settings.Photo.SendLarge" = "Poslat velkГ© fotografie";
+"Settings.Photo.SendLarge.Notice" = "ZvГЅЕЎit limit velikosti komprimovanГЅch obrГЎzkЕЇ na 2560px.";
+
+"Settings.VideoNotes.Header" = "KRUHOVГЃ VIDEA";
+"Settings.VideoNotes.StartWithRearCam" = "ZaДЌГ­t s zadnГ­ kamerou";
+
+"Settings.CustomColors.Header" = "BARVY ГљДЊTU";
+"Settings.CustomColors.Saturation" = "SYTOST";
+/* Make sure to escape Percentage sign % */
+"Settings.CustomColors.Saturation.Notice" = "Nastavit sytost na 0%% pro vypnutГ­ barev ГєДЌtu.";
+
+"Settings.UploadsBoost" = "ZrychlenГ­ nahrГЎvГЎnГ­";
+"Settings.DownloadsBoost" = "ZrychlenГ­ stahovГЎnГ­";
+"Settings.DownloadsBoost.Notice" = "ZvyЕЎuje poДЌet paralelnГ­ch pЕ™ipojenГ­ a velikost ДЌГЎstГ­ souboru. Pokud vaЕЎe sГ­ЕҐ nezvlГЎdГЎ zГЎtД›Еѕ, vyzkouЕЎejte rЕЇznГ© moЕѕnosti, kterГ© vyhovujГ­ vaЕЎemu pЕ™ipojenГ­.";
+"Settings.DownloadsBoost.none" = "Vypnuto";
+"Settings.DownloadsBoost.medium" = "StЕ™ednГ­";
+"Settings.DownloadsBoost.maximum" = "MaximГЎlnГ­";
+
+"Settings.ShowProfileID" = "Zobrazit ID profilu";
+"Settings.ShowDC" = "Zobrazit Data Center";
+"Settings.ShowCreationDate" = "Zobrazit datum vytvoЕ™enГ­ chatu";
+"Settings.ShowCreationDate.Notice" = "Datum vytvoЕ™enГ­ chatu mЕЇЕѕe bГЅt neznГЎmГ© pro nД›kterГ© chaty.";
+
+"Settings.ShowRegDate" = "Zobrazit datum registrace";
+"Settings.ShowRegDate.Notice" = "Datum registrace je pЕ™ibliЕѕnГ©.";
+
+"Settings.SendWithReturnKey" = "Poslat klГЎvesou \"enter\"";
+"Settings.HidePhoneInSettingsUI" = "SkrГЅt telefon v nastavenГ­";
+"Settings.HidePhoneInSettingsUI.Notice" = "Toto skryje vaЕЎe telefonnГ­ ДЌГ­slo pouze v nastavenГ­ rozhranГ­. Chcete-li je skryt pЕ™ed ostatnГ­mi, pЕ™ejdД›te na SoukromГ­ a bezpeДЌnost.";
+
+"PasscodeSettings.AutoLock.InFiveSeconds" = "Zamknout za 5 sekund";
+
+"ProxySettings.UseSystemDNS" = "PouЕѕГ­t systГ©movГ© DNS";
+"ProxySettings.UseSystemDNS.Notice" = "PouЕѕГ­t systГ©movГ© DNS k obejitГ­ ДЌasovГ©ho limitu, pokud nemГЎte pЕ™Г­stup k Google DNS";
+
+/* Preserve markdown asterisks! Example: You **don't** need Telegram Premium! */
+"Common.NoTelegramPremiumNeeded" = "NepotЕ™ebujete **%@**!";
+"Common.RestartRequired" = "VyЕѕadovГЎn restart";
+"Common.RestartNow" = "Restartovat nynГ­";
+"Common.OpenTelegram" = "OtevЕ™Г­t Telegram";
+"Common.UseTelegramForPremium" = "VezmД›te prosГ­m na vД›domГ­, Еѕe abyste zГ­skali Premium, musГ­te pouЕѕГ­t oficiГЎlnГ­ aplikaci Telegram . Jakmile zГ­skГЎte Telegram Premium, vЕЎechny jeho funkce budou k dispozici ve namelessu.";
+
+"Message.HoldToShowOrReport" = "PodrЕѕte pro zobrazenГ­ nebo nahlГЎЕЎenГ­.";
+
+"Auth.AccountBackupReminder" = "UjistД›te se, Еѕe mГЎte zГЎloЕѕnГ­ pЕ™Г­stupovou metodu. UchovГЎvejte SIM pro SMS nebo dalЕЎГ­ pЕ™ihlГЎЕЎenou relaci, abyste pЕ™edeЕЎli zamДЌenГ­.";
+"Auth.UnofficialAppCodeTitle" = "KГіd mЕЇЕѕete zГ­skat pouze s oficiГЎlnГ­ aplikacГ­";
+
+"Settings.SmallReactions" = "MalГ© reakce";
+"Settings.HideReactions" = "SkrГЅt reakce";
+
+"ContextMenu.SaveToCloud" = "UloЕѕit do cloudu";
+"ContextMenu.SelectFromUser" = "Vybrat od autora";
+
+"Settings.ContextMenu" = "KONTEXTOVГ‰ MENU";
+"Settings.ContextMenu.Notice" = "ZakГЎzanГ© poloЕѕky budou dostupnГ© v podmenu \"nameless\".";
+
+
+"Settings.ChatSwipeOptions" = "MoЕѕnosti potГЎhnutГ­ v seznamu chatu";
+"Settings.DeleteChatSwipeOption" = "PЕ™ejeДЏte pro smazГЎnГ­ chatu";
+/* Re-word like this string on offical app https://translations.telegram.org/en/ios/groups_and_channels/Chat.NextChannelSameLocationSwipeProgress */
+"Settings.PullToNextChannel" = "TГЎhnout na dalЕЎГ­ nepЕ™eДЌtenГЅ kanГЎl";
+/* Re-word like this string on offical app https://translations.telegram.org/en/ios/groups_and_channels/Chat.NextUnreadTopicSwipeProgress */
+"Settings.PullToNextTopic" = "PЕ™etГЎhnД›te na dalЕЎГ­ tГ©ma";
+"Settings.GalleryCamera" = "FotoaparГЎt v galerii";
+/* "Send Message As..." button */
+"Settings.SendAsButton" = "TlaДЌГ­tko \"%@\"";
+"Settings.SnapDeletionEffect" = "ГљДЌinky odstranД›nГ­ zprГЎv";
+
+"Settings.Stickers.Size" = "VELIKOST";
+"Settings.Stickers.Timestamp" = "Zobrazit ДЌasovГ© razГ­tko";
+
+"Settings.RecordingButton" = "TlaДЌГ­tko nahrГЎvГЎnГ­ hlasu";
+
+"Settings.DefaultEmojisFirst" = "UpЕ™ednostnД›te standardnГ­ emoji";
+"Settings.DefaultEmojisFirst.Notice" = "Zobrazit standardnГ­ emoji pЕ™ed prГ©miovГЅmi na klГЎvesnici s emoji";
+
+/* Date when chat was created. "created: 24 May 2016" */
+"Chat.Created" = "vytvoЕ™eno: %@";
+
+/* Date when user joined the chat. "Joined nameless Chat" */
+"Chat.JoinedDateTitle" = "PЕ™ipojeno k %@";
+/* Date when user registered in Telegram. Will be shown like "Registered\n24 May 2016" */
+"Chat.RegDate" = "RegistrovГЎno";
+
+"Settings.messageDoubleTapActionOutgoingEdit" = "DvojitГЅm klepnutГ­m upravte zprГЎvu";
+
+"Settings.wideChannelPosts" = "Е irokГ© pЕ™Г­spД›vky ve skupinГЎch";
+"Settings.ForceEmojiTab" = "Emoji klГЎvesnice ve vГЅchozГ­m nastavenГ­";
+
+"Settings.forceBuiltInMic" = "Vynutit vestavД›nГЅ mikrofon zaЕ™Г­zenГ­";
+"Settings.forceBuiltInMic.Notice" = "Pokud je povoleno, aplikace pouЕѕije pouze mikrofon zaЕ™Г­zenГ­, i kdyЕѕ jsou pЕ™ipojeny sluchГЎtka.";
+
+"Settings.hideChannelBottomButton" = "SkrГЅt panel dolnГ­ho kanГЎlu";
+
+"Settings.CallConfirmation" = "PotvrzenГ­ hovoru";
+"Settings.CallConfirmation.Notice" = "nameless poЕѕГЎdГЎ o vaЕЎi potvrzenГ­ pЕ™ed uskuteДЌnД›nГ­m hovoru.";
+
+/* Confirmation before making a Call */
+"CallConfirmation.Audio.Title" = "UskuteДЌnit hovor?";
+
+/* Confirmation before making a Video Call */
+"CallConfirmation.Video.Title" = "UskuteДЌnit video hovor?";
+
+"MutualContact.Label" = "vzГЎjemnГЅ kontakt";
+
+"Settings.swipeForVideoPIP" = "Video PIP s pЕ™etahovГЎnГ­m";
+"Settings.swipeForVideoPIP.Notice" = "Pokud je povoleno, poslГЎnГ­ videa jej otevЕ™e v reЕѕimu Obraz v obraze.";

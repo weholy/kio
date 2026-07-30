@@ -1,0 +1,152 @@
+﻿"Settings.ContentSettings" = "ConfiguraciГі del Contingut";
+
+"Settings.Tabs.Header" = "PESTANYES";
+"Settings.Tabs.HideTabBar" = "Amagar barra de pestanyes";
+"Settings.Tabs.ShowContacts" = "Mostrar Pestanya de Contactes";
+"Settings.Tabs.ShowNames" = "Mostrar noms de les pestanyes";
+
+"Settings.Folders.BottomTab" = "Carpetes a la part inferior";
+"Settings.Folders.BottomTabStyle" = "Bottom Folders Style";
+
+/* Do not translate */
+"Settings.Folders.BottomTabStyle.ios" = "iOS";
+/* Do not translate */
+"Settings.Folders.BottomTabStyle.telegram" = "Telegram";
+/* Example: Hide "All Chats" */
+"Settings.Folders.AllChatsHidden" = "Amaga \"%@\"";
+"Settings.Folders.RememberLast" = "Obrir l'Гєltima carpeta";
+"Settings.Folders.RememberLast.Notice" = "nameless obrirГ  l'Гєltima carpeta utilitzada desprГ©s de reiniciar o canviar de compte.";
+
+"Settings.Folders.CompactNames" = "Espaiat mГ©s petit";
+"Settings.Folders.AllChatsTitle" = "TГ­tol \"Tots els xats\"";
+"Settings.Folders.AllChatsTitle.short" = "Curt";
+"Settings.Folders.AllChatsTitle.long" = "Llarg";
+/* Default behaviour for All Chats Folder Title. "All Chats" title: Default */
+"Settings.Folders.AllChatsTitle.none" = "Per defecte";
+
+
+"Settings.ChatList.Header" = "LLISTA DE XATS";
+"Settings.CompactChatList" = "Llista de xats compacta";
+
+"Settings.Profiles.Header" = "PERFILS";
+
+"Settings.Stories.Hide" = "Amagar HistГІries";
+"Settings.Stories.WarnBeforeView" = "Preguntar abans de veure";
+"Settings.Stories.DisableSwipeToRecord" = "Desactivar lliscar per enregistrar";
+
+"Settings.Translation.QuickTranslateButton" = "BotГі de TraducciГі RГ pida";
+
+"Stories.Warning.Author" = "Autor";
+"Stories.Warning.ViewStory" = "Veure HistГІria?";
+/* Author will be able to see that you viewed their Story */
+"Stories.Warning.Notice" = "%@ PODRГЂ VEURE que has vist la seva HistГІria.";
+"Stories.Warning.NoticeStealth" = "%@ no podrГ  veure que has vist la seva HistГІria.";
+
+"Settings.Photo.Quality.Notice" = "Qualitat de les fotos sortints i histГІries de fotos.";
+"Settings.Photo.SendLarge" = "Enviar fotos grans";
+"Settings.Photo.SendLarge.Notice" = "Incrementar el lГ­mit de mida en imatges comprimides a 2560px.";
+
+"Settings.VideoNotes.Header" = "VГЌDEOS RODONS";
+"Settings.VideoNotes.StartWithRearCam" = "ComenГ§ar amb cГ mera posterior";
+
+"Settings.CustomColors.Header" = "COLORS DEL COMPTE";
+"Settings.CustomColors.Saturation" = "SATURACIГ“";
+/* Make sure to escape Percentage sign % */
+"Settings.CustomColors.Saturation.Notice" = "Estableix la saturaciГі a 0%% per desactivar els colors del compte.";
+
+"Settings.UploadsBoost" = "Millora de cГ rregues";
+"Settings.DownloadsBoost" = "Millora de baixades";
+"Settings.DownloadsBoost.Notice" = "Augmenta el nombre de connexions paralВ·leles i la mida de les parts de fitxer. Si la teva xarxa no pot gestionar la cГ rrega, prova diferents opcions que s'adaptin a la teva connexiГі.";
+"Settings.DownloadsBoost.none" = "Desactivat";
+"Settings.DownloadsBoost.medium" = "MitjГ ";
+"Settings.DownloadsBoost.maximum" = "MГ xim";
+
+"Settings.ShowProfileID" = "Mostrar ID de perfil";
+"Settings.ShowDC" = "Mostrar Data Center";
+"Settings.ShowCreationDate" = "Mostrar Data de CreaciГі de Xat";
+"Settings.ShowCreationDate.Notice" = "La data de creaciГі pot ser desconeguda per alguns xats.";
+
+"Settings.ShowRegDate" = "Mostra la data d'inscripciГі";
+"Settings.ShowRegDate.Notice" = "La data d'inscripciГі Г©s aproximada.";
+
+"Settings.SendWithReturnKey" = "Enviar amb clau \"retorn\"";
+"Settings.HidePhoneInSettingsUI" = "Amagar telГЁfon en la interfГ­cie d'ajustos";
+"Settings.HidePhoneInSettingsUI.Notice" = "AixГІ nomГ©s amagarГ  el teu nГєmero de telГЁfon de la interfГ­cie d'ajustos. Per amagar-lo als altres, ves a Privadesa i Seguretat.";
+
+"PasscodeSettings.AutoLock.InFiveSeconds" = "Si no hi ha en 5 segons";
+
+"ProxySettings.UseSystemDNS" = "Utilitzar DNS del sistema";
+"ProxySettings.UseSystemDNS.Notice" = "Utilitzar DNS del sistema per evitar el temps d'espera si no tens accГ©s a Google DNS";
+
+/* Preserve markdown asterisks! Example: You **don't** need Telegram Premium! */
+"Common.NoTelegramPremiumNeeded" = "No **necessites** %@!";
+"Common.RestartRequired" = "Reinici requerit";
+"Common.RestartNow" = "Reiniciar Ara";
+"Common.OpenTelegram" = "Obrir Telegram";
+"Common.UseTelegramForPremium" = "Recorda que per obtenir Telegram Premium, has d'utilitzar l'aplicaciГі oficial de Telegram. Un cop hagis obtingut Telegram Premium, totes les seves funcions estaran disponibles a nameless.";
+
+"Message.HoldToShowOrReport" = "Mantingues per Mostrar o Informar.";
+
+"Auth.AccountBackupReminder" = "Assegura't de tenir un mГЁtode d'accГ©s de reserva. Mantingues un SIM per a SMS o una sessiГі addicional registrada per evitar quedar bloquejat.";
+"Auth.UnofficialAppCodeTitle" = "NomГ©s pots obtenir el codi amb l'aplicaciГі oficial";
+
+"Settings.SmallReactions" = "Petites reaccions";
+"Settings.HideReactions" = "Amaga les reaccions";
+
+"ContextMenu.SaveToCloud" = "Desar al NГєvol";
+"ContextMenu.SelectFromUser" = "Seleccionar de l'Autor";
+
+"Settings.ContextMenu" = "MENГљ CONTEXTUAL";
+"Settings.ContextMenu.Notice" = "Les entrades desactivades estaran disponibles al submenГє \"nameless\".";
+
+
+"Settings.ChatSwipeOptions" = "Opcions desplaГ§ament de la llista de xats";
+"Settings.DeleteChatSwipeOption" = "Desplaceu-vos per esborrar la conversa";
+/* Re-word like this string on offical app https://translations.telegram.org/en/ios/groups_and_channels/Chat.NextChannelSameLocationSwipeProgress */
+"Settings.PullToNextChannel" = "Arrossega cap al segГјent canal no llegit";
+/* Re-word like this string on offical app https://translations.telegram.org/en/ios/groups_and_channels/Chat.NextUnreadTopicSwipeProgress */
+"Settings.PullToNextTopic" = "Arrosega cap al segГјent tema";
+"Settings.GalleryCamera" = "CГ mera a la galeria";
+/* "Send Message As..." button */
+"Settings.SendAsButton" = "\"%@\" BotГі";
+"Settings.SnapDeletionEffect" = "Efectes d'eliminaciГі de missatges";
+
+"Settings.Stickers.Size" = "GRANOR";
+"Settings.Stickers.Timestamp" = "Mostra l'estona";
+
+"Settings.RecordingButton" = "BotГі d'enregistrament de veu";
+
+"Settings.DefaultEmojisFirst" = "Prioritzar emojis estГ ndard";
+"Settings.DefaultEmojisFirst.Notice" = "Mostra emojis estГ ndard abans que premium al teclat emoji";
+
+/* Date when chat was created. "created: 24 May 2016" */
+"Chat.Created" = "creada: %@";
+
+/* Date when user joined the chat. "Joined nameless Chat" */
+"Chat.JoinedDateTitle" = "Unida a %@";
+/* Date when user registered in Telegram. Will be shown like "Registered\n24 May 2016" */
+"Chat.RegDate" = "Inscrit";
+
+"Settings.messageDoubleTapActionOutgoingEdit" = "Toqueu dues vegades per editar el missatge";
+
+"Settings.wideChannelPosts" = "Entrades Г mplies als canals";
+"Settings.ForceEmojiTab" = "Teclat d'emojis per defecte";
+
+"Settings.forceBuiltInMic" = "ForГ§a el MicrГІfon del Dispositiu";
+"Settings.forceBuiltInMic.Notice" = "Si estГ  habilitat, l'aplicaciГі utilitzarГ  nomГ©s el micrГІfon del dispositiu encara que estiguin connectats els auriculars.";
+
+"Settings.hideChannelBottomButton" = "Amaga el panell inferior del canal";
+
+"Settings.CallConfirmation" = "ConfirmaciГі de trucada";
+"Settings.CallConfirmation.Notice" = "nameless et demanarГ  la teva confirmaciГі abans de fer una trucada.";
+
+/* Confirmation before making a Call */
+"CallConfirmation.Audio.Title" = "Vols fer una trucada?";
+
+/* Confirmation before making a Video Call */
+"CallConfirmation.Video.Title" = "Vols fer una videotrucada?";
+
+"MutualContact.Label" = "contacte mutu";
+
+"Settings.swipeForVideoPIP" = "VГ­deo PIP amb desplaГ§ament";
+"Settings.swipeForVideoPIP.Notice" = "Si estГ  habilitat, desplaГ§ar el vГ­deo l'obrirГ  en mode Imatge en Imatge.";

@@ -1,0 +1,155 @@
+name: nameless iOS Build
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+concurrency:
+  group: build-${{ github.ref }}
+  # Only one build on main; cancel older so the newest always runs
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: macos-26
+    timeout-minutes: 360
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Cache Bazel user root
+        uses: actions/cache@v4
+        with:
+          path: |
+            /private/var/tmp/_bazel_containerhost
+            /Users/Shared/telegram-ios/build-input
+          key: bazel-${{ runner.os }}-xcode26-${{ hashFiles('MODULE.bazel', 'MODULE.bazel.lock', 'versions.json') }}
+          restore-keys: |
+            bazel-${{ runner.os }}-xcode26-
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Set active Xcode path
+        run: |
+          set -euo pipefail
+          XCODE_VERSION=$(cat versions.json | python3 -c 'import json,sys;obj=json.load(sys.stdin);print(obj["xcode"]);')
+          if [ -d "/Applications/Xcode_$XCODE_VERSION.app/Contents/Developer" ]; then
+            sudo xcode-select -s "/Applications/Xcode_$XCODE_VERSION.app/Contents/Developer"
+          else
+            sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+          fi
+          xcodebuild -version
+
+      - name: Create canonical source directory
+        run: |
+          set -euo pipefail
+          sudo mkdir -p /Users/Shared
+          sudo rm -rf /Users/Shared/telegram-ios
+          cp -R $GITHUB_WORKSPACE /Users/Shared/
+          mv /Users/Shared/$(basename $GITHUB_WORKSPACE) /Users/Shared/telegram-ios
+
+      - name: Patch submodules for FFmpeg 7.x and nameless compat
+        run: |
+          set -euo pipefail
+          SOURCE_DIR=/Users/Shared/telegram-ios
+          sed -i '' '/reordered_opaque/d' "$SOURCE_DIR/third-party/webrtc/webrtc/modules/video_coding/codecs/h264/h264_decoder_impl.cc"
+          # PeerInfo uses namelessFeaturesController (SGSettingsUI); luxGram hub stays excluded until BUILD-ready
+          sed -i '' 's/PresentationResourcesSettings.nameless.withRenderingMode(.alwaysOriginal)/PresentationResourcesSettings.nameless?.withRenderingMode(.alwaysOriginal)/' "$SOURCE_DIR/submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/ListItems/PeerInfoScreenCommentItem.swift"
+          sed -i '' 's/sgWebSettings\.global\.canGrant/(context.currentAppConfiguration.with { $0 }).sgWebSettings.global.canGrant/' "$SOURCE_DIR/submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoSettingsItems.swift"
+
+      - name: Import fake certificates
+        run: |
+          cd /Users/Shared/telegram-ios
+          python3 build-system/Make/ImportCertificates.py --path build-system/fake-codesigning/certs
+
+      - name: Patch rules_apple for CI
+        run: |
+          cd /Users/Shared/telegram-ios
+          python3 build-system/patch-rules-apple.py
+
+      - name: Build the App
+        shell: bash
+        run: |
+          set -euo pipefail
+          SOURCE_DIR=/Users/Shared/telegram-ios
+          BAZEL_USER_ROOT="/private/var/tmp/_bazel_containerhost"
+          cd "$SOURCE_DIR"
+          BUILD_NUMBER_OFFSET="$(cat build_number_offset)"
+          export APP_VERSION
+          APP_VERSION=$(python3 -c 'import json;print(json.load(open("versions.json"))["app"])')
+          export COMMIT_COUNT
+          COMMIT_COUNT=$(git rev-list --count HEAD)
+          COMMIT_COUNT=$((COMMIT_COUNT + BUILD_NUMBER_OFFSET))
+          export BUILD_NUMBER="$COMMIT_COUNT"
+          echo "BUILD_NUMBER=$BUILD_NUMBER" >> "$GITHUB_ENV"
+          echo "APP_VERSION=$APP_VERSION" >> "$GITHUB_ENV"
+          echo "Starting Make.py buildNumber=$BUILD_NUMBER app=$APP_VERSION"
+          # Avoid fragile PIPESTATUS: write log then check exit code file
+          set +e
+          python3 -u build-system/Make/Make.py \
+            --bazelUserRoot="$BAZEL_USER_ROOT" \
+            build \
+            --configurationPath="build-system/ci-configuration.json" \
+            --codesigningInformationPath=build-system/fake-codesigning \
+            --disableProvisioningProfiles --disableExtensions \
+            --configuration=release_arm64 \
+            --buildNumber="$BUILD_NUMBER" \
+            > /tmp/build.log 2>&1
+          BUILD_EXIT=$?
+          set -e
+          cp /tmp/build.log "$GITHUB_WORKSPACE/build.log" || true
+          echo "=== BUILD EXIT: $BUILD_EXIT ==="
+          echo "=== ERRORS ==="
+          (grep -nE "error:|ERROR:|cannot find|Build did NOT|FAILED|fatal error|undefined" /tmp/build.log || true) | tail -100
+          echo "=== LAST 100 LINES ==="
+          tail -100 /tmp/build.log
+          if [ "$BUILD_EXIT" -ne 0 ]; then
+            echo "Make/Bazel failed with exit code $BUILD_EXIT"
+            exit "$BUILD_EXIT"
+          fi
+          OUTPUT_PATH="build/artifacts"
+          rm -rf "$OUTPUT_PATH"
+          mkdir -p "$OUTPUT_PATH"
+          shopt -s nullglob
+          IPA=""
+          for f in bazel-bin/Telegram/Swiftgram.ipa bazel-out/applebin_ios-ios_arm*-opt-ST-*/bin/Telegram/Swiftgram.ipa; do
+            if [ -f "$f" ]; then IPA="$f"; break; fi
+          done
+          if [ -z "$IPA" ]; then
+            IPA=$(find bazel-out bazel-bin -name '*.ipa' -type f 2>/dev/null | head -1 || true)
+          fi
+          if [ -z "$IPA" ] || [ ! -f "$IPA" ]; then
+            echo "No IPA produced — failing job"
+            exit 1
+          fi
+          cp "$IPA" "$OUTPUT_PATH/nameless.ipa"
+          echo "Found IPA: $IPA"
+          ls -lah "$OUTPUT_PATH/"
+
+      - name: Upload build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log
+          path: |
+            /tmp/build.log
+            ${{ github.workspace }}/build.log
+          if-no-files-found: warn
+          retention-days: 3
+
+      - name: Upload unsigned build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nameless-${{ env.APP_VERSION }}-${{ env.BUILD_NUMBER }}
+          path: |
+            /Users/Shared/telegram-ios/build/artifacts/nameless.ipa
+          retention-days: 7

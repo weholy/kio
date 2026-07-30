@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>NamelessPink</key>
+	<dict>
+		<key>CFBundleIconFiles</key>
+		<array>
+			<string>NamelessPink</string>
+		</array>
+		<key>UIPrerenderedIcon</key>
+		<true/>
+	</dict>
+	<key>NamelessSky</key>
+	<dict>
+		<key>CFBundleIconFiles</key>
+		<array>
+			<string>NamelessSky</string>
+		</array>
+		<key>UIPrerenderedIcon</key>
+		<true/>
+	</dict>
+</dict>
+</plist>

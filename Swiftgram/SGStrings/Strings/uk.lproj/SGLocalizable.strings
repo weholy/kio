@@ -1,0 +1,245 @@
+﻿"Settings.ContentSettings" = "РќР°Р»Р°С€С‚СѓРІР°РЅРЅСЏ РєРѕРЅС‚РµРЅС‚Сѓ";
+
+"Settings.Tabs.Header" = "Р’РљР›РђР”РљР";
+"Settings.Tabs.HideTabBar" = "РџСЂРёС…РѕРІР°С‚Рё РїР°РЅРµР»СЊ РІРєР»Р°РґРѕРє";
+"Settings.Tabs.ShowContacts" = "Р’РєР»Р°РґРєР° \"РљРѕРЅС‚Р°РєС‚Рё\"";
+"Settings.Tabs.ShowNames" = "РџРѕРєР°Р·СѓРІР°С‚Рё РЅР°Р·РІРё РІРєР»Р°РґРѕРє";
+
+"Settings.Folders.BottomTab" = "РџР°РїРєРё Р·РЅРёР·Сѓ";
+"Settings.Folders.BottomTabStyle" = "РЎС‚РёР»СЊ РЅРёР¶РЅС–С… РїР°РїРѕРє";
+
+/* Do not translate */
+"Settings.Folders.BottomTabStyle.ios" = "iOS";
+/* Do not translate */
+"Settings.Folders.BottomTabStyle.telegram" = "Telegram";
+/* Example: Hide "All Chats" */
+"Settings.Folders.AllChatsHidden" = "РџСЂРёС…РѕРІР°С‚Рё \"%@\"";
+"Settings.Folders.RememberLast" = "Р’С–РґРєСЂРёРІР°С‚Рё РѕСЃС‚Р°РЅРЅСЋ РїР°РїРєСѓ";
+"Settings.Folders.RememberLast.Notice" = "nameless РІС–РґРєСЂРёС” РѕСЃС‚Р°РЅРЅСЋ РїР°РїРєСѓ РїС–СЃР»СЏ РїРµСЂРµР·Р°РїСѓСЃРєСѓ Р·Р°СЃС‚РѕСЃСѓРЅРєСѓ Р°Р±Рѕ Р·РјС–РЅРё Р°РєР°СѓРЅС‚Сѓ.";
+
+"Settings.Folders.CompactNames" = "Р—РјРµРЅС€РёС‚Рё РІС–РґСЃС‚СѓРїРё";
+"Settings.Folders.AllChatsTitle" = "Р—Р°РіРѕР»РѕРІРѕРє \"РЈСЃС– С‡Р°С‚Рё\"";
+"Settings.Folders.AllChatsTitle.short" = "РљРѕСЂРѕС‚РєРёР№";
+"Settings.Folders.AllChatsTitle.long" = "Р”РѕРІРіРёР№";
+/* Default behaviour for All Chats Folder Title. "All Chats" title: Default */
+"Settings.Folders.AllChatsTitle.none" = "РўРёРїРѕРІРёР№";
+
+
+"Settings.ChatList.Header" = "РЎРџРРЎРћРљ Р§РђРўР†Р’";
+"Settings.CompactChatList" = "РљРѕРјРїР°РєС‚РЅРёР№ СЃРїРёСЃРѕРє С‡Р°С‚С–РІ";
+
+"Settings.Profiles.Header" = "РџР РћР¤Р†Р›Р†";
+
+"Settings.Stories.Hide" = "РџСЂРёС…РѕРІСѓРІР°С‚Рё С–СЃС‚РѕСЂС–С—";
+"Settings.Stories.WarnBeforeView" = "РџРёС‚Р°С‚Рё РїРµСЂРµРґ РїРµСЂРµРіР»СЏРґРѕРј";
+"Settings.Stories.DisableSwipeToRecord" = "Р’РёРјРєРЅСѓС‚Рё \"РЎРІР°Р№Рї РґР»СЏ Р·Р°РїРёСЃСѓ\"";
+
+"Settings.Translation.QuickTranslateButton" = "РљРЅРѕРїРєР° С€РІРёРґРєРѕРіРѕ РїРµСЂРµРєР»Р°РґСѓ";
+
+"Stories.Warning.Author" = "РђРІС‚РѕСЂ";
+"Stories.Warning.ViewStory" = "РџРµСЂРµРіР»СЏРЅСѓС‚Рё С–СЃС‚РѕСЂС–СЋ?";
+/* Author will be able to see that you viewed their Story */
+"Stories.Warning.Notice" = "%@ Р—РњРћР–Р• РџРћР‘РђР§РРўР, С‰Рѕ РІРё РїРµСЂРµРіР»СЏРЅСѓР»Рё С—С… С–СЃС‚РѕСЂС–СЋ.";
+"Stories.Warning.NoticeStealth" = "%@ РЅРµ РїРѕР±Р°С‡РёС‚СЊ, С‰Рѕ РІРё РїРµСЂРµРіР»СЏРЅСѓР»Рё С—С… С–СЃС‚РѕСЂС–СЋ.";
+
+"Settings.Photo.Quality.Notice" = "РЇРєС–СЃС‚СЊ РІС–РґРїСЂР°РІР»РµРЅРёС… С„РѕС‚Рѕ С‚Р° С–СЃС‚РѕСЂС–Р№";
+"Settings.Photo.SendLarge" = "РќР°РґСЃРёР»Р°С‚Рё РІРµР»РёРєС– С„РѕС‚РѕРіСЂР°С„С–С—";
+"Settings.Photo.SendLarge.Notice" = "Р—Р±С–Р»СЊС€РёС‚Рё Р»С–РјС–С‚ СЂРѕР·РјС–СЂСѓ СЃС‚РёСЃРЅСѓС‚РёС… Р·РѕР±СЂР°Р¶РµРЅСЊ РґРѕ 2560px";
+
+"Settings.VideoNotes.Header" = "РљР РЈР“Р›Р† Р’Р†Р”Р•Рћ";
+"Settings.VideoNotes.StartWithRearCam" = "РџРѕС‡РёРЅР°С‚Рё Р·Р°РїРёСЃ Р· Р·Р°РґРЅСЊРѕС— РєР°РјРµСЂРё";
+
+"Settings.CustomColors.Header" = "РљРћР›Р¬РћР Р РђРљРљРђРЈРќРўРЈ";
+"Settings.CustomColors.Saturation" = "РќРђРЎРР§Р•РќР†РЎРўР¬";
+/* Make sure to escape Percentage sign % */
+"Settings.CustomColors.Saturation.Notice" = "Р’СЃС‚Р°РЅРѕРІС–С‚СЊ РЅР°СЃРёС‡РµРЅС–СЃС‚СЊ РЅР° 0%%, С‰РѕР± РІРёРјРєРЅСѓС‚Рё РїРµСЂСЃРѕРЅР°Р»СЊРЅС– РєРѕР»СЊРѕСЂРё";
+
+"Settings.UploadsBoost" = "РџСЂРёСЃРєРѕСЂРµРЅРЅСЏ РІРёРІР°РЅС‚Р°Р¶РµРЅРЅСЏ";
+"Settings.DownloadsBoost" = "РџСЂРёСЃРєРѕСЂРµРЅРЅСЏ Р·Р°РІР°РЅС‚Р°Р¶РµРЅРЅСЏ";
+"Settings.DownloadsBoost.Notice" = "Р—Р±С–Р»СЊС€СѓС” РєС–Р»СЊРєС–СЃС‚СЊ РїР°СЂР°Р»РµР»СЊРЅРёС… Р·'С”РґРЅР°РЅСЊ С‚Р° СЂРѕР·РјС–СЂ С‡Р°СЃС‚РёРЅ С„Р°Р№Р»С–РІ. РЇРєС‰Рѕ РІР°С€Р° РјРµСЂРµР¶Р° РЅРµ РјРѕР¶Рµ РІРёС‚СЂРёРјР°С‚Рё РЅР°РІР°РЅС‚Р°Р¶РµРЅРЅСЏ, СЃРїСЂРѕР±СѓР№С‚Рµ СЂС–Р·РЅС– РѕРїС†С–С—, СЏРєС– РїС–РґС…РѕРґСЏС‚СЊ РІР°С€РѕРјСѓ Р·'С”РґРЅР°РЅРЅСЋ.";
+"Settings.DownloadsBoost.none" = "Р’С–РґРєР»СЋС‡РµРЅРѕ";
+"Settings.DownloadsBoost.medium" = "РЎРµСЂРµРґРЅС”";
+"Settings.DownloadsBoost.maximum" = "РњР°РєСЃРёРјР°Р»СЊРЅРµ";
+
+"Settings.ShowProfileID" = "РџРѕРєР°Р·СѓРІР°С‚Рё ID РїСЂРѕС„С–Р»СЋ";
+"Settings.ShowDC" = "РџРѕРєР°Р·СѓРІР°С‚Рё РґР°С‚Р°-С†РµРЅС‚СЂ";
+"Settings.ShowCreationDate" = "РџРѕРєР°Р·СѓРІР°С‚Рё РґР°С‚Сѓ СЃС‚РІРѕСЂРµРЅРЅСЏ С‡Р°С‚Сѓ";
+"Settings.ShowCreationDate.Notice" = "Р”Р°С‚Р° СЃС‚РІРѕСЂРµРЅРЅСЏ РјРѕР¶Рµ Р±СѓС‚Рё РЅРµРІС–РґРѕРјР° РґР»СЏ РґРµСЏРєРёС… С‡Р°С‚С–РІ.";
+
+"Settings.ShowRegDate" = "РџРѕРєР°Р·СѓРІР°С‚Рё РґР°С‚Сѓ СЂРµС”СЃС‚СЂР°С†С–С—";
+"Settings.ShowRegDate.Notice" = "Р”Р°С‚Р° СЂРµС”СЃС‚СЂР°С†С–С— С” РїСЂРёР±Р»РёР·РЅРѕСЋ.";
+
+"Settings.SendWithReturnKey" = "РќР°РґСЃРёР»Р°С‚Рё РєРЅРѕРїРєРѕСЋ \"Р’РІРµРґРµРЅРЅСЏ\"";
+"Settings.HidePhoneInSettingsUI" = "РџСЂРёС…РѕРІР°С‚Рё С‚РµР»РµС„РѕРЅ Сѓ РЅР°Р»Р°С€С‚СѓРІР°РЅРЅСЏС…";
+"Settings.HidePhoneInSettingsUI.Notice" = "РќРѕРјРµСЂ Р±СѓРґРµ РїСЂРёС…РѕРІР°РЅРёР№ С‚С–Р»СЊРєРё РІ РЅР°Р»Р°С€С‚СѓРІР°РЅРЅСЏС…. РџРµСЂРµР№РґС–С‚СЊ РІ \"РџСЂРёРІР°С‚РЅС–СЃС‚СЊ С– Р±РµР·РїРµРєР°\", С‰РѕР± РїСЂРёС…РѕРІР°С‚Рё Р№РѕРіРѕ РІС–Рґ С–РЅС€РёС….";
+
+"PasscodeSettings.AutoLock.InFiveSeconds" = "Р—Р° 5 СЃРµРє";
+
+"ProxySettings.UseSystemDNS" = "Р’РёРєРѕСЂРёСЃС‚РѕРІСѓРІР°С‚Рё СЃРёСЃС‚РµРјРЅС– РЅР°Р»Р°С€С‚СѓРІР°РЅРЅСЏ DNS";
+"ProxySettings.UseSystemDNS.Notice" = "Р’РёРєРѕСЂРёСЃС‚РѕРІСѓРІР°С‚Рё СЃРёСЃС‚РµРјРЅРёР№ DNS РґР»СЏ РѕР±С…РѕРґСѓ С‚Р°Р№Рј-Р°СѓС‚Сѓ, СЏРєС‰Рѕ Сѓ РІР°СЃ РЅРµРјР°С” РґРѕСЃС‚СѓРїСѓ РґРѕ Google DNS";
+
+/* Preserve markdown asterisks! Example: You **don't** need Telegram Premium! */
+"Common.NoTelegramPremiumNeeded" = "Р’Р°Рј **РЅРµ РїРѕС‚СЂС–Р±РµРЅ** %@!";
+"Common.RestartRequired" = "РџРѕС‚СЂС–Р±РµРЅ РїРµСЂРµР·Р°РїСѓСЃРє";
+"Common.RestartNow" = "РџРµСЂРµР·Р°РІР°РЅС‚Р°Р¶РёС‚Рё";
+"Common.OpenTelegram" = "Р’С–РґРєСЂРёС‚Рё Telegram";
+"Common.UseTelegramForPremium" = "Р—РІРµСЂРЅС–С‚СЊ СѓРІР°РіСѓ, С‰Рѕ РґР»СЏ РѕС‚СЂРёРјР°РЅРЅСЏ Telegram Premium РІР°Рј РїРѕС‚СЂС–Р±РµРЅ РѕС„С–С†С–Р№РЅРёР№ Р·Р°СЃС‚РѕСЃСѓРЅРѕРє Telegram. РџС–СЃР»СЏ РѕС‚СЂРёРјР°РЅРЅСЏ Telegram Premium, СѓСЃС– РїРµСЂРµРІР°РіРё СЃС‚Р°РЅСѓС‚СЊ РґРѕСЃС‚СѓРїРЅРёРјРё Сѓ nameless.";
+"Common.UpdateOS" = "РќРµРѕР±С…С–РґРЅРµ РѕРЅРѕРІР»РµРЅРЅСЏ iOS";
+
+"Message.HoldToShowOrReport" = "Р—Р°С‚РёСЃРЅС–С‚СЊ, С‰РѕР± РїРµСЂРµРіР»СЏРЅСѓС‚Рё Р°Р±Рѕ РїРѕСЃРєР°СЂР¶РёС‚РёСЃСЊ.";
+
+"Auth.AccountBackupReminder" = "РџРµСЂРµРєРѕРЅР°Р№С‚РµСЃСЏ, С‰Рѕ Сѓ РІР°СЃ С” СЂРµР·РµСЂРІРЅРёР№ РјРµС‚РѕРґ РґРѕСЃС‚СѓРїСѓ. РўСЂРёРјР°Р№С‚Рµ SIM-РєР°СЂС‚Сѓ РґР»СЏ SMS Р°Р±Рѕ РґРѕРґР°С‚РєРѕРІСѓ СЃРµСЃС–СЋ, С‰РѕР± РЅРµ РІС‚СЂР°С‚РёС‚Рё РґРѕСЃС‚СѓРї РґРѕ Р°РєР°СѓРЅС‚Сѓ.";
+"Auth.UnofficialAppCodeTitle" = "Р’Рё РјРѕР¶РµС‚Рµ РѕС‚СЂРёРјР°С‚Рё РєРѕРґ С‚С–Р»СЊРєРё Р· РѕС„С–С†С–Р№РЅРёРј РґРѕРґР°С‚РєРѕРј";
+
+"Settings.SmallReactions" = "РњР°Р»С– СЂРµР°РєС†С–С—";
+"Settings.HideReactions" = "РџСЂРёС…РѕРІСѓРІР°С‚Рё СЂРµР°РєС†С–С—";
+
+"ContextMenu.SaveToCloud" = "РџРµСЂРµСЃР»Р°С‚Рё РІ Р—Р±РµСЂРµР¶РµРЅРµ";
+"ContextMenu.SelectFromUser" = "Р’РёР±СЂР°С‚Рё РІС–Рґ Р°РІС‚РѕСЂР°";
+
+"Settings.ContextMenu" = "РљРћРќРўР•РљРЎРўРќР• РњР•РќР®";
+"Settings.ContextMenu.Notice" = "Р’РёРјРєРЅРµРЅС– РµР»РµРјРµРЅС‚Рё Р±СѓРґСѓС‚СЊ РґРѕСЃС‚СѓРїРЅС– РІ РїС–РґРјРµРЅСЋ \"nameless\".";
+
+
+"Settings.ChatSwipeOptions" = "РћРїС†С–С— СЃРІР°Р№РїСѓ Сѓ СЃРїРёСЃРєСѓ С‡Р°С‚С–РІ";
+"Settings.DeleteChatSwipeOption" = "РџРѕС‚СЏРіРЅСѓС‚Рё РґР»СЏ РІРёРґР°Р»РµРЅРЅСЏ С‡Р°С‚Сѓ";
+/* Re-word like this string on offical app https://translations.telegram.org/en/ios/groups_and_channels/Chat.NextChannelSameLocationSwipeProgress */
+"Settings.PullToNextChannel" = "РџРѕС‚СЏРіРЅСѓС‚Рё РґРѕ РЅР°СЃС‚СѓРїРЅРѕРіРѕ РєР°РЅР°Р»Сѓ";
+/* Re-word like this string on offical app https://translations.telegram.org/en/ios/groups_and_channels/Chat.NextUnreadTopicSwipeProgress */
+"Settings.PullToNextTopic" = "РџРѕС‚СЏРіРЅСѓС‚Рё РґРѕ РЅР°СЃС‚СѓРїРЅРѕС— РіС–Р»РєРё";
+"Settings.GalleryCamera" = "РљР°РјРµСЂР° РІ РіР°Р»РµСЂРµС—";
+"Settings.GalleryCameraPreview" = "РџРѕРїРµСЂРµРґРЅС–Р№ РїРµСЂРµРіР»СЏРґ РєР°РјРµСЂРё РІ РіР°Р»РµСЂРµС—";
+/* "Send Message As..." button */
+"Settings.SendAsButton" = "РљРЅРѕРїРєР° \"%@\"";
+"Settings.SnapDeletionEffect" = "Р•С„РµРєС‚Рё РІРёРґР°Р»РµРЅРЅСЏ РїРѕРІС–РґРѕРјР»РµРЅРЅСЏ";
+
+"Settings.Stickers.Size" = "Р РћР—РњР†Р ";
+"Settings.Stickers.Timestamp" = "РџРѕРєР°Р·СѓРІР°С‚Рё С‡Р°СЃ";
+
+"Settings.RecordingButton" = "РљРЅРѕРїРєР° Р·Р°РїРёСЃСѓ РіРѕР»РѕСЃСѓ";
+
+"Settings.DefaultEmojisFirst" = "РџСЂС–РѕСЂРёС‚РёР·СѓРІР°С‚Рё Р·РІРёС‡Р°Р№РЅС– РµРјРѕРґР·С–";
+"Settings.DefaultEmojisFirst.Notice" = "РџРѕРєР°Р·СѓРІР°С‚Рё Р·РІРёС‡Р°Р№РЅС– РµРјРѕРґР·С– РїРµСЂРµРґ РїСЂРµРјС–СѓРј Сѓ РєР»Р°РІС–Р°С‚СѓСЂС– РµРјРѕРґР·С–";
+
+/* Date when chat was created. "created: 24 May 2016" */
+"Chat.Created" = "СЃС‚РІРѕСЂРµРЅРѕ: %@";
+
+/* Date when user joined the chat. "Joined nameless Chat" */
+"Chat.JoinedDateTitle" = "РџСЂРёС”РґРЅР°РІСЃСЏ РґРѕ %@";
+/* Date when user registered in Telegram. Will be shown like "Registered\n24 May 2016" */
+"Chat.RegDate" = "Р РµС”СЃС‚СЂР°С†С–СЏ";
+
+"Settings.messageDoubleTapActionOutgoingEdit" = "Р РµРґ. РїРѕРІС–РґРѕРјР»РµРЅРЅСЏ РїРѕРґРІС–Р№РЅРёРј РґРѕС‚РёРєРѕРј";
+
+"Settings.wideChannelPosts" = "РЁРёСЂРѕРєС– РїРѕСЃС‚Рё РІ РєР°РЅР°Р»Р°С…";
+"Settings.ForceEmojiTab" = "РљР»Р°РІС–Р°С‚СѓСЂР° РµРјРѕРґР·С– Р·Р° Р·Р°РјРѕРІС‡СѓРІР°РЅРЅСЏРј";
+
+"Settings.forceBuiltInMic" = "Р’РёРєРѕСЂРёСЃС‚РѕРІСѓРІР°С‚Рё РјС–РєСЂРѕС„РѕРЅ РїСЂРёСЃС‚СЂРѕСЋ";
+"Settings.forceBuiltInMic.Notice" = "РЇРєС‰Рѕ СѓРІС–РјРєРЅРµРЅРѕ, Р·Р°СЃС‚РѕСЃСѓРЅРѕРє РІРёРєРѕСЂРёСЃС‚РѕРІСѓРІР°С‚РёРјРµ Р»РёС€Рµ РјС–РєСЂРѕС„РѕРЅ РїСЂРёСЃС‚СЂРѕСЋ, РЅР°РІС–С‚СЊ СЏРєС‰Рѕ РїС–РґРєР»СЋС‡РµРЅС– РЅР°РІСѓС€РЅРёРєРё.";
+
+"Settings.showChannelBottomButton" = "РќРёР¶РЅСЏ РїР°РЅРµР»СЊ Сѓ РєР°РЅР°Р»Р°С…";
+
+"Settings.secondsInMessages" = "РЎРµРєСѓРЅРґРё РІ РїРѕРІС–РґРѕРјР»РµРЅРЅСЏС…";
+
+"Settings.CallConfirmation" = "РџС–РґС‚РІРµСЂРґР¶РµРЅРЅСЏ РІРёРєР»РёРєС–РІ";
+"Settings.CallConfirmation.Notice" = "nameless Р·Р°РїРёС‚СѓРІР°С‚РёРјРµ РґРѕР·РІС–Р» РїРµСЂРµРґ Р·РґС–Р№СЃРЅРµРЅРЅСЏРј РІРёРєР»РёРєСѓ.";
+
+/* Confirmation before making a Call */
+"CallConfirmation.Audio.Title" = "Р—РґС–Р№СЃРЅРёС‚Рё РІРёРєР»РёРє?";
+
+/* Confirmation before making a Video Call */
+"CallConfirmation.Video.Title" = "Р—РґС–Р№СЃРЅРёС‚Рё РІС–РґРµРѕРІРёРєР»РёРє?";
+
+"MutualContact.Label" = "РІР·Р°С”РјРЅРёР№ РєРѕРЅС‚Р°РєС‚";
+
+"Settings.swipeForVideoPIP" = "Р’С–РґРµРѕ PIP Р·С– Р·РјР°С…СѓРІР°РЅРЅСЏРј";
+"Settings.swipeForVideoPIP.Notice" = "РЇРєС‰Рѕ СѓРІС–РјРєРЅРµРЅРѕ, Р·РјР°С…СѓРІР°РЅРЅСЏ РІС–РґРµРѕ РІС–РґРєСЂРёС” Р№РѕРіРѕ РІ СЂРµР¶РёРјС– В«РљР°СЂС‚РёРЅРєР° РІ РєР°СЂС‚РёРЅС†С–В».";
+
+"SessionBackup.Title" = "Р РµР·РµСЂРІРЅРµ РєРѕРїС–СЋРІР°РЅРЅСЏ СЃРµСЃС–С—";
+"SessionBackup.Sessions.Title" = "РЎРµСЃС–С—";
+"SessionBackup.Actions.Backup" = "Р РµР·РµСЂРІРЅРµ РєРѕРїС–СЋРІР°РЅРЅСЏ РІ Keychain";
+"SessionBackup.Actions.Restore" = "Р’С–РґРЅРѕРІР»РµРЅРЅСЏ Р· Keychain";
+"SessionBackup.Actions.DeleteAll" = "Р’РёРґР°Р»РёС‚Рё СЂРµР·РµСЂРІРЅСѓ РєРѕРїС–СЋ Keychain";
+"SessionBackup.Actions.DeleteOne" = "Р’РёРґР°Р»РёС‚Рё Р· СЂРµР·РµСЂРІРЅРѕС— РєРѕРїС–С—";
+"SessionBackup.Actions.RemoveFromApp" = "Р’РёРґР°Р»РёС‚Рё Р· РґРѕРґР°С‚РєСѓ";
+"SessionBackup.LastBackupAt" = "РћСЃС‚Р°РЅРЅС” СЂРµР·РµСЂРІРЅРµ РєРѕРїС–СЋРІР°РЅРЅСЏ: %@";
+"SessionBackup.RestoreOK" = "РћРљ. РЎРµСЃС–С— РІС–РґРЅРѕРІР»РµРЅРѕ: %@";
+"SessionBackup.LoggedIn" = "РЈРІС–Р№С€Р»Рё";
+"SessionBackup.LoggedOut" = "Р’РёР№С€Р»Рё";
+"SessionBackup.DeleteAll.Title" = "Р’РёРґР°Р»РёС‚Рё РІСЃС– СЃРµСЃС–С—?";
+"SessionBackup.DeleteAll.Text" = "Р’СЃС– СЃРµСЃС–С— Р±СѓРґСѓС‚СЊ РІРёРґР°Р»РµРЅС– Р· Keychain.\n\nРћР±Р»С–РєРѕРІС– Р·Р°РїРёСЃРё РЅРµ Р±СѓРґСѓС‚СЊ РІРёР№С€Р»Рё Р·С– nameless.";
+"SessionBackup.DeleteSingle.Title" = "Р’РёРґР°Р»РёС‚Рё 1 (РѕРґРЅСѓ) СЃРµСЃС–СЋ?";
+"SessionBackup.DeleteSingle.Text" = "%@ СЃРµСЃС–СЏ Р±СѓРґРµ РІРёРґР°Р»РµРЅР° Р· Keychain.\n\nРћР±Р»С–РєРѕРІРёР№ Р·Р°РїРёСЃ РЅРµ Р±СѓРґРµ РІРёР№С€РѕРІ Р·С– nameless.";
+"SessionBackup.RemoveFromApp.Title" = "Р’РёРґР°Р»РёС‚Рё РѕР±Р»С–РєРѕРІРёР№ Р·Р°РїРёСЃ Р· РґРѕРґР°С‚РєСѓ?";
+"SessionBackup.RemoveFromApp.Text" = "%@ СЃРµСЃС–СЏ Р‘РЈР”Р• Р’РР”РђР›Р•РќРђ Р· nameless! РЎРµСЃС–СЏ Р·Р°Р»РёС€РёС‚СЊСЃСЏ Р°РєС‚РёРІРЅРѕСЋ, С‰РѕР± РІРё РјРѕРіР»Рё РІС–РґРЅРѕРІРёС‚Рё С—С— РїС–Р·РЅС–С€Рµ.";
+"SessionBackup.Notice" = "РЎРµСЃС–С— Р·Р°С€РёС„СЂРѕРІР°РЅС– С‚Р° Р·Р±РµСЂС–РіР°СЋС‚СЊСЃСЏ РЅР° РїСЂРёСЃС‚СЂРѕС—. РЎРµСЃС–С— РЅС–РєРѕР»Рё РЅРµ Р·Р°Р»РёС€Р°СЋС‚СЊ РІР°С€ РїСЂРёСЃС‚СЂС–Р№.\n\nР’РђР–Р›РР’Рћ: Р”Р»СЏ РІС–РґРЅРѕРІР»РµРЅРЅСЏ СЃРµСЃС–Р№ РЅР° С–РЅС€РѕРјСѓ РїСЂРёСЃС‚СЂРѕС— Р°Р±Рѕ РїС–СЃР»СЏ СЃРєРёРґР°РЅРЅСЏ РЅР°Р»Р°С€С‚СѓРІР°РЅСЊ, РІРё РїРѕРІРёРЅРЅС– РІРІС–РјРєРЅСѓС‚Рё С€РёС„СЂСѓРІР°РЅРЅСЏ СЂРµР·РµСЂРІРЅРёС… РєРѕРїС–Р№, РІ С–РЅС€РѕРјСѓ РІРёРїР°РґРєСѓ РєР»СЋС‡С– РЅРµ Р±СѓРґСѓС‚СЊ РїРµСЂРµРЅРµСЃРµРЅС–.\n\nРўРђРљРћР–: РЎРµСЃС–С— РјРѕР¶СѓС‚СЊ Р±СѓС‚Рё РІС–РґРєР»РёРєР°РЅС– Telegram Р°Р±Рѕ Р· С–РЅС€РѕРіРѕ РїСЂРёСЃС‚СЂРѕСЋ.";
+
+"MessageFilter.Title" = "Р¤С–Р»СЊС‚СЂ РїРѕРІС–РґРѕРјР»РµРЅСЊ";
+"MessageFilter.SubTitle" = "РџСЂРёС…РѕРІР°С‚Рё РІС–РґРІРѕР»С–РєР°РЅРЅСЏ С‚Р° Р·РјРµРЅС€РёС‚Рё РІРёРґРёРјС–СЃС‚СЊ РїРѕРІС–РґРѕРјР»РµРЅСЊ, С‰Рѕ РјС–СЃС‚СЏС‚СЊ РЅРёР¶С‡РµРІРєР°Р·Р°РЅС– РєР»СЋС‡РѕРІС– СЃР»РѕРІР°.\nРљР»СЋС‡РѕРІС– СЃР»РѕРІР° С‡СѓС‚Р»РёРІС– РґРѕ СЂРµРіС–СЃС‚СЂСѓ.";
+"MessageFilter.Keywords.Title" = "РљР»СЋС‡РѕРІС– СЃР»РѕРІР°";
+"MessageFilter.InputPlaceholder" = "Р’РІРµРґС–С‚СЊ РєР»СЋС‡РѕРІРµ СЃР»РѕРІРѕ";
+
+"InputToolbar.Title" = "РџР°РЅРµР»СЊ С„РѕСЂРјР°С‚СѓРІР°РЅРЅСЏ";
+
+"Notifications.MentionsAndReplies.Title" = "@Р—РіР°РґР°Р№ С‚Р° РІС–РґРїРѕРІС–РґС–";
+"Notifications.MentionsAndReplies.value.default" = "РўРёРїРѕРІРёР№";
+"Notifications.MentionsAndReplies.value.silenced" = "РџСЂРёРіР»СѓС€РµРЅРѕ";
+"Notifications.MentionsAndReplies.value.disabled" = "Р’С–РґРєР»СЋС‡РµРЅРѕ";
+"Notifications.PinnedMessages.Title" = "Р—Р°РєСЂС–РїР»РµРЅС– РїРѕРІС–РґРѕРјР»РµРЅРЅСЏ";
+"Notifications.PinnedMessages.value.default" = "РўРёРїРѕРІРёР№";
+"Notifications.PinnedMessages.value.silenced" = "РџСЂРёРіР»СѓС€РµРЅРѕ";
+"Notifications.PinnedMessages.value.disabled" = "Р’С–РґРєР»СЋС‡РµРЅРѕ";
+
+
+"PayWall.Text" = "РџРѕСЃРёР»РµРЅРёР№ С„СѓРЅРєС†С–СЏРјРё Pro";
+
+"PayWall.SessionBackup.Title" = "Р РµР·РµСЂРІРЅРµ РєРѕРїС–СЋРІР°РЅРЅСЏ СЃРµСЃС–С—";
+"PayWall.SessionBackup.Notice" = "Р’С…С–Рґ РґРѕ РѕР±Р»С–РєРѕРІРёС… Р·Р°РїРёСЃС–РІ Р±РµР· РєРѕРґСѓ, РЅР°РІС–С‚СЊ РїС–СЃР»СЏ РїРµСЂРµРІСЃС‚Р°РЅРѕРІР»РµРЅРЅСЏ. Р‘РµР·РїРµС‡РЅРµ СЃС…РѕРІРёС‰Рµ Р· РљР»СЋС‡Р°СЂРµРј РїСЂРёСЃС‚СЂРѕСЋ.";
+"PayWall.SessionBackup.Description" = "Р—РјС–РЅР° РїСЂРёСЃС‚СЂРѕСЋ Р°Р±Рѕ РІРёРґР°Р»РµРЅРЅСЏ nameless Р±С–Р»СЊС€Рµ РЅРµ РїСЂРѕР±Р»РµРјР°. Р’С–РґРЅРѕРІРёС‚Рё РІСЃС– СЃРµР°РЅСЃРё, СЏРєС– РґРѕСЃС– Р°РєС‚РёРІРЅС– РЅР° СЃРµСЂРІРµСЂР°С… Telegram.";
+
+"PayWall.MessageFilter.Title" = "Р¤С–Р»СЊС‚СЂ РїРѕРІС–РґРѕРјР»РµРЅСЊ";
+"PayWall.MessageFilter.Notice" = "Р—РјРµРЅС€РёС‚Рё РІРёРґРёРјС–СЃС‚СЊ РЎРџРђРњСѓ, СЂРµРєР»Р°Рј С‚Р° РЅР°Р±СЂРёРґР»РёРІРёС… РїРѕРІС–РґРѕРјР»РµРЅСЊ.";
+"PayWall.MessageFilter.Description" = "РЎС‚РІРѕСЂРёС‚Рё СЃРїРёСЃРѕРє РєР»СЋС‡РѕРІРёС… СЃР»С–РІ, СЏРєС– РІРё РЅРµ С…РѕС‡РµС‚Рµ Р±Р°С‡РёС‚Рё С‡Р°СЃС‚Рѕ, Р° nameless Р·РјРµРЅС€РёС‚СЊ РІС–РґРІРѕР»С–РєР°РЅРЅСЏ.";
+
+"PayWall.Notifications.Title" = "Р’РёРјРєРЅСѓС‚Рё @Р·РіР°РґРєРё С‚Р° РІС–РґРїРѕРІС–РґС–";
+"PayWall.Notifications.Notice" = "РЎС…РѕРІР°С‚Рё Р°Р±Рѕ РїСЂРёРіР»СѓС€РёС‚Рё РЅРµРїРѕС‚СЂС–Р±РЅС– СЃРїРѕРІС–С‰РµРЅРЅСЏ.";
+"PayWall.Notifications.Description" = "Р‘С–Р»СЊС€Рµ РЅРµ РїРѕС‚СЂС–Р±РЅРѕ РІРёРєРѕСЂРёСЃС‚РѕРІСѓРІР°С‚Рё РїСЂРёРєСЂС–РїР»РµРЅС– РїРѕРІС–РґРѕРјР»РµРЅРЅСЏ Р°Р±Рѕ @Р·РіР°РґРєРё, РєРѕР»Рё РІРё РїРѕС‚СЂРµР±СѓС”С‚Рµ СЂРѕР·СѓРјСѓ.";
+
+"PayWall.InputToolbar.Title" = "РџР°РЅРµР»СЊ С„РѕСЂРјР°С‚СѓРІР°РЅРЅСЏ";
+"PayWall.InputToolbar.Notice" = "Р—Р±РµСЂС–РіР°С‚Рё С‡Р°СЃ С„РѕСЂРјР°С‚СѓРІР°РЅРЅСЏ РїРѕРІС–РґРѕРјР»РµРЅСЊ РѕРґРЅРёРј РґРѕС‚РёРєРѕРј.";
+"PayWall.InputToolbar.Description" = "Р—Р°СЃС‚РѕСЃСѓРІР°С‚Рё С– РѕС‡РёСЃС‚РёС‚Рё С„РѕСЂРјР°С‚СѓРІР°РЅРЅСЏ Р°Р±Рѕ РІСЃС‚Р°РІРёС‚Рё РЅРѕРІС– Р»С–РЅС–С—, СЏРє Pro.";
+
+"PayWall.AppIcons.Title" = "РЈРЅС–РєР°Р»СЊРЅС– Р·РЅР°С‡РєРё РґРѕРґР°С‚РєС–РІ";
+"PayWall.AppIcons.Notice" = "РќР°Р»Р°С€С‚СѓР№С‚Рµ РІРёРіР»СЏРґ nameless РЅР° РІР°С€РѕРјСѓ РґРѕРјР°С€РЅСЊРѕРјСѓ РµРєСЂР°РЅС–.";
+
+"PayWall.About.Title" = "РџСЂРѕ nameless Pro";
+"PayWall.About.Notice" = "Р‘РµР·РєРѕС€С‚РѕРІРЅР° РІРµСЂСЃС–СЏ nameless РЅР°РґР°С” РґРµСЃСЏС‚РєРё С„СѓРЅРєС†С–Р№ С‚Р° РїРѕРєСЂР°С‰РµРЅСЊ Сѓ РїРѕСЂС–РІРЅСЏРЅРЅС– Р· РґРѕРґР°С‚РєРѕРј Telegram. Р†РЅРЅРѕРІР°С†С–С— С‚Р° РїС–РґС‚СЂРёРјРєР° nameless РІ Р°РєС‚СѓР°Р»СЊРЅРѕРјСѓ СЃС‚Р°РЅС– Р· РјС–СЃСЏС‡РЅРёРјРё РѕРЅРѕРІР»РµРЅРЅСЏРјРё Telegram РїРѕС‚СЂРµР±СѓС” РІРµР»РёС‡РµР·РЅРёС… Р·СѓСЃРёР»СЊ, С‰Рѕ РІРёРјР°РіР°СЋС‚СЊ Р±Р°РіР°С‚Рѕ С‡Р°СЃСѓ С‚Р° РґРѕСЂРѕРіРѕРіРѕ РѕР±Р»Р°РґРЅР°РЅРЅСЏ.\n\nnameless вЂ” С†Рµ РґРѕРґР°С‚РѕРє Р· РІС–РґРєСЂРёС‚РёРј РєРѕРґРѕРј, СЏРєРёР№ РїРѕРІР°Р¶Р°С” РІР°С€Сѓ РєРѕРЅС„С–РґРµРЅС†С–Р№РЅС–СЃС‚СЊ С– РЅРµ С‚СѓСЂР±СѓС” РІР°СЃ СЂРµРєР»Р°РјРѕСЋ. РџС–РґРїРёСЃСѓСЋС‡РёСЃСЊ РЅР° nameless Pro, РІРё РѕС‚СЂРёРјСѓС”С‚Рµ РґРѕСЃС‚СѓРї РґРѕ РµРєСЃРєР»СЋР·РёРІРЅРёС… С„СѓРЅРєС†С–Р№ С– РїС–РґС‚СЂРёРјСѓС”С‚Рµ РЅРµР·Р°Р»РµР¶РЅРѕРіРѕ СЂРѕР·СЂРѕР±РЅРёРєР°.\n\n- @Kylmakalle";
+/* DO NOT TRANSLATE */
+"PayWall.About.Signature" = "@Kylmakalle";
+/* DO NOT TRANSLATE */
+"PayWall.About.SignatureURL" = "https://t.me/Kylmakalle";
+
+"PayWall.ProSupport.Title" = "РџСЂРѕР±Р»РµРјРё Р· РѕРїР»Р°С‚РѕСЋ?";
+"PayWall.ProSupport.Contact" = "РќРµ С…РІРёР»СЋР№С‚РµСЃСЏ!";
+
+"PayWall.RestorePurchases" = "Р’С–РґРЅРѕРІРёС‚Рё РїРѕРєСѓРїРєРё";
+"PayWall.Terms" = "РЈРјРѕРІРё РѕР±СЃР»СѓРіРѕРІСѓРІР°РЅРЅСЏ";
+"PayWall.Privacy" = "РџРѕР»С–С‚РёРєР° РєРѕРЅС„С–РґРµРЅС†С–Р№РЅРѕСЃС‚С–";
+"PayWall.TermsURL" = "https://swiftgram.app/terms";
+"PayWall.PrivacyURL" = "https://swiftgram.app/privacy";
+"PayWall.Notice.Markdown" = "РџС–РґРїРёСЃСѓСЋС‡РёСЃСЊ РЅР° nameless Pro, РІРё РїРѕРіРѕРґР¶СѓС”С‚РµСЃСЏ Р· [РЈРјРѕРІР°РјРё РѕР±СЃР»СѓРіРѕРІСѓРІР°РЅРЅСЏ nameless](%1$@) С‚Р° [РџРѕР»С–С‚РёРєРѕСЋ РєРѕРЅС„С–РґРµРЅС†С–Р№РЅРѕСЃС‚С–](%2$@).";
+"PayWall.Notice.Raw" = "РџС–РґРїРёСЃСѓСЋС‡РёСЃСЊ РЅР° nameless Pro, РІРё РїРѕРіРѕРґР¶СѓС”С‚РµСЃСЏ Р· РЈРјРѕРІР°РјРё РѕР±СЃР»СѓРіРѕРІСѓРІР°РЅРЅСЏ nameless С‚Р° РџРѕР»С–С‚РёРєРѕСЋ РєРѕРЅС„С–РґРµРЅС†С–Р№РЅРѕСЃС‚С–.";
+
+"PayWall.Button.OpenPro" = "Р’РёРєРѕСЂРёСЃС‚РѕРІСѓРІР°С‚Рё С„СѓРЅРєС†С–С— Pro";
+"PayWall.Button.Purchasing" = "РџСЂРёРґР±Р°РЅРЅСЏ...";
+"PayWall.Button.Restoring" = "Р’С–РґРЅРѕРІР»РµРЅРЅСЏ РїРѕРєСѓРїРѕРє...";
+"PayWall.Button.Validating" = "РџРµСЂРµРІС–СЂРєР° РїРѕРєСѓРїРєРё...";
+"PayWall.Button.PaymentsUnavailable" = "РџР»Р°С‚РµР¶С– РЅРµРґРѕСЃС‚СѓРїРЅС–";
+"PayWall.Button.BuyInAppStore" = "РџС–РґРїРёСЃР°С‚РёСЃСЏ РЅР° РІРµСЂСЃС–СЋ РІ App Store";
+"PayWall.Button.Subscribe" = "РџС–РґРїРёСЃР°С‚РёСЃСЏ Р·Р° %@ / РјС–СЃСЏС†СЊ";
+"PayWall.Button.ContactingAppStore" = "Р—РІ'СЏР·РѕРє Р· App Store...";
+
+"Paywall.Error.Title" = "РџРѕРјРёР»РєР°";
+"PayWall.ValidationError" = "РџРѕРјРёР»РєР° РІР°Р»С–РґР°С†С–С—";
+"PayWall.ValidationError.TryAgain" = "Р©РѕСЃСЊ РїС–С€Р»Рѕ РЅРµ С‚Р°Рє РїС–Рґ С‡Р°СЃ РїРµСЂРµРІС–СЂРєРё РїРѕРєСѓРїРєРё. РќРµ С…РІРёР»СЋР№С‚РµСЃСЏ! РЎРїСЂРѕР±СѓР№С‚Рµ РІС–РґРЅРѕРІРёС‚Рё РїРѕРєСѓРїРєРё С‚СЂРѕС…Рё РїС–Р·РЅС–С€Рµ.";
+"PayWall.ValidationError.Expired" = "Р’Р°С€Р° РїС–РґРїРёСЃРєР° Р·Р°СЃС‚Р°СЂС–Р»Р°. РџС–РґРїРёС€С–С‚СЊСЃСЏ, С‰РѕР± РІС–РґРЅРѕРІРёС‚Рё РґРѕСЃС‚СѓРї РґРѕ Pro-РјРѕР¶Р»РёРІРѕСЃС‚РµР№.";

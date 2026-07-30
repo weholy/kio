@@ -1,0 +1,777 @@
+     1→     1→// MARK: Swiftgram
+     2→     2→import SGLogging
+     3→     3→import SGSimpleSettings
+     4→     4→import SGStrings
+     5→     5→import SGAPIToken
+     6→     6→
+     7→     7→import SGItemListUI
+     8→     8→import Foundation
+     9→     9→import UIKit
+    10→    10→import Display
+    11→    11→import SwiftSignalKit
+    12→    12→import Postbox
+    13→    13→import TelegramCore
+    14→    14→import MtProtoKit
+    15→    15→import MessageUI
+    16→    16→import TelegramPresentationData
+    17→    17→import TelegramUIPreferences
+    18→    18→import ItemListUI
+    19→    19→import PresentationDataUtils
+    20→    20→import OverlayStatusController
+    21→    21→import AccountContext
+    22→    22→import AppBundle
+    23→    23→import WebKit
+    24→    24→import PeerNameColorScreen
+    25→    25→import UndoUI
+    26→    26→
+    27→    27→
+    28→    28→private enum SGControllerSection: Int32, SGItemListSection {
+    29→    29→    case search
+    30→    30→    case trending
+    31→    31→    case content
+    32→    32→    case tabs
+    33→    33→    case folders
+    34→    34→    case chatList
+    35→    35→    case profiles
+    36→    36→    case stories
+    37→    37→    case translation
+    38→    38→    case voiceMessages
+    39→    39→    case calls
+    40→    40→    case photo
+    41→    41→    case stickers
+    42→    42→    case videoNotes
+    43→    43→    case contextMenu
+    44→    44→    case accountColors
+    45→    45→    case other
+    46→    46→}
+    47→    47→
+    48→    48→private enum SGBoolSetting: String {
+    49→    49→    case hidePhoneInSettings
+    50→    50→    case showTabNames
+    51→    51→    case showContactsTab
+    52→    52→    case showCallsTab
+    53→    53→    case wideTabBar
+    54→    54→    case foldersAtBottom
+    55→    55→    case startTelescopeWithRearCam
+    56→    56→    case hideStories
+    57→    57→    case uploadSpeedBoost
+    58→    58→    case showProfileId
+    59→    59→    case warnOnStoriesOpen
+    60→    60→    case sendWithReturnKey
+    61→    61→    case rememberLastFolder
+    62→    62→    case sendLargePhotos
+    63→    63→    case storyStealthMode
+    64→    64→    case disableSwipeToRecordStory
+    65→    65→    case disableDeleteChatSwipeOption
+    66→    66→    case quickTranslateButton
+    67→    67→    case hideReactions
+    68→    68→    case showRepostToStory
+    69→    69→    case contextShowSelectFromUser
+    70→    70→    case contextShowSaveToCloud
+    71→    71→    case contextShowHideForwardName
+    72→    72→    case contextShowRestrict
+    73→    73→    case contextShowReport
+    74→    74→    case contextShowReply
+    75→    75→    case contextShowPin
+    76→    76→    case contextShowSaveMedia
+    77→    77→    case contextShowMessageReplies
+    78→    78→    case contextShowJson
+    79→    79→    case disableScrollToNextChannel
+    80→    80→    case disableScrollToNextTopic
+    81→    81→    case disableChatSwipeOptions
+    82→    82→    case disableGalleryCamera
+    83→    83→    case disableGalleryCameraPreview
+    84→    84→    case disableSendAsButton
+    85→    85→    case disableSnapDeletionEffect
+    86→    86→    case stickerTimestamp
+    87→    87→    case hideRecordingButton
+    88→    88→    case hideTabBar
+    89→    89→    case showDC
+    90→    90→    case showCreationDate
+    91→    91→    case showRegDate
+    92→    92→    case compactChatList
+    93→    93→    case compactMessagePreview
+    94→    94→    case compactFolderNames
+    95→    95→    case allChatsHidden
+    96→    96→    case defaultEmojisFirst
+    97→    97→    case messageDoubleTapActionOutgoingEdit
+    98→    98→    case wideChannelPosts
+    99→    99→    case forceEmojiTab
+   100→   100→    case forceBuiltInMic
+   101→   101→    case secondsInMessages
+   102→   102→    case hideChannelBottomButton
+   103→   103→    case confirmCalls
+   104→   104→    case swipeForVideoPIP
+   105→   105→    case enableVoipTcp
+   106→   106→    case nyStyleSnow
+   107→   107→    case nyStyleLightning
+   108→   108→    case tabBarSearchEnabled
+   109→   109→}
+   110→   110→
+   111→   111→private enum SGOneFromManySetting: String {
+   112→   112→    case nyStyle
+   113→   113→    case bottomTabStyle
+   114→   114→    case downloadSpeedBoost
+   115→   115→    case allChatsTitleLengthOverride
+   116→   116→//    case allChatsFolderPositionOverride
+   117→   117→    case translationBackend
+   118→   118→    case transcriptionBackend
+   119→   119→}
+   120→   120→
+   121→   121→private enum SGSliderSetting: String {
+   122→   122→    case accountColorsSaturation
+   123→   123→    case outgoingPhotoQuality
+   124→   124→    case stickerSize
+   125→   125→}
+   126→   126→
+   127→   127→private enum SGDisclosureLink: String {
+   128→   128→    case contentSettings
+   129→   129→    case languageSettings
+   130→   130→}
+   131→   131→
+   132→   132→private struct PeerNameColorScreenState: Equatable {
+   133→   133→    var updatedNameColor: PeerNameColor?
+   134→   134→    var updatedBackgroundEmojiId: Int64?
+   135→   135→}
+   136→   136→
+   137→   137→private struct SGSettingsControllerState: Equatable {
+   138→   138→    var searchQuery: String?
+   139→   139→}
+   140→   140→
+   141→   141→private typealias SGControllerEntry = SGItemListUIEntry<SGControllerSection, SGBoolSetting, SGSliderSetting, SGOneFromManySetting, SGDisclosureLink, AnyHashable>
+   142→   142→
+   143→   143→private func SGControllerEntries(presentationData: PresentationData, callListSettings: CallListSettings, experimentalUISettings: ExperimentalUISettings, appConfiguration: AppConfiguration, nameColors: PeerNameColors, state: SGSettingsControllerState) -> [SGControllerEntry] {
+   144→   144→    
+   145→   145→    let lang = presentationData.strings.baseLanguageCode
+   146→   146→    let strings = presentationData.strings
+   147→   147→    let newStr = strings.Settings_New
+   148→   148→    var entries: [SGControllerEntry] = []
+   149→   149→    
+   150→   150→    let id = SGItemListCounter()
+   151→   151→    
+   152→   152→    entries.append(.searchInput(id: id.count, section: .search, title: NSAttributedString(string: "🔍"), text: state.searchQuery ?? "", placeholder: strings.Common_Search))
+   153→   153→    
+   154→   154→    
+   155→   155→    if SGSimpleSettings.shared.canUseNY {
+   156→   156→        entries.append(.header(id: id.count, section: .trending, text: i18n("Settings.NY.Header", lang), badge: newStr))
+   157→   157→        entries.append(.toggle(id: id.count, section: .trending, settingName: .nyStyleSnow, value: SGSimpleSettings.shared.nyStyle == SGSimpleSettings.NYStyle.snow.rawValue, text: i18n("Settings.NY.Style.snow", lang), enabled: true))
+   158→   158→        entries.append(.toggle(id: id.count, section: .trending, settingName: .nyStyleLightning, value: SGSimpleSettings.shared.nyStyle == SGSimpleSettings.NYStyle.lightning.rawValue, text: i18n("Settings.NY.Style.lightning", lang), enabled: true))
+   159→   159→        // entries.append(.oneFromManySelector(id: id.count, section: .trending, settingName: .nyStyle, text: i18n("Settings.NY.Style", lang), value: i18n("Settings.NY.Style.\(SGSimpleSettings.shared.nyStyle)", lang), enabled: true))
+   160→   160→        entries.append(.notice(id: id.count, section: .trending, text: i18n("Settings.NY.Notice", lang)))
+   161→   161→    } else {
+   162→   162→        id.increment(3)
+   163→   163→    }
+   164→   164→    
+   165→   165→    if appConfiguration.sgWebSettings.global.canEditSettings {
+   166→   166→        entries.append(.disclosure(id: id.count, section: .content, link: .contentSettings, text: i18n("Settings.ContentSettings", lang)))
+   167→   167→    } else {
+   168→   168→        id.increment(1)
+   169→   169→    }
+   170→   170→    
+   171→   171→    entries.append(.header(id: id.count, section: .tabs, text: i18n("Settings.Tabs.Header", lang), badge: nil))
+   172→   172→    entries.append(.toggle(id: id.count, section: .tabs, settingName: .hideTabBar, value: SGSimpleSettings.shared.hideTabBar, text: i18n("Settings.Tabs.HideTabBar", lang), enabled: true))
+   173→   173→    entries.append(.toggle(id: id.count, section: .tabs, settingName: .showContactsTab, value: callListSettings.showContactsTab, text: i18n("Settings.Tabs.ShowContacts", lang), enabled: !SGSimpleSettings.shared.hideTabBar))
+   174→   174→    entries.append(.toggle(id: id.count, section: .tabs, settingName: .showCallsTab, value: callListSettings.showTab, text: strings.CallSettings_TabIcon, enabled: !SGSimpleSettings.shared.hideTabBar))
+   175→   175→    entries.append(.toggle(id: id.count, section: .tabs, settingName: .showTabNames, value: SGSimpleSettings.shared.showTabNames, text: i18n("Settings.Tabs.ShowNames", lang), enabled: !SGSimpleSettings.shared.hideTabBar))
+   176→   176→    entries.append(.toggle(id: id.count, section: .tabs, settingName: .tabBarSearchEnabled, value: SGSimpleSettings.shared.tabBarSearchEnabled, text: i18n("Settings.Tabs.SearchButton", lang), enabled: !SGSimpleSettings.shared.hideTabBar))
+   177→   177→    entries.append(.toggle(id: id.count, section: .tabs, settingName: .wideTabBar, value: SGSimpleSettings.shared.wideTabBar, text: i18n("Settings.Tabs.WideTabBar", lang), enabled: !SGSimpleSettings.shared.hideTabBar))
+   178→   178→    entries.append(.notice(id: id.count, section: .tabs, text: i18n("Settings.Tabs.WideTabBar.Notice", lang)))
+   179→   179→    
+   180→   180→    entries.append(.header(id: id.count, section: .folders, text: strings.Settings_ChatFolders.uppercased(), badge: nil))
+   181→   181→    entries.append(.toggle(id: id.count, section: .folders, settingName: .foldersAtBottom, value: experimentalUISettings.foldersTabAtBottom, text: i18n("Settings.Folders.BottomTab", lang), enabled: true))
+   182→   182→    entries.append(.toggle(id: id.count, section: .folders, settingName: .allChatsHidden, value: SGSimpleSettings.shared.allChatsHidden, text: i18n("Settings.Folders.AllChatsHidden", lang, strings.ChatList_Tabs_AllChats), enabled: true))
+   183→   183→    #if DEBUG
+   184→   184→//    entries.append(.oneFromManySelector(id: id.count, section: .folders, settingName: .allChatsFolderPositionOverride, text: i18n("Settings.Folders.AllChatsPlacement", lang), value: i18n("Settings.Folders.AllChatsPlacement.\(SGSimpleSettings.shared.allChatsFolderPositionOverride)", lang), enabled: true))
+   185→   185→    #endif
+   186→   186→    entries.append(.toggle(id: id.count, section: .folders, settingName: .compactFolderNames, value: SGSimpleSettings.shared.compactFolderNames, text: i18n("Settings.Folders.CompactNames", lang), enabled: true))
+   187→   187→    entries.append(.oneFromManySelector(id: id.count, section: .folders, settingName: .allChatsTitleLengthOverride, text: i18n("Settings.Folders.AllChatsTitle", lang), value: i18n("Settings.Folders.AllChatsTitle.\(SGSimpleSettings.shared.allChatsTitleLengthOverride)", lang), enabled: true))
+   188→   188→    entries.append(.toggle(id: id.count, section: .folders, settingName: .rememberLastFolder, value: SGSimpleSettings.shared.rememberLastFolder, text: i18n("Settings.Folders.RememberLast", lang), enabled: true))
+   189→   189→    entries.append(.notice(id: id.count, section: .folders, text: i18n("Settings.Folders.RememberLast.Notice", lang)))
+   190→   190→    
+   191→   191→    entries.append(.header(id: id.count, section: .chatList, text: i18n("Settings.ChatList.Header", lang), badge: nil))
+   192→   192→    entries.append(.toggle(id: id.count, section: .chatList, settingName: .compactChatList, value: SGSimpleSettings.shared.compactChatList, text: i18n("Settings.CompactChatList", lang), enabled: true))
+   193→   193→    entries.append(.toggle(id: id.count, section: .chatList, settingName: .compactMessagePreview, value: SGSimpleSettings.shared.chatListLines != SGSimpleSettings.ChatListLines.three.rawValue, text: i18n("Settings.CompactMessagePreview", lang), enabled: true))
+   194→   194→    entries.append(.toggle(id: id.count, section: .chatList, settingName: .disableChatSwipeOptions, value: !SGSimpleSettings.shared.disableChatSwipeOptions, text: i18n("Settings.ChatSwipeOptions", lang), enabled: true))
+   195→   195→    entries.append(.toggle(id: id.count, section: .chatList, settingName: .disableDeleteChatSwipeOption, value: !SGSimpleSettings.shared.disableDeleteChatSwipeOption, text: i18n("Settings.DeleteChatSwipeOption", lang), enabled: !SGSimpleSettings.shared.disableChatSwipeOptions))
+   196→   196→    
+   197→   197→    entries.append(.header(id: id.count, section: .profiles, text: i18n("Settings.Profiles.Header", lang), badge: nil))
+   198→   198→    entries.append(.toggle(id: id.count, section: .profiles, settingName: .showProfileId, value: SGSimpleSettings.shared.showProfileId, text: i18n("Settings.ShowProfileID", lang), enabled: true))
+   199→   199→    entries.append(.toggle(id: id.count, section: .profiles, settingName: .showDC, value: SGSimpleSettings.shared.showDC, text: i18n("Settings.ShowDC", lang), enabled: true))
+   200→   200→    entries.append(.toggle(id: id.count, section: .profiles, settingName: .showRegDate, value: SGSimpleSettings.shared.showRegDate, text: i18n("Settings.ShowRegDate", lang), enabled: true))
+   201→   201→    entries.append(.notice(id: id.count, section: .profiles, text: i18n("Settings.ShowRegDate.Notice", lang)))
+   202→   202→    entries.append(.toggle(id: id.count, section: .profiles, settingName: .showCreationDate, value: SGSimpleSettings.shared.showCreationDate, text: i18n("Settings.ShowCreationDate", lang), enabled: true))
+   203→   203→    entries.append(.notice(id: id.count, section: .profiles, text: i18n("Settings.ShowCreationDate.Notice", lang)))
+   204→   204→    entries.append(.toggle(id: id.count, section: .profiles, settingName: .confirmCalls, value: SGSimpleSettings.shared.confirmCalls, text: i18n("Settings.CallConfirmation", lang), enabled: true))
+   205→   205→    entries.append(.notice(id: id.count, section: .profiles, text: i18n("Settings.CallConfirmation.Notice", lang)))
+   206→   206→    
+   207→   207→    entries.append(.header(id: id.count, section: .stories, text: strings.AutoDownloadSettings_Stories.uppercased(), badge: nil))
+   208→   208→    entries.append(.toggle(id: id.count, section: .stories, settingName: .hideStories, value: SGSimpleSettings.shared.hideStories, text: i18n("Settings.Stories.Hide", lang), enabled: true))
+   209→   209→    entries.append(.toggle(id: id.count, section: .stories, settingName: .disableSwipeToRecordStory, value: SGSimpleSettings.shared.disableSwipeToRecordStory, text: i18n("Settings.Stories.DisableSwipeToRecord", lang), enabled: true))
+   210→   210→    entries.append(.toggle(id: id.count, section: .stories, settingName: .warnOnStoriesOpen, value: SGSimpleSettings.shared.warnOnStoriesOpen, text: i18n("Settings.Stories.WarnBeforeView", lang), enabled: true))
+   211→   211→    entries.append(.toggle(id: id.count, section: .stories, settingName: .showRepostToStory, value: SGSimpleSettings.shared.showRepostToStoryV2, text: strings.Share_RepostToStory.replacingOccurrences(of: "\n", with: " "), enabled: true))
+   212→   212→    if SGSimpleSettings.shared.canUseStealthMode {
+   213→   213→        entries.append(.toggle(id: id.count, section: .stories, settingName: .storyStealthMode, value: SGSimpleSettings.shared.storyStealthMode, text: strings.Story_StealthMode_Title, enabled: true))
+   214→   214→        entries.append(.notice(id: id.count, section: .stories, text: strings.Story_StealthMode_ControlText))
+   215→   215→    } else {
+   216→   216→        id.increment(2)
+   217→   217→    }
+   218→   218→
+   219→   219→    
+   220→   220→    entries.append(.header(id: id.count, section: .translation, text: strings.Localization_TranslateMessages.uppercased(), badge: nil))
+   221→   221→    entries.append(.oneFromManySelector(id: id.count, section: .translation, settingName: .translationBackend, text: i18n("Settings.Translation.Backend", lang), value: i18n("Settings.Translation.Backend.\(SGSimpleSettings.shared.translationBackend)", lang), enabled: true))
+   222→   222→    if SGSimpleSettings.shared.translationBackendEnum != .gtranslate {
+   223→   223→        entries.append(.notice(id: id.count, section: .translation, text: i18n("Settings.Translation.Backend.Notice", lang, "Settings.Translation.Backend.\(SGSimpleSettings.TranslationBackend.gtranslate.rawValue)".i18n(lang))))
+   224→   224→    } else {
+   225→   225→        id.increment(1)
+   226→   226→    }
+   227→   227→    entries.append(.toggle(id: id.count, section: .translation, settingName: .quickTranslateButton, value: SGSimpleSettings.shared.quickTranslateButton, text: i18n("Settings.Translation.QuickTranslateButton", lang), enabled: true))
+   228→   228→    entries.append(.disclosure(id: id.count, section: .translation, link: .languageSettings, text: strings.Localization_TranslateEntireChat))
+   229→   229→    entries.append(.notice(id: id.count, section: .translation, text: i18n("Common.NoTelegramPremiumNeeded", lang, strings.Settings_Premium)))
+   230→   230→
+   231→   231→    entries.append(.header(id: id.count, section: .voiceMessages, text: "Settings.Transcription.Header".i18n(lang), badge: nil))
+   232→   232→    entries.append(.oneFromManySelector(id: id.count, section: .voiceMessages, settingName: .transcriptionBackend, text: i18n("Settings.Transcription.Backend", lang), value: i18n("Settings.Transcription.Backend.\(SGSimpleSettings.shared.transcriptionBackend)", lang), enabled: true))
+   233→   233→    if SGSimpleSettings.shared.transcriptionBackendEnum != .apple {
+   234→   234→        entries.append(.notice(id: id.count, section: .voiceMessages, text: i18n("Settings.Transcription.Backend.Notice", lang, "Settings.Transcription.Backend.\(SGSimpleSettings.TranscriptionBackend.apple.rawValue)".i18n(lang))))
+   235→   235→    } else {
+   236→   236→        id.increment(1)
+   237→   237→    }
+   238→   238→    entries.append(.header(id: id.count, section: .voiceMessages, text: strings.Privacy_VoiceMessages.uppercased(), badge: nil))
+   239→   239→    entries.append(.toggle(id: id.count, section: .voiceMessages, settingName: .forceBuiltInMic, value: SGSimpleSettings.shared.forceBuiltInMic, text: i18n("Settings.forceBuiltInMic", lang), enabled: true))
+   240→   240→    entries.append(.notice(id: id.count, section: .voiceMessages, text: i18n("Settings.forceBuiltInMic.Notice", lang)))
+   241→   241→
+   242→   242→    entries.append(.header(id: id.count, section: .calls, text: strings.Calls_TabTitle.uppercased(), badge: nil))
+   243→   243→    entries.append(.toggle(id: id.count, section: .calls, settingName: .enableVoipTcp, value: experimentalUISettings.enableVoipTcp, text: "Force TCP", enabled: true))
+   244→   244→    entries.append(.notice(id: id.count, section: .calls, text: "Common.KnowWhatYouDo".i18n(lang)))
+   245→   245→    
+   246→   246→    entries.append(.header(id: id.count, section: .photo, text: strings.NetworkUsageSettings_MediaImageDataSection, badge: nil))
+   247→   247→    entries.append(.header(id: id.count, section: .photo, text: strings.PhotoEditor_QualityTool.uppercased(), badge: nil))
+   248→   248→    entries.append(.percentageSlider(id: id.count, section: .photo, settingName: .outgoingPhotoQuality, value: SGSimpleSettings.shared.outgoingPhotoQuality))
+   249→   249→    entries.append(.notice(id: id.count, section: .photo, text: i18n("Settings.Photo.Quality.Notice", lang)))
+   250→   250→    entries.append(.toggle(id: id.count, section: .photo, settingName: .sendLargePhotos, value: SGSimpleSettings.shared.sendLargePhotos, text: i18n("Settings.Photo.SendLarge", lang), enabled: true))
+   251→   251→    entries.append(.notice(id: id.count, section: .photo, text: i18n("Settings.Photo.SendLarge.Notice", lang)))
+   252→   252→    
+   253→   253→    entries.append(.header(id: id.count, section: .stickers, text: strings.StickerPacksSettings_Title.uppercased(), badge: nil))
+   254→   254→    entries.append(.header(id: id.count, section: .stickers, text: i18n("Settings.Stickers.Size", lang), badge: nil))
+   255→   255→    entries.append(.percentageSlider(id: id.count, section: .stickers, settingName: .stickerSize, value: SGSimpleSettings.shared.stickerSize))
+   256→   256→    entries.append(.toggle(id: id.count, section: .stickers, settingName: .stickerTimestamp, value: SGSimpleSettings.shared.stickerTimestamp, text: i18n("Settings.Stickers.Timestamp", lang), enabled: true))
+   257→   257→    
+   258→   258→    
+   259→   259→    entries.append(.header(id: id.count, section: .videoNotes, text: i18n("Settings.VideoNotes.Header", lang), badge: nil))
+   260→   260→    entries.append(.toggle(id: id.count, section: .videoNotes, settingName: .startTelescopeWithRearCam, value: SGSimpleSettings.shared.startTelescopeWithRearCam, text: i18n("Settings.VideoNotes.StartWithRearCam", lang), enabled: true))
+   261→   261→    
+   262→   262→    entries.append(.header(id: id.count, section: .contextMenu, text: i18n("Settings.ContextMenu", lang), badge: nil))
+   263→   263→    entries.append(.notice(id: id.count, section: .contextMenu, text: i18n("Settings.ContextMenu.Notice", lang)))
+   264→   264→    entries.append(.toggle(id: id.count, section: .contextMenu, settingName: .contextShowSaveToCloud, value: SGSimpleSettings.shared.contextShowSaveToCloud, text: i18n("ContextMenu.SaveToCloud", lang), enabled: true))
+   265→   265→    entries.append(.toggle(id: id.count, section: .contextMenu, settingName: .contextShowHideForwardName, value: SGSimpleSettings.shared.contextShowHideForwardName, text: strings.Conversation_ForwardOptions_HideSendersNames, enabled: true))
+   266→   266→    entries.append(.toggle(id: id.count, section: .contextMenu, settingName: .contextShowSelectFromUser, value: SGSimpleSettings.shared.contextShowSelectFromUser, text: i18n("ContextMenu.SelectFromUser", lang), enabled: true))
+   267→   267→    entries.append(.toggle(id: id.count, section: .contextMenu, settingName: .contextShowRestrict, value: SGSimpleSettings.shared.contextShowRestrict, text: strings.Conversation_ContextMenuBan, enabled: true))
+   268→   268→    entries.append(.toggle(id: id.count, section: .contextMenu, settingName: .contextShowReport, value: SGSimpleSettings.shared.contextShowReport, text: strings.Conversation_ContextMenuReport, enabled: true))
+   269→   269→    entries.append(.toggle(id: id.count, section: .contextMenu, settingName: .contextShowReply, value: SGSimpleSettings.shared.contextShowReply, text: strings.Conversation_ContextMenuReply, enabled: true))
+   270→   270→    entries.append(.toggle(id: id.count, section: .contextMenu, settingName: .contextShowPin, value: SGSimpleSettings.shared.contextShowPin, text: strings.Conversation_Pin, enabled: true))
+   271→   271→    entries.append(.toggle(id: id.count, section: .contextMenu, settingName: .contextShowSaveMedia, value: SGSimpleSettings.shared.contextShowSaveMedia, text: strings.Conversation_SaveToFiles, enabled: true))
+   272→   272→    entries.append(.toggle(id: id.count, section: .contextMenu, settingName: .contextShowMessageReplies, value: SGSimpleSettings.shared.contextShowMessageReplies, text: strings.Conversation_ContextViewThread, enabled: true))
+   273→   273→    entries.append(.toggle(id: id.count, section: .contextMenu, settingName: .contextShowJson, value: SGSimpleSettings.shared.contextShowJson, text: "JSON", enabled: true))
+   274→   274→    /* entries.append(.toggle(id: id.count, section: .contextMenu, settingName: .contextShowRestrict, value: SGSimpleSettings.shared.contextShowRestrict, text: strings.Conversation_ContextMenuBan)) */
+   275→   275→    
+   276→   276→    entries.append(.header(id: id.count, section: .accountColors, text: i18n("Settings.CustomColors.Header", lang), badge: nil))
+   277→   277→    entries.append(.header(id: id.count, section: .accountColors, text: i18n("Settings.CustomColors.Saturation", lang), badge: nil))
+   278→   278→    let accountColorSaturation = SGSimpleSettings.shared.accountColorsSaturation
+   279→   279→    entries.append(.percentageSlider(id: id.count, section: .accountColors, settingName: .accountColorsSaturation, value: accountColorSaturation))
+   280→   280→//    let nameColor: PeerNameColor
+   281→   281→//    if let updatedNameColor = state.updatedNameColor {
+   282→   282→//        nameColor = updatedNameColor
+   283→   283→//    } else {
+   284→   284→//        nameColor = .blue
+   285→   285→//    }
+   286→   286→//    let _ = nameColors.get(nameColor, dark: presentationData.theme.overallDarkAppearance)
+   287→   287→//    entries.append(.peerColorPicker(id: entries.count, section: .other,
+   288→   288→//        colors: nameColors,
+   289→   289→//        currentColor: nameColor, // TODO: PeerNameColor(rawValue: <#T##Int32#>)
+   290→   290→//        currentSaturation: accountColorSaturation
+   291→   291→//    ))
+   292→   292→    
+   293→   293→    if accountColorSaturation == 0 {
+   294→   294→        id.increment(100)
+   295→   295→        entries.append(.peerColorDisclosurePreview(id: id.count, section: .accountColors, name: "\(strings.UserInfo_FirstNamePlaceholder) \(strings.UserInfo_LastNamePlaceholder)", color:         presentationData.theme.chat.message.incoming.accentTextColor))
+   296→   296→    } else {
+   297→   297→        id.increment(200)
+   298→   298→        for index in nameColors.displayOrder.prefix(3) {
+   299→   299→            let color: PeerNameColor = PeerNameColor(rawValue: index)
+   300→   300→            let colors = nameColors.get(color, dark: presentationData.theme.overallDarkAppearance)
+   301→   301→            entries.append(.peerColorDisclosurePreview(id: id.count, section: .accountColors, name: "\(strings.UserInfo_FirstNamePlaceholder) \(strings.UserInfo_LastNamePlaceholder)", color: colors.main))
+   302→   302→        }
+   303→   303→    }
+   304→   304→    entries.append(.notice(id: id.count, section: .accountColors, text: i18n("Settings.CustomColors.Saturation.Notice", lang)))
+   305→   305→    
+   306→   306→    id.increment(10000)
+   307→   307→    entries.append(.header(id: id.count, section: .other, text: strings.Appearance_Other.uppercased(), badge: nil))
+   308→   308→    entries.append(.toggle(id: id.count, section: .other, settingName: .swipeForVideoPIP, value: SGSimpleSettings.shared.videoPIPSwipeDirection == SGSimpleSettings.VideoPIPSwipeDirection.up.rawValue, text: i18n("Settings.swipeForVideoPIP", lang), enabled: true))
+   309→   309→    entries.append(.notice(id: id.count, section: .other, text: i18n("Settings.swipeForVideoPIP.Notice", lang)))
+   310→   310→    entries.append(.toggle(id: id.count, section: .other, settingName: .hideChannelBottomButton, value: !SGSimpleSettings.shared.hideChannelBottomButton, text: i18n("Settings.showChannelBottomButton", lang), enabled: true))
+   311→   311→    entries.append(.toggle(id: id.count, section: .other, settingName: .wideChannelPosts, value: SGSimpleSettings.shared.wideChannelPosts, text: i18n("Settings.wideChannelPosts", lang), enabled: true))
+   312→   312→    entries.append(.toggle(id: id.count, section: .other, settingName: .secondsInMessages, value: SGSimpleSettings.shared.secondsInMessages, text: i18n("Settings.secondsInMessages", lang), enabled: true))
+   313→   313→    entries.append(.toggle(id: id.count, section: .other, settingName: .messageDoubleTapActionOutgoingEdit, value: SGSimpleSettings.shared.messageDoubleTapActionOutgoing == SGSimpleSettings.MessageDoubleTapAction.edit.rawValue, text: i18n("Settings.messageDoubleTapActionOutgoingEdit", lang), enabled: true))
+   314→   314→    entries.append(.toggle(id: id.count, section: .other, settingName: .hideRecordingButton, value: !SGSimpleSettings.shared.hideRecordingButton, text: i18n("Settings.RecordingButton", lang), enabled: true))
+   315→   315→    entries.append(.toggle(id: id.count, section: .other, settingName: .disableSnapDeletionEffect, value: !SGSimpleSettings.shared.disableSnapDeletionEffect, text: i18n("Settings.SnapDeletionEffect", lang), enabled: true))
+   316→   316→    entries.append(.toggle(id: id.count, section: .other, settingName: .disableSendAsButton, value: !SGSimpleSettings.shared.disableSendAsButton, text: i18n("Settings.SendAsButton", lang, strings.Conversation_SendMesageAs), enabled: true))
+   317→   317→    entries.append(.toggle(id: id.count, section: .other, settingName: .disableGalleryCamera, value: !SGSimpleSettings.shared.disableGalleryCamera, text: i18n("Settings.GalleryCamera", lang), enabled: true))
+   318→   318→    entries.append(.toggle(id: id.count, section: .other, settingName: .disableGalleryCameraPreview, value: !SGSimpleSettings.shared.disableGalleryCameraPreview, text: i18n("Settings.GalleryCameraPreview", lang), enabled: !SGSimpleSettings.shared.disableGalleryCamera))
+   319→   319→    entries.append(.toggle(id: id.count, section: .other, settingName: .disableScrollToNextChannel, value: !SGSimpleSettings.shared.disableScrollToNextChannel, text: i18n("Settings.PullToNextChannel", lang), enabled: true))
+   320→   320→    entries.append(.toggle(id: id.count, section: .other, settingName: .disableScrollToNextTopic, value: !SGSimpleSettings.shared.disableScrollToNextTopic, text: i18n("Settings.PullToNextTopic", lang), enabled: true))
+   321→   321→    entries.append(.toggle(id: id.count, section: .other, settingName: .hideReactions, value: SGSimpleSettings.shared.hideReactions, text: i18n("Settings.HideReactions", lang), enabled: true))
+   322→   322→    entries.append(.toggle(id: id.count, section: .other, settingName: .uploadSpeedBoost, value: SGSimpleSettings.shared.uploadSpeedBoost, text: i18n("Settings.UploadsBoost", lang), enabled: true))
+   323→   323→    entries.append(.oneFromManySelector(id: id.count, section: .other, settingName: .downloadSpeedBoost, text: i18n("Settings.DownloadsBoost", lang), value: i18n("Settings.DownloadsBoost.\(SGSimpleSettings.shared.downloadSpeedBoost)", lang), enabled: true))
+   324→   324→    entries.append(.notice(id: id.count, section: .other, text: i18n("Settings.DownloadsBoost.Notice", lang)))
+   325→   325→    entries.append(.toggle(id: id.count, section: .other, settingName: .sendWithReturnKey, value: SGSimpleSettings.shared.sendWithReturnKey, text: i18n("Settings.SendWithReturnKey", lang), enabled: true))
+   326→   326→    entries.append(.toggle(id: id.count, section: .other, settingName: .forceEmojiTab, value: SGSimpleSettings.shared.forceEmojiTab, text: i18n("Settings.ForceEmojiTab", lang), enabled: true))
+   327→   327→    entries.append(.toggle(id: id.count, section: .other, settingName: .defaultEmojisFirst, value: SGSimpleSettings.shared.defaultEmojisFirst, text: i18n("Settings.DefaultEmojisFirst", lang), enabled: true))
+   328→   328→    entries.append(.notice(id: id.count, section: .other, text: i18n("Settings.DefaultEmojisFirst.Notice", lang)))
+   329→   329→    entries.append(.toggle(id: id.count, section: .other, settingName: .hidePhoneInSettings, value: SGSimpleSettings.shared.hidePhoneInSettings, text: i18n("Settings.HidePhoneInSettingsUI", lang), enabled: true))
+   330→   330→    entries.append(.notice(id: id.count, section: .other, text: i18n("Settings.HidePhoneInSettingsUI.Notice", lang)))
+   331→   331→    
+   332→   332→    return filterSGItemListUIEntrires(entries: entries, by: state.searchQuery)
+   333→   333→}
+   334→   334→
+   335→   335→public func sgSettingsController(context: AccountContext/*, focusOnItemTag: Int? = nil*/) -> ViewController {
+   336→   336→    var presentControllerImpl: ((ViewController, ViewControllerPresentationArguments?) -> Void)?
+   337→   337→    var pushControllerImpl: ((ViewController) -> Void)?
+   338→   338→//    var getRootControllerImpl: (() -> UIViewController?)?
+   339→   339→//    var getNavigationControllerImpl: (() -> NavigationController?)?
+   340→   340→    var askForRestart: (() -> Void)?
+   341→   341→    
+   342→   342→    let initialState = SGSettingsControllerState()
+   343→   343→    let statePromise = ValuePromise(initialState, ignoreRepeated: true)
+   344→   344→    let stateValue = Atomic(value: initialState)
+   345→   345→    let updateState: ((SGSettingsControllerState) -> SGSettingsControllerState) -> Void = { f in
+   346→   346→        statePromise.set(stateValue.modify { f($0) })
+   347→   347→    }
+   348→   348→    
+   349→   349→//    let sliderPromise = ValuePromise(SGSimpleSettings.shared.accountColorsSaturation, ignoreRepeated: true)
+   350→   350→//    let sliderStateValue = Atomic(value: SGSimpleSettings.shared.accountColorsSaturation)
+   351→   351→//    let _: ((Int32) -> Int32) -> Void = { f in
+   352→   352→//        sliderPromise.set(sliderStateValue.modify( {f($0)}))
+   353→   353→//    }
+   354→   354→    
+   355→   355→    let simplePromise = ValuePromise(true, ignoreRepeated: false)
+   356→   356→    
+   357→   357→    let arguments = SGItemListArguments<SGBoolSetting, SGSliderSetting, SGOneFromManySetting, SGDisclosureLink, AnyHashable>(
+   358→   358→        context: context,
+   359→   359→        /*updatePeerColor: { color in
+   360→   360→          updateState { state in
+   361→   361→              var updatedState = state
+   362→   362→              updatedState.updatedNameColor = color
+   363→   363→              return updatedState
+   364→   364→          }
+   365→   365→        },*/ setBoolValue: { setting, value in
+   366→   366→        switch setting {
+   367→   367→        case .hidePhoneInSettings:
+   368→   368→            SGSimpleSettings.shared.hidePhoneInSettings = value
+   369→   369→            askForRestart?()
+   370→   370→        case .showTabNames:
+   371→   371→            SGSimpleSettings.shared.showTabNames = value
+   372→   372→            askForRestart?()
+   373→   373→        case .showContactsTab:
+   374→   374→            let _ = (
+   375→   375→                updateCallListSettingsInteractively(
+   376→   376→                    accountManager: context.sharedContext.accountManager, { $0.withUpdatedShowContactsTab(value) }
+   377→   377→                )
+   378→   378→            ).start()
+   379→   379→        case .showCallsTab:
+   380→   380→            let _ = (
+   381→   381→                updateCallListSettingsInteractively(
+   382→   382→                    accountManager: context.sharedContext.accountManager, { $0.withUpdatedShowTab(value) }
+   383→   383→                )
+   384→   384→            ).start()
+   385→   385→        case .tabBarSearchEnabled:
+   386→   386→            SGSimpleSettings.shared.tabBarSearchEnabled = value
+   387→   387→        case .wideTabBar:
+   388→   388→            SGSimpleSettings.shared.wideTabBar = value
+   389→   389→            askForRestart?()
+   390→   390→        case .foldersAtBottom:
+   391→   391→            let _ = (
+   392→   392→                updateExperimentalUISettingsInteractively(accountManager: context.sharedContext.accountManager, { settings in
+   393→   393→                        var settings = settings
+   394→   394→                        settings.foldersTabAtBottom = value
+   395→   395→                        return settings
+   396→   396→                    }
+   397→   397→                )
+   398→   398→            ).start()
+   399→   399→        case .startTelescopeWithRearCam:
+   400→   400→            SGSimpleSettings.shared.startTelescopeWithRearCam = value
+   401→   401→        case .hideStories:
+   402→   402→            SGSimpleSettings.shared.hideStories = value
+   403→   403→        case .showProfileId:
+   404→   404→            SGSimpleSettings.shared.showProfileId = value
+   405→   405→        case .warnOnStoriesOpen:
+   406→   406→            SGSimpleSettings.shared.warnOnStoriesOpen = value
+   407→   407→        case .sendWithReturnKey:
+   408→   408→            SGSimpleSettings.shared.sendWithReturnKey = value
+   409→   409→        case .rememberLastFolder:
+   410→   410→            SGSimpleSettings.shared.rememberLastFolder = value
+   411→   411→        case .sendLargePhotos:
+   412→   412→            SGSimpleSettings.shared.sendLargePhotos = value
+   413→   413→        case .storyStealthMode:
+   414→   414→            SGSimpleSettings.shared.storyStealthMode = value
+   415→   415→        case .disableSwipeToRecordStory:
+   416→   416→            SGSimpleSettings.shared.disableSwipeToRecordStory = value
+   417→   417→        case .quickTranslateButton:
+   418→   418→            SGSimpleSettings.shared.quickTranslateButton = value
+   419→   419→        case .uploadSpeedBoost:
+   420→   420→            SGSimpleSettings.shared.uploadSpeedBoost = value
+   421→   421→        case .hideReactions:
+   422→   422→            SGSimpleSettings.shared.hideReactions = value
+   423→   423→        case .showRepostToStory:
+   424→   424→            SGSimpleSettings.shared.showRepostToStoryV2 = value
+   425→   425→        case .contextShowSelectFromUser:
+   426→   426→            SGSimpleSettings.shared.contextShowSelectFromUser = value
+   427→   427→        case .contextShowSaveToCloud:
+   428→   428→            SGSimpleSettings.shared.contextShowSaveToCloud = value
+   429→   429→        case .contextShowRestrict:
+   430→   430→            SGSimpleSettings.shared.contextShowRestrict = value
+   431→   431→        case .contextShowHideForwardName:
+   432→   432→            SGSimpleSettings.shared.contextShowHideForwardName = value
+   433→   433→        case .disableScrollToNextChannel:
+   434→   434→            SGSimpleSettings.shared.disableScrollToNextChannel = !value
+   435→   435→        case .disableScrollToNextTopic:
+   436→   436→            SGSimpleSettings.shared.disableScrollToNextTopic = !value
+   437→   437→        case .disableChatSwipeOptions:
+   438→   438→            SGSimpleSettings.shared.disableChatSwipeOptions = !value
+   439→   439→            simplePromise.set(true) // Trigger update for 'enabled' field of other toggles
+   440→   440→            askForRestart?()
+   441→   441→        case .disableDeleteChatSwipeOption:
+   442→   442→            SGSimpleSettings.shared.disableDeleteChatSwipeOption = !value
+   443→   443→            askForRestart?()
+   444→   444→        case .disableGalleryCamera:
+   445→   445→            SGSimpleSettings.shared.disableGalleryCamera = !value
+   446→   446→            simplePromise.set(true)
+   447→   447→        case .disableGalleryCameraPreview:
+   448→   448→            SGSimpleSettings.shared.disableGalleryCameraPreview = !value
+   449→   449→        case .disableSendAsButton:
+   450→   450→            SGSimpleSettings.shared.disableSendAsButton = !value
+   451→   451→        case .disableSnapDeletionEffect:
+   452→   452→            SGSimpleSettings.shared.disableSnapDeletionEffect = !value
+   453→   453→        case .contextShowReport:
+   454→   454→            SGSimpleSettings.shared.contextShowReport = value
+   455→   455→        case .contextShowReply:
+   456→   456→            SGSimpleSettings.shared.contextShowReply = value
+   457→   457→        case .contextShowPin:
+   458→   458→            SGSimpleSettings.shared.contextShowPin = value
+   459→   459→        case .contextShowSaveMedia:
+   460→   460→            SGSimpleSettings.shared.contextShowSaveMedia = value
+   461→   461→        case .contextShowMessageReplies:
+   462→   462→            SGSimpleSettings.shared.contextShowMessageReplies = value
+   463→   463→        case .stickerTimestamp:
+   464→   464→            SGSimpleSettings.shared.stickerTimestamp = value
+   465→   465→        case .contextShowJson:
+   466→   466→            SGSimpleSettings.shared.contextShowJson = value
+   467→   467→        case .hideRecordingButton:
+   468→   468→            SGSimpleSettings.shared.hideRecordingButton = !value
+   469→   469→        case .hideTabBar:
+   470→   470→            SGSimpleSettings.shared.hideTabBar = value
+   471→   471→            simplePromise.set(true) // Trigger update for 'enabled' field of other toggles
+   472→   472→            askForRestart?()
+   473→   473→        case .showDC:
+   474→   474→            SGSimpleSettings.shared.showDC = value
+   475→   475→        case .showCreationDate:
+   476→   476→            SGSimpleSettings.shared.showCreationDate = value
+   477→   477→        case .showRegDate:
+   478→   478→            SGSimpleSettings.shared.showRegDate = value
+   479→   479→        case .compactChatList:
+   480→   480→            SGSimpleSettings.shared.compactChatList = value
+   481→   481→            askForRestart?()
+   482→   482→        case .compactMessagePreview:
+   483→   483→            SGSimpleSettings.shared.chatListLines = value ? SGSimpleSettings.ChatListLines.one.rawValue : SGSimpleSettings.ChatListLines.three.rawValue
+   484→   484→            askForRestart?()
+   485→   485→        case .compactFolderNames:
+   486→   486→            SGSimpleSettings.shared.compactFolderNames = value
+   487→   487→            askForRestart?()
+   488→   488→        case .allChatsHidden:
+   489→   489→            SGSimpleSettings.shared.allChatsHidden = value
+   490→   490→            askForRestart?()
+   491→   491→        case .defaultEmojisFirst:
+   492→   492→            SGSimpleSettings.shared.defaultEmojisFirst = value
+   493→   493→        case .messageDoubleTapActionOutgoingEdit:
+   494→   494→            SGSimpleSettings.shared.messageDoubleTapActionOutgoing = value ? SGSimpleSettings.MessageDoubleTapAction.edit.rawValue : SGSimpleSettings.MessageDoubleTapAction.default.rawValue
+   495→   495→        case .wideChannelPosts:
+   496→   496→            SGSimpleSettings.shared.wideChannelPosts = value
+   497→   497→        case .forceEmojiTab:
+   498→   498→            SGSimpleSettings.shared.forceEmojiTab = value
+   499→   499→        case .forceBuiltInMic:
+   500→   500→            SGSimpleSettings.shared.forceBuiltInMic = value
+   501→   501→        case .hideChannelBottomButton:
+   502→   502→            SGSimpleSettings.shared.hideChannelBottomButton = !value
+   503→   503→        case .secondsInMessages:
+   504→   504→            SGSimpleSettings.shared.secondsInMessages = value
+   505→   505→        case .confirmCalls:
+   506→   506→            SGSimpleSettings.shared.confirmCalls = value
+   507→   507→        case .swipeForVideoPIP:
+   508→   508→            SGSimpleSettings.shared.videoPIPSwipeDirection = value ? SGSimpleSettings.VideoPIPSwipeDirection.up.rawValue : SGSimpleSettings.VideoPIPSwipeDirection.none.rawValue
+   509→   509→        case .enableVoipTcp:
+   510→   510→            let _ = (
+   511→   511→                updateExperimentalUISettingsInteractively(accountManager: context.sharedContext.accountManager, { settings in
+   512→   512→                        var settings = settings
+   513→   513→                        settings.enableVoipTcp = value
+   514→   514→                        return settings
+   515→   515→                    }
+   516→   516→                )
+   517→   517→            ).start()
+   518→   518→        case .nyStyleSnow:
+   519→   519→            SGSimpleSettings.shared.nyStyle = value ? SGSimpleSettings.NYStyle.snow.rawValue : SGSimpleSettings.NYStyle.default.rawValue
+   520→   520→            simplePromise.set(true) // Trigger update for 'enabled' field of other toggles
+   521→   521→        case .nyStyleLightning:
+   522→   522→            SGSimpleSettings.shared.nyStyle = value ? SGSimpleSettings.NYStyle.lightning.rawValue : SGSimpleSettings.NYStyle.default.rawValue
+   523→   523→            simplePromise.set(true) // Trigger update for 'enabled' field of other toggles
+   524→   524→        }
+   525→   525→    }, updateSliderValue: { setting, value in
+   526→   526→        switch (setting) {
+   527→   527→            case .accountColorsSaturation:
+   528→   528→                if SGSimpleSettings.shared.accountColorsSaturation != value {
+   529→   529→                    SGSimpleSettings.shared.accountColorsSaturation = value
+   530→   530→                    simplePromise.set(true)
+   531→   531→                }
+   532→   532→            case .outgoingPhotoQuality:
+   533→   533→                if SGSimpleSettings.shared.outgoingPhotoQuality != value {
+   534→   534→                    SGSimpleSettings.shared.outgoingPhotoQuality = value
+   535→   535→                    simplePromise.set(true)
+   536→   536→                }
+   537→   537→            case .stickerSize:
+   538→   538→                if SGSimpleSettings.shared.stickerSize != value {
+   539→   539→                    SGSimpleSettings.shared.stickerSize = value
+   540→   540→                    simplePromise.set(true)
+   541→   541→                }
+   542→   542→        }
+   543→   543→
+   544→   544→    }, setOneFromManyValue: { setting in
+   545→   545→        let presentationData = context.sharedContext.currentPresentationData.with { $0 }
+   546→   546→        let actionSheet = ActionSheetController(presentationData: presentationData)
+   547→   547→        var items: [ActionSheetItem] = []
+   548→   548→        
+   549→   549→        switch (setting) {
+   550→   550→            case .downloadSpeedBoost:
+   551→   551→                let setAction: (String) -> Void = { value in
+   552→   552→                    SGSimpleSettings.shared.downloadSpeedBoost = value
+   553→   553→                    
+   554→   554→                    let enableDownloadX: Bool
+   555→   555→                    switch (value) {
+   556→   556→                        case SGSimpleSettings.DownloadSpeedBoostValues.none.rawValue:
+   557→   557→                            enableDownloadX = false
+   558→   558→                        default:
+   559→   559→                            enableDownloadX = true
+   560→   560→                    }
+   561→   561→                    
+   562→   562→                    // Updating controller
+   563→   563→                    simplePromise.set(true)
+   564→   564→
+   565→   565→                    let _ = updateNetworkSettingsInteractively(postbox: context.account.postbox, network: context.account.network, { settings in
+   566→   566→                        var settings = settings
+   567→   567→                        settings.useExperimentalDownload = enableDownloadX
+   568→   568→                        return settings
+   569→   569→                    }).start(completed: {
+   570→   570→                        Queue.mainQueue().async {
+   571→   571→                            askForRestart?()
+   572→   572→                        }
+   573→   573→                    })
+   574→   574→                }
+   575→   575→
+   576→   576→                for value in SGSimpleSettings.DownloadSpeedBoostValues.allCases {
+   577→   577→                    items.append(ActionSheetButtonItem(title: i18n("Settings.DownloadsBoost.\(value.rawValue)", presentationData.strings.baseLanguageCode), color: .accent, action: { [weak actionSheet] in
+   578→   578→                        actionSheet?.dismissAnimated()
+   579→   579→                        setAction(value.rawValue)
+   580→   580→                    }))
+   581→   581→                }
+   582→   582→            case .bottomTabStyle:
+   583→   583→                let setAction: (String) -> Void = { value in
+   584→   584→                    SGSimpleSettings.shared.bottomTabStyle = value
+   585→   585→                    simplePromise.set(true)
+   586→   586→                }
+   587→   587→
+   588→   588→                for value in SGSimpleSettings.BottomTabStyleValues.allCases {
+   589→   589→                    items.append(ActionSheetButtonItem(title: i18n("Settings.Folders.BottomTabStyle.\(value.rawValue)", presentationData.strings.baseLanguageCode), color: .accent, action: { [weak actionSheet] in
+   590→   590→                        actionSheet?.dismissAnimated()
+   591→   591→                        setAction(value.rawValue)
+   592→   592→                    }))
+   593→   593→                }
+   594→   594→            case .allChatsTitleLengthOverride:
+   595→   595→                let setAction: (String) -> Void = { value in
+   596→   596→                    SGSimpleSettings.shared.allChatsTitleLengthOverride = value
+   597→   597→                    simplePromise.set(true)
+   598→   598→                }
+   599→   599→
+   600→   600→                for value in SGSimpleSettings.AllChatsTitleLengthOverride.allCases {
+   601→   601→                    let title: String
+   602→   602→                    switch (value) {
+   603→   603→                        case SGSimpleSettings.AllChatsTitleLengthOverride.short:
+   604→   604→                            title = "\"\(presentationData.strings.ChatList_Tabs_All)\""
+   605→   605→                        case SGSimpleSettings.AllChatsTitleLengthOverride.long:
+   606→   606→                            title = "\"\(presentationData.strings.ChatList_Tabs_AllChats)\""
+   607→   607→                        default:
+   608→   608→                            title = i18n("Settings.Folders.AllChatsTitle.none", presentationData.strings.baseLanguageCode)
+   609→   609→                    }
+   610→   610→                    items.append(ActionSheetButtonItem(title: title, color: .accent, action: { [weak actionSheet] in
+   611→   611→                        actionSheet?.dismissAnimated()
+   612→   612→                        setAction(value.rawValue)
+   613→   613→                    }))
+   614→   614→                }
+   615→   615→//        case .allChatsFolderPositionOverride:
+   616→   616→//            let setAction: (String) -> Void = { value in
+   617→   617→//                SGSimpleSettings.shared.allChatsFolderPositionOverride = value
+   618→   618→//                simplePromise.set(true)
+   619→   619→//            }
+   620→   620→//
+   621→   621→//            for value in SGSimpleSettings.AllChatsFolderPositionOverride.allCases {
+   622→   622→//                items.append(ActionSheetButtonItem(title: i18n("Settings.Folders.AllChatsTitle.\(value)", presentationData.strings.baseLanguageCode), color: .accent, action: { [weak actionSheet] in
+   623→   623→//                    actionSheet?.dismissAnimated()
+   624→   624→//                    setAction(value.rawValue)
+   625→   625→//                }))
+   626→   626→//            }
+   627→   627→            case .translationBackend:
+   628→   628→                let setAction: (String) -> Void = { value in
+   629→   629→                    SGSimpleSettings.shared.translationBackend = value
+   630→   630→                    simplePromise.set(true)
+   631→   631→                }
+   632→   632→
+   633→   633→                for value in SGSimpleSettings.TranslationBackend.allCases {
+   634→   634→                    if value == .system {
+   635→   635→                        if #available(iOS 18.0, *) {
+   636→   636→                        } else {
+   637→   637→                            continue // System translation is not available on iOS 17 and below
+   638→   638→                        }
+   639→   639→                    }
+   640→   640→                    items.append(ActionSheetButtonItem(title: i18n("Settings.Translation.Backend.\(value.rawValue)", presentationData.strings.baseLanguageCode), color: .accent, action: { [weak actionSheet] in
+   641→   641→                        actionSheet?.dismissAnimated()
+   642→   642→                        setAction(value.rawValue)
+   643→   643→                    }))
+   644→   644→                }
+   645→   645→            case .transcriptionBackend:
+   646→   646→                let setAction: (String) -> Void = { value in
+   647→   647→                    SGSimpleSettings.shared.transcriptionBackend = value
+   648→   648→                    simplePromise.set(true)
+   649→   649→                }
+   650→   650→
+   651→   651→                for value in SGSimpleSettings.TranscriptionBackend.allCases {
+   652→   652→                    if #available(iOS 13.0, *) {
+   653→   653→                    } else {
+   654→   654→                        if value == .apple {
+   655→   655→                            continue // Apple recognition is not available on iOS 12
+   656→   656→                        }
+   657→   657→                    }
+   658→   658→                    items.append(ActionSheetButtonItem(title: i18n("Settings.Transcription.Backend.\(value.rawValue)", presentationData.strings.baseLanguageCode), color: .accent, action: { [weak actionSheet] in
+   659→   659→                        actionSheet?.dismissAnimated()
+   660→   660→                        setAction(value.rawValue)
+   661→   661→                    }))
+   662→   662→                }
+   663→   663→            case .nyStyle:
+   664→   664→                let setAction: (String) -> Void = { value in
+   665→   665→                    SGSimpleSettings.shared.nyStyle = value
+   666→   666→                    simplePromise.set(true)
+   667→   667→                }
+   668→   668→
+   669→   669→                for value in SGSimpleSettings.NYStyle.allCases {
+   670→   670→                    items.append(ActionSheetButtonItem(title: i18n("Settings.NY.Style.\(value.rawValue)", presentationData.strings.baseLanguageCode), color: .accent, action: { [weak actionSheet] in
+   671→   671→                        actionSheet?.dismissAnimated()
+   672→   672→                        setAction(value.rawValue)
+   673→   673→                    }))
+   674→   674→                }
+   675→   675→        }
+   676→   676→        
+   677→   677→        actionSheet.setItemGroups([ActionSheetItemGroup(items: items), ActionSheetItemGroup(items: [
+   678→   678→            ActionSheetButtonItem(title: presentationData.strings.Common_Cancel, color: .accent, font: .bold, action: { [weak actionSheet] in
+   679→   679→                actionSheet?.dismissAnimated()
+   680→   680→            })
+   681→   681→        ])])
+   682→   682→        presentControllerImpl?(actionSheet, ViewControllerPresentationArguments(presentationAnimation: .modalSheet))
+   683→   683→    }, openDisclosureLink: { link in
+   684→   684→        switch (link) {
+   685→   685→            case .languageSettings:
+   686→   686→                pushControllerImpl?(context.sharedContext.makeLocalizationListController(context: context))
+   687→   687→            case .contentSettings:
+   688→   688→                let _ = (getSGSettingsURL(context: context) |> deliverOnMainQueue).start(next: { [weak context] url in
+   689→   689→                    guard let strongContext = context else {
+   690→   690→                        return
+   691→   691→                    }
+   692→   692→                    strongContext.sharedContext.applicationBindings.openUrl(url)
+   693→   693→                })
+   694→   694→        }
+   695→   695→    }, searchInput: { searchQuery in
+   696→   696→        updateState { state in
+   697→   697→            var updatedState = state
+   698→   698→            updatedState.searchQuery = searchQuery
+   699→   699→            return updatedState
+   700→   700→        }
+   701→   701→    })
+   702→   702→    
+   703→   703→    let sharedData = context.sharedContext.accountManager.sharedData(keys: [ApplicationSpecificSharedDataKeys.callListSettings, ApplicationSpecificSharedDataKeys.experimentalUISettings])
+   704→   704→    let preferences = context.account.postbox.preferencesView(keys: [PreferencesKeys.appConfiguration])
+   705→   705→    let updatedContentSettingsConfiguration = contentSettingsConfiguration(network: context.account.network)
+   706→   706→    |> map(Optional.init)
+   707→   707→    let contentSettingsConfiguration = Promise<ContentSettingsConfiguration?>()
+   708→   708→    contentSettingsConfiguration.set(.single(nil)
+   709→   709→    |> then(updatedContentSettingsConfiguration))
+   710→   710→    
+   711→   711→    let signal = combineLatest(simplePromise.get(), /*sliderPromise.get(),*/ statePromise.get(), context.sharedContext.presentationData, sharedData, preferences, contentSettingsConfiguration.get(),
+   712→   712→        context.engine.accountData.observeAvailableColorOptions(scope: .replies),
+   713→   713→        context.engine.accountData.observeAvailableColorOptions(scope: .profile)
+   714→   714→    )
+   715→   715→    |> map { _, /*sliderValue,*/ state, presentationData, sharedData, view, contentSettingsConfiguration, availableReplyColors, availableProfileColors ->  (ItemListControllerState, (ItemListNodeState, Any)) in
+   716→   716→        
+   717→   717→        let appConfiguration: AppConfiguration = view.values[PreferencesKeys.appConfiguration]?.get(AppConfiguration.self) ?? AppConfiguration.defaultValue
+   718→   718→        let callListSettings: CallListSettings = sharedData.entries[ApplicationSpecificSharedDataKeys.callListSettings]?.get(CallListSettings.self) ?? CallListSettings.defaultSettings
+   719→   719→        let experimentalUISettings: ExperimentalUISettings = sharedData.entries[ApplicationSpecificSharedDataKeys.experimentalUISettings]?.get(ExperimentalUISettings.self) ?? ExperimentalUISettings.defaultSettings
+   720→   720→        
+   721→   721→        let entries = SGControllerEntries(presentationData: presentationData, callListSettings: callListSettings, experimentalUISettings: experimentalUISettings, appConfiguration: appConfiguration, nameColors: PeerNameColors.with(availableReplyColors: availableReplyColors, availableProfileColors: availableProfileColors), state: state)
+   722→   722→        
+   723→   723→        let controllerState = ItemListControllerState(presentationData: ItemListPresentationData(presentationData), title: .text("nameless"), leftNavigationButton: nil, rightNavigationButton: nil, backNavigationButton: ItemListBackButton(title: presentationData.strings.Common_Back))
+   724→   724→        
+   725→   725→        // TODO(swiftgram): focusOnItemTag support
+   726→   726→        /* var index = 0
+   727→   727→        var scrollToItem: ListViewScrollToItem?
+   728→   728→         if let focusOnItemTag = focusOnItemTag {
+   729→   729→            for entry in entries {
+   730→   730→                if entry.tag?.isEqual(to: focusOnItemTag) ?? false {
+   731→   731→                    scrollToItem = ListViewScrollToItem(index: index, position: .top(0.0), animated: false, curve: .Default(duration: 0.0), directionHint: .Up)
+   732→   732→                }
+   733→   733→                index += 1
+   734→   734→            }
+   735→   735→        } */
+   736→   736→        
+   737→   737→        let listState = ItemListNodeState(presentationData: ItemListPresentationData(presentationData), entries: entries, style: .blocks, ensureVisibleItemTag: /*focusOnItemTag*/ nil, initialScrollToItem: nil /* scrollToItem*/ )
+   738→   738→        
+   739→   739→        return (controllerState, (listState, arguments))
+   740→   740→    }
+   741→   741→    
+   742→   742→    let controller = ItemListController(context: context, state: signal)
+   743→   743→    presentControllerImpl = { [weak controller] c, a in
+   744→   744→        controller?.present(c, in: .window(.root), with: a)
+   745→   745→    }
+   746→   746→    pushControllerImpl = { [weak controller] c in
+   747→   747→        (controller?.navigationController as? NavigationController)?.pushViewController(c)
+   748→   748→    }
+   749→   749→//    getRootControllerImpl = { [weak controller] in
+   750→   750→//        return controller?.view.window?.rootViewController
+   751→   751→//    }
+   752→   752→//    getNavigationControllerImpl = { [weak controller] in
+   753→   753→//        return controller?.navigationController as? NavigationController
+   754→   754→//    }
+   755→   755→    askForRestart = { [weak context] in
+   756→   756→        guard let context = context else {
+   757→   757→            return
+   758→   758→        }
+   759→   759→        let presentationData = context.sharedContext.currentPresentationData.with { $0 }
+   760→   760→        presentControllerImpl?(
+   761→   761→            UndoOverlayController(
+   762→   762→                presentationData: presentationData, 
+   763→   763→                content: .info(title: nil, // i18n("Common.RestartRequired", presentationData.strings.baseLanguageCode),
+   764→   764→                    text: i18n("Common.RestartRequired", presentationData.strings.baseLanguageCode),
+   765→   765→                    timeout: nil,
+   766→   766→                    customUndoText: i18n("Common.RestartNow", presentationData.strings.baseLanguageCode) //presentationData.strings.Common_Yes
+   767→   767→                ),
+   768→   768→                elevatedLayout: false,
+   769→   769→                action: { action in if action == .undo { exit(0) }; return true }
+   770→   770→            ),
+   771→   771→            nil
+   772→   772→        )
+   773→   773→    }
+   774→   774→    return controller
+   775→   775→
+   776→   776→}
+   777→   777→

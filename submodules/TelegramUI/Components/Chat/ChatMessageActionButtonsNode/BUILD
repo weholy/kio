@@ -1,0 +1,32 @@
+load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library")
+
+swift_library(
+    name = "ChatMessageActionButtonsNode",
+    module_name = "ChatMessageActionButtonsNode",
+    srcs = glob([
+        "Sources/**/*.swift",
+    ]),
+    copts = [
+        "-warnings-as-errors",
+    ],
+    deps = [
+        "//Swiftgram/SGLiquidGlass:SGLiquidGlass",
+        "//submodules/TelegramUI/Components/GlassBackgroundComponent:GlassBackgroundComponent",
+        "//Swiftgram/SGLiquidGlassCore:SGLiquidGlassCore",
+        "//submodules/SSignalKit/SwiftSignalKit",
+        "//submodules/AsyncDisplayKit",
+        "//submodules/TelegramCore",
+        "//submodules/Display",
+        "//submodules/TelegramPresentationData",
+        "//submodules/AccountContext",
+        "//submodules/WallpaperBackgroundNode",
+        "//submodules/UrlHandling",
+        "//submodules/TelegramUI/Components/TextLoadingEffect",
+        "//submodules/ComponentFlow",
+        "//submodules/Components/ComponentDisplayAdapters",
+        "//submodules/TelegramUI/Components/EmojiStatusComponent",
+    ],
+    visibility = [
+        "//visibility:public",
+    ],
+)

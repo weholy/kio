@@ -1,0 +1,252 @@
+     1→/home/z/my-project/Telegram/NotificationService/Sources/NotificationService.swift:527:    // MARK: Swiftgram
+     2→/home/z/my-project/Telegram/NotificationService/Sources/NotificationService.swift:606:        // MARK: Swiftgram
+     3→/home/z/my-project/Telegram/NotificationService/Sources/NotificationService.swift:734:        // MARK: Swiftgram
+     4→/home/z/my-project/Telegram/NotificationService/Sources/NotificationService.swift:1494:                                    // MARK: Swiftgram
+     5→/home/z/my-project/Telegram/NotificationService/Sources/NotificationService.swift:2604:    // MARK: Swiftgram
+     6→/home/z/my-project/Telegram/NotificationService/Sources/NotificationService.swift:2613:    // MARK: Swiftgram
+     7→/home/z/my-project/Telegram/NotificationService/Sources/NotificationService.swift:2698:                            // MARK: Swiftgram
+     8→/home/z/my-project/Swiftgram/SGInputToolbar/Sources/SGInputToolbar.swift:5:// MARK: Swiftgram
+     9→/home/z/my-project/Swiftgram/SGSharedAccountContextMigration/Sources/SharedAccountContext+SGUISettingsMigration.swift:1:// MARK: Swiftgram
+    10→/home/z/my-project/Swiftgram/SGSharedAccountContextMigration/Sources/SharedAccountContext+SGUISettingsMigration.swift:12:    // MARK: Swiftgram
+    11→/home/z/my-project/Swiftgram/SGSettingsUI/Sources/SGSettingsController.swift:1:// MARK: Swiftgram
+    12→/home/z/my-project/Swiftgram/SGItemListUI/Sources/SGItemListUI.swift:1:// MARK: Swiftgram
+    13→/home/z/my-project/Swiftgram/SGItemListUI/Sources/SliderPercentageItem.swift:91:    // MARK: Swiftgram
+    14→/home/z/my-project/Swiftgram/SGItemListUI/Sources/SliderPercentageItem.swift:115:        // MARK: Swiftgram
+    15→/home/z/my-project/Swiftgram/SGItemListUI/Sources/SliderPercentageItem.swift:127:        // MARK: Swiftgram
+    16→/home/z/my-project/Swiftgram/SGAppBadgeOffset/Sources/SGAppBadgeOffset.swift:86:        return DEVICE_MODELS_WITH_APP_BADGE_SUPPORT.contains(DeviceModel.current) // MARK: Swiftgram
+    17→/home/z/my-project/Telegram/WatchApp/tgwatch Watch App/UserNamesStore.swift:16:    // MARK: Swiftgram
+    18→/home/z/my-project/Telegram/WatchApp/tgwatch Watch App/UserNamesStore.swift:24:            // MARK: Swiftgram
+    19→/home/z/my-project/Telegram/WatchApp/tgwatch Watch App/Messages/ChatHistoryStore.swift:552:            // MARK: Swiftgram
+    20→/home/z/my-project/Telegram/WatchApp/tgwatch Watch App/Messages/ChatHistoryStore.swift:654:            // MARK: Swiftgram
+    21→/home/z/my-project/Telegram/WatchApp/tgwatch Watch App/Messages/MessageRow.swift:56:    // MARK: Swiftgram
+    22→/home/z/my-project/Telegram/WatchApp/tgwatch Watch App/Messages/MessageRow.swift:118:    // MARK: Swiftgram
+    23→/home/z/my-project/Telegram/WatchApp/tgwatch Watch App/Messages/MessageRow.swift:386:            // MARK: Swiftgram
+    24→/home/z/my-project/Telegram/WatchApp/tgwatch Watch App/Messages/MessageBubbleView.swift:9:    // MARK: Swiftgram
+    25→/home/z/my-project/Telegram/WatchApp/tgwatch Watch App/Messages/MessageBubbleView.swift:21:                    // MARK: Swiftgram
+    26→/home/z/my-project/Telegram/WatchApp/tgwatch Watch App/Messages/MessageBubbleView.swift:39:                        // MARK: Swiftgram
+    27→/home/z/my-project/Telegram/WatchApp/tgwatch Watch App/Messages/MessageRowView.swift:14:    // MARK: Swiftgram
+    28→/home/z/my-project/Telegram/WatchApp/tgwatch Watch App/Messages/MessageRowView.swift:38:                // MARK: Swiftgram
+    29→/home/z/my-project/Telegram/WatchApp/tgwatch Watch App/Messages/MessageListView.swift:223:                                    // MARK: Swiftgram
+    30→/home/z/my-project/Telegram/WatchApp/tgwatch Watch App/Stickers/StickerBubbleView.swift:13:    // MARK: Swiftgram
+    31→/home/z/my-project/Telegram/WatchApp/tgwatch Watch App/Stickers/StickerBubbleView.swift:28:                // MARK: Swiftgram
+    32→/home/z/my-project/Telegram/WatchApp/tgwatch Watch App/Chats/AvatarView.swift:60:// MARK: Swiftgram
+    33→/home/z/my-project/Telegram/WatchApp/tgwatch Watch App/Chats/ChatRowView.swift:17:                size: 28 // MARK: Swiftgram
+    34→/home/z/my-project/submodules/AttachmentTextInputPanelNode/Sources/AttachmentTextInputPanelNode.swift:1:// MARK: Swiftgram
+    35→/home/z/my-project/submodules/AttachmentTextInputPanelNode/Sources/AttachmentTextInputPanelNode.swift:330:    // MARK: Swiftgram
+    36→/home/z/my-project/submodules/AttachmentTextInputPanelNode/Sources/AttachmentTextInputPanelNode.swift:621:        // MARK: Swiftgram
+    37→/home/z/my-project/submodules/AttachmentTextInputPanelNode/Sources/AttachmentTextInputPanelNode.swift:2423:// MARK: Swiftgram
+    38→/home/z/my-project/submodules/Camera/Sources/CameraOutput.swift:386:            // MARK: Swiftgram
+    39→/home/z/my-project/submodules/WallpaperBackgroundNode/Sources/WallpaperBackgroundNode.swift:1117:    // MARK: Swiftgram
+    40→/home/z/my-project/submodules/WallpaperBackgroundNode/Sources/WallpaperBackgroundNode.swift:1789:            /* MARK: Swiftgram */ if SGSimpleSettings.shared.isNYEnabled && self.NYNode == nil { let nYNode = WallpaperNYNode(); self.addSubnode(nYNode); self.NYNode = nYNode }
+    41→/home/z/my-project/submodules/WallpaperBackgroundNode/Sources/WallpaperBackgroundNode.swift:1791:        /* MARK: Swiftgram */ self.NYNode?.frame = CGRect(origin: CGPoint(), size: size); self.NYNode?.updateLayout(size: size)
+    42→/home/z/my-project/submodules/PlatformRestrictionMatching/Sources/PlatformRestrictionMatching.swift:11:        // MARK: Swiftgram
+    43→/home/z/my-project/submodules/PlatformRestrictionMatching/Sources/PlatformRestrictionMatching.swift:31:        // MARK: Swiftgram
+    44→/home/z/my-project/submodules/PlatformRestrictionMatching/Sources/PlatformRestrictionMatching.swift:53:// MARK: Swiftgram
+    45→/home/z/my-project/submodules/AccountUtils/Sources/AccountUtils.swift:7:// MARK: Swiftgram
+    46→/home/z/my-project/submodules/AccountUtils/Sources/AccountUtils.swift:56:// MARK: Swiftgram
+    47→/home/z/my-project/submodules/SettingsUI/Sources/Language Selection/LocalizationListControllerNode.swift:464:        chatTranslationAvailable = true; translateButtonAvailable = true // MARK: Swiftgram
+    48→/home/z/my-project/submodules/SettingsUI/Sources/Language Selection/LocalizationListControllerNode.swift:481:            // MARK: Swiftgram
+    49→/home/z/my-project/submodules/SettingsUI/Sources/Language Selection/LocalizationListControllerNode.swift:786:                    // MARK: Swiftgram
+    50→/home/z/my-project/submodules/AuthorizationUI/Sources/AuthorizationSequenceController.swift:650:                        // MARK: Swiftgram
+    51→/home/z/my-project/submodules/AuthorizationUI/Sources/AuthorizationSequencePhoneEntryController.swift:233:                /* MARK: Swiftgram
+    52→/home/z/my-project/submodules/AuthorizationUI/Sources/AuthorizationSequencePhoneEntryController.swift:410:                // MARK: Swiftgram
+    53→/home/z/my-project/submodules/SettingsUI/Sources/Privacy and Security/Recent Sessions/RecentSessionsController.swift:961:        // MARK: Swiftgram
+    54→/home/z/my-project/submodules/SettingsUI/Sources/Privacy and Security/RecentSessionScreen.swift:438:                ipString = session.ip // MARK: Swiftgram
+    55→/home/z/my-project/submodules/SettingsUI/Sources/Privacy and Security/RecentSessionScreen.swift:529:            // MARK: Swiftgram
+    56→/home/z/my-project/submodules/SettingsUI/Sources/Privacy and Security/RecentSessionScreen.swift:607:            // MARK: Swiftgram
+    57→/home/z/my-project/submodules/SettingsUI/Sources/Privacy and Security/PasscodeOptionsController.swift:1:// MARK: Swiftgram
+    58→/home/z/my-project/submodules/SettingsUI/Sources/Privacy and Security/PasscodeOptionsController.swift:196:        // MARK: Swiftgram
+    59→/home/z/my-project/submodules/SettingsUI/Sources/Themes/ThemeSettingsController.swift:636:            // MARK: Swiftgram
+    60→/home/z/my-project/submodules/SettingsUI/Sources/Themes/ThemeSettingsController.swift:1109:            ApplicationSpecificSharedDataKeys.sgStatus // MARK: Swiftgram
+    61→/home/z/my-project/submodules/SettingsUI/Sources/Themes/ThemeSettingsController.swift:1124:        // MARK: Swiftgram
+    62→/home/z/my-project/submodules/SettingsUI/Sources/Data and Storage/ProxyListSettingsController.swift:1:// MARK: Swiftgram
+    63→/home/z/my-project/submodules/SettingsUI/Sources/Data and Storage/ProxyListSettingsController.swift:305:    // MARK: Swiftgram
+    64→/home/z/my-project/submodules/SettingsUI/Sources/Data and Storage/ProxyListSettingsController.swift:644:    // MARK: Swiftgram
+    65→/home/z/my-project/submodules/SettingsUI/Sources/Data and Storage/WebBrowserItem.swift:159:                        let currentIcon = icons.first(where: { $0.name == current })?.imageName ?? icons.first(where: { $0.isDefault })?.imageName ?? "BlueIcon" // MARK: Swiftgram
+    66→/home/z/my-project/submodules/SettingsUI/Sources/Data and Storage/WebBrowserSettingsController.swift:333:        // MARK: Swiftgram
+    67→/home/z/my-project/submodules/TelegramUIPreferences/Sources/PostboxKeys.swift:33:    // MARK: Swiftgram
+    68→/home/z/my-project/submodules/TelegramUIPreferences/Sources/PostboxKeys.swift:61:    // MARK: Swiftgram
+    69→/home/z/my-project/submodules/TelegramCallsUI/Sources/CallKitIntegration.swift:162:        // MARK: Swiftgram
+    70→/home/z/my-project/submodules/TextFormat/Sources/DateFormat.swift:144:    // MARK: Swiftgram
+    71→/home/z/my-project/submodules/Display/Source/GenerateImage.swift:303:// MARK: Swiftgram
+    72→/home/z/my-project/submodules/Display/Source/GenerateImage.swift:309:    // MARK: Swiftgram
+    73→/home/z/my-project/submodules/ChatListUI/Sources/ChatListControllerNode.swift:537:        let panRecognizer = InteractiveTransitionGestureRecognizer(target: self, action: #selector(self.panGesture(_:)), allowedDirections: { [weak self] _ in // MARK: Swiftgram
+    74→/home/z/my-project/submodules/ChatListUI/Sources/ChatListControllerNode.swift:589:        // MARK: Swiftgram
+    75→/home/z/my-project/submodules/ChatListUI/Sources/ChatListControllerNode.swift:1515:        var tabs: AnyComponent<Empty>? // MARK: Swiftgram
+    76→/home/z/my-project/submodules/ChatListUI/Sources/ChatListControllerNode.swift:1655:                tabs: (self.controller?.tabContainerData?.1 ?? false) ? nil : tabs, // MARK: Swiftgram
+    77→/home/z/my-project/submodules/ChatListUI/Sources/ChatListControllerNode.swift:1847:        // MARK: Swiftgram
+    78→/home/z/my-project/submodules/ChatListUI/Sources/ChatListControllerNode.swift:1964:        // MARK: Swiftgram
+    79→/home/z/my-project/submodules/ChatListUI/Sources/ChatListControllerNode.swift:2033:        // MARK: Swiftgram
+    80→/home/z/my-project/submodules/ChatListUI/Sources/ChatListSearchListPaneNode.swift:4316:                    // MARK: Swiftgram
+    81→/home/z/my-project/submodules/ChatListUI/Sources/ChatListController.swift:1:// MARK: Swiftgram
+    82→/home/z/my-project/submodules/ChatListUI/Sources/ChatListController.swift:412:                    // MARK: Swiftgram
+    83→/home/z/my-project/submodules/ChatListUI/Sources/ChatListController.swift:423:                        // MARK: Swiftgram
+    84→/home/z/my-project/submodules/ChatListUI/Sources/ChatListController.swift:765:                // MARK: Swiftgram
+    85→/home/z/my-project/submodules/ChatListUI/Sources/ChatListController.swift:2162:                // MARK: Swiftgram
+    86→/home/z/my-project/submodules/ChatListUI/Sources/ChatListController.swift:2481:                                let tooltipController = TooltipController(content: .text(strongSelf.presentationData.strings.DialogList_PasscodeLockHelp.replacingOccurrences(of: "Telegram", with: "Swiftgram") /* MARK: Swiftgram */), baseFontSize: strongSelf.presentationData.listsFontSize.baseDisplaySize, dismissByTapOutside: true)
+    87→/home/z/my-project/submodules/ChatListUI/Sources/ChatListController.swift:3978:        // MARK: Swiftgram
+    88→/home/z/my-project/submodules/ChatListUI/Sources/ChatListController.swift:4031:            // MARK: Swiftgram
+    89→/home/z/my-project/submodules/ChatListUI/Sources/ChatListController.swift:6830:        // MARK: Swiftgram
+    90→/home/z/my-project/submodules/ChatListUI/Sources/ChatListController.swift:7284:                // MARK: Swiftgram
+    91→/home/z/my-project/submodules/ChatListUI/Sources/ChatListController.swift:7567:// MARK: Swiftgram
+    92→/home/z/my-project/submodules/ChatListUI/Sources/ChatContextMenus.swift:365:                        let archiveEnabled = !isSavedMessages && peerId != EnginePeer.Id(namespace: Namespaces.Peer.CloudUser, id: EnginePeer.Id.Id._internalFromInt64Value(777000)) /* && peerId == context.account.peerId // MARK: Swiftgram */
+    93→/home/z/my-project/submodules/ChatListUI/Sources/Node/ChatListNode.swift:140:        // MARK: Swiftgram
+    94→/home/z/my-project/submodules/ChatListUI/Sources/Node/ChatListNode.swift:1359:    // MARK: Swiftgram
+    95→/home/z/my-project/submodules/ChatListUI/Sources/Node/ChatListItem.swift:1765:        // MARK: Swiftgram
+    96→/home/z/my-project/submodules/ChatListUI/Sources/Node/ChatListItem.swift:1929:            // MARK: Swiftgram
+    97→/home/z/my-project/submodules/ChatListUI/Sources/Node/ChatListItem.swift:2197:        // MARK: Swiftgram
+    98→/home/z/my-project/submodules/ChatListUI/Sources/Node/ChatListItem.swift:2463:            // MARK: Swiftgram
+    99→/home/z/my-project/submodules/ChatListUI/Sources/Node/ChatListItem.swift:2533:            // MARK: Swiftgram
+   100→/home/z/my-project/submodules/ChatListUI/Sources/Node/ChatListItem.swift:2563:            // MARK: Swiftgram
+   101→/home/z/my-project/submodules/ChatListUI/Sources/Node/ChatListItem.swift:3672:            // MARK: Swiftgram
+   102→/home/z/my-project/submodules/ChatListUI/Sources/Node/ChatListItem.swift:3694:                // MARK: Swiftgram
+   103→/home/z/my-project/submodules/ChatListUI/Sources/Node/ChatListItem.swift:3824:                                // MARK: Swiftgram
+   104→/home/z/my-project/submodules/ChatListUI/Sources/Node/ChatListItem.swift:3834:                                    // MARK: Swiftgram
+   105→/home/z/my-project/submodules/ChatListUI/Sources/Node/ChatListItem.swift:3878:            // MARK: Swiftgram
+   106→/home/z/my-project/submodules/ChatListUI/Sources/Node/ChatListItem.swift:3910:            // MARK: Swiftgram
+   107→/home/z/my-project/submodules/ChatListUI/Sources/Node/ChatListItem.swift:4070:                        // MARK: Swiftgram
+   108→/home/z/my-project/submodules/ChatListUI/Sources/Node/ChatListItem.swift:4424:                    // MARK: Swiftgram
+   109→/home/z/my-project/submodules/ChatListUI/Sources/Node/ChatListItem.swift:4463:                        // MARK: Swiftgram
+   110→/home/z/my-project/submodules/ChatListUI/Sources/Node/ChatListItem.swift:4549:                    // MARK: Swiftgram
+   111→/home/z/my-project/submodules/ChatListUI/Sources/Node/ChatListItem.swift:4762:                        // MARK: Swiftgram
+   112→/home/z/my-project/submodules/TelegramStringFormatting/Sources/DateFormat.swift:160:// MARK: Swiftgram
+   113→/home/z/my-project/submodules/DebugSettingsUI/Sources/DebugController.swift:1:// MARK: Swiftgram
+   114→/home/z/my-project/submodules/DebugSettingsUI/Sources/DebugController.swift:166:        // MARK: Swiftgram
+   115→/home/z/my-project/submodules/DebugSettingsUI/Sources/DebugController.swift:419:        // MARK: Swiftgram
+   116→/home/z/my-project/submodules/DebugSettingsUI/Sources/DebugController.swift:1579:    // MARK: Swiftgram
+   117→/home/z/my-project/submodules/WebUI/Sources/WebAppController.swift:278:            // MARK: Swiftgram
+   118→/home/z/my-project/submodules/WebUI/Sources/WebAppController.swift:4039:            // MARK: Swiftgram
+   119→/home/z/my-project/submodules/WebUI/Sources/WebAppController.swift:4171:    // MARK: Swiftgram
+   120→/home/z/my-project/submodules/WebUI/Sources/WebAppWebView.swift:344:    // MARK: Swiftgram
+   121→/home/z/my-project/submodules/WebUI/Sources/WebAppWebView.swift:399:// MARK: Swiftgram
+   122→/home/z/my-project/submodules/TelegramCore/Sources/PendingMessages/EnqueueMessage.swift:591:                    // MARK: Swiftgram
+   123→/home/z/my-project/submodules/TelegramCore/Sources/PendingMessages/EnqueueMessage.swift:720:                                    // MARK: Swiftgram
+   124→/home/z/my-project/submodules/TelegramCore/Sources/PendingMessages/EnqueueMessage.swift:738:                    // MARK: Swiftgram
+   125→/home/z/my-project/submodules/TelegramCore/Sources/SyncCore/SyncCore_AppConfiguration.swift:7:    // MARK: Swiftgram
+   126→/home/z/my-project/submodules/TelegramCore/Sources/SyncCore/SyncCore_TranslationMessageAttribute.swift:96:// MARK: Swiftgram
+   127→/home/z/my-project/submodules/TelegramCore/Sources/Utils/PeerUtils.swift:32:        // MARK: Swiftgram
+   128→/home/z/my-project/submodules/TelegramCore/Sources/Utils/PeerUtils.swift:313:        if SGSimpleSettings.shared.accountColorsSaturation == 0 { // MARK: Swiftgram
+   129→/home/z/my-project/submodules/TelegramCore/Sources/TelegramEngine/Localization/LocalizationInfo.swift:29:// MARK: Swiftgram
+   130→/home/z/my-project/submodules/TelegramCore/Sources/TelegramEngine/Peers/ChatListFiltering.swift:1137:        // MARK: Swiftgram
+   131→/home/z/my-project/submodules/TelegramCore/Sources/TelegramEngine/Messages/SearchMessages.swift:346:                    // MARK: Swiftgram
+   132→/home/z/my-project/submodules/TelegramCore/Sources/TelegramEngine/Messages/TelegramEngineMessages.swift:721:        // MARK: Swiftgram
+   133→/home/z/my-project/submodules/TelegramCore/Sources/TelegramEngine/Messages/TelegramEngineMessages.swift:1606:            // MARK: Swiftgram
+   134→/home/z/my-project/submodules/TelegramCore/Sources/TelegramEngine/Messages/TelegramEngineMessages.swift:2023:// MARK: Swiftgram
+   135→/home/z/my-project/submodules/TelegramCore/Sources/TelegramEngine/Messages/RequestChatContextResults.swift:131:                // MARK: Swiftgram
+   136→/home/z/my-project/submodules/TelegramCore/Sources/Settings/ContentSettings.swift:32:        // MARK: Swiftgram
+   137→/home/z/my-project/submodules/TelegramCore/Sources/Network/Network.swift:1:// MARK: Swiftgram
+   138→/home/z/my-project/submodules/TelegramCore/Sources/Account/AccountManager.swift:220:    // MARK: Swiftgram
+   139→/home/z/my-project/submodules/TelegramCore/Sources/Suggestions.swift:231:// MARK: Swiftgram
+   140→/home/z/my-project/submodules/Utils/DeviceModel/Sources/DeviceModel.swift:413:        // MARK: Swiftgram
+   141→/home/z/my-project/submodules/PremiumUI/Sources/PremiumIntroScreen.swift:2233:                            var buttonText: String = "" // MARK: Swiftgram
+   142→/home/z/my-project/submodules/PremiumUI/Sources/PremiumIntroScreen.swift:2244:                                // MARK: Swiftgram
+   143→/home/z/my-project/submodules/PremiumUI/Sources/PremiumIntroScreen.swift:3204:            // MARK: Swiftgram
+   144→/home/z/my-project/submodules/PremiumUI/Sources/PremiumIntroScreen.swift:3804:                var buttonTitle: String = "" // MARK: Swiftgram
+   145→/home/z/my-project/submodules/PremiumUI/Sources/PremiumIntroScreen.swift:3819:                    // MARK: Swiftgram
+   146→/home/z/my-project/submodules/PremiumUI/Sources/PremiumIntroScreen.swift:3829:                    // MARK: Swiftgram
+   147→/home/z/my-project/submodules/PremiumUI/Sources/PremiumGiftScreen.swift:887:            // MARK: Swiftgram
+   148→/home/z/my-project/submodules/PremiumUI/Sources/ReplaceBoostScreen.swift:193:                        // MARK: Swiftgram
+   149→/home/z/my-project/submodules/PremiumUI/Sources/PremiumBoostLevelsScreen.swift:1150:                                        // MARK: Swiftgram
+   150→/home/z/my-project/submodules/PeerInfoUI/Sources/ChannelBannedMemberController.swift:788:                    picker: .dateTime, // MARK: Swiftgram
+   151→/home/z/my-project/submodules/PeerInfoUI/Sources/ChannelBannedMemberController.swift:792:                    pickerValueMapping: .rawTimestamp, // MARK: Swiftgram
+   152→/home/z/my-project/submodules/TelegramUI/Sources/OpenUrl.swift:307:                    // MARK: Swiftgram
+   153→/home/z/my-project/submodules/TelegramUI/Sources/TransformOutgoingMessageMedia.swift:173:                            // MARK: Swiftgram
+   154→/home/z/my-project/submodules/TelegramUI/Sources/ChatController.swift:576:    // MARK: Swiftgram
+   155→/home/z/my-project/submodules/TelegramUI/Sources/ChatController.swift:6818:        // MARK: Swiftgram
+   156→/home/z/my-project/submodules/TelegramUI/Sources/ChatController.swift:6851:        // MARK: Swiftgram
+   157→/home/z/my-project/submodules/TelegramUI/Sources/ChatController.swift:9871:        if ({ return true })() { return } // MARK: Swiftgram
+   158→/home/z/my-project/submodules/TelegramUI/Sources/TelegramRootController.swift:217:        // MARK: Swiftgram
+   159→/home/z/my-project/submodules/TelegramUI/Sources/AccountContext.swift:826:        // MARK: Swiftgram
+   160→/home/z/my-project/submodules/TelegramUI/Sources/AccountContext.swift:895:        // MARK: Swiftgram
+   161→/home/z/my-project/submodules/TelegramUI/Sources/MentionChatInputPanelItem.swift:144:        // MARK: Swiftgram
+   162→/home/z/my-project/submodules/TelegramUI/Sources/MentionChatInputPanelItem.swift:149:        // MARK: Swiftgram
+   163→/home/z/my-project/submodules/TelegramUI/Sources/MentionChatInputPanelItem.swift:482:// MARK: Swiftgram
+   164→/home/z/my-project/submodules/TelegramUI/Sources/MentionChatInputContextPanelNode.swift:166:                                    // MARK: Swiftgram
+   165→/home/z/my-project/submodules/TelegramUI/Sources/MentionChatInputContextPanelNode.swift:177:                                    // MARK: Swiftgram
+   166→/home/z/my-project/submodules/TelegramUI/Sources/ChatHistoryListNode.swift:434:    return ChatMessageItemAssociatedData(translateToLanguageSG: translateToLanguageSG, translationSettings: translationSettings, /* MARK: Swiftgram */ automaticDownloadPeerType: automaticMediaDownloadPeerType, automaticDownloadPeerId: automaticDownloadPeerId, automaticDownloadNetworkType: automaticDownloadNetworkType, preferredStoryHighQuality: preferredStoryHighQuality, isRecentActions: false, subject: subject, contactsPeerIds: contactsPeerIds, channelDiscussionGroup: channelDiscussionGroup, animatedEmojiStickers: animatedEmojiStickers, additionalAnimatedEmojiStickers: additionalAnimatedEmojiStickers, currentlyPlayingMessageId: currentlyPlayingMessageId, isCopyProtectionEnabled: isCopyProtectionEnabled, availableReactions: availableReactions, availableMessageEffects: availableMessageEffects, savedMessageTags: savedMessageTags, defaultReaction: defaultReaction, areStarReactionsEnabled: areStarReactionsEnabled, isPremium: isPremium, accountPeer: accountPeer, alwaysDisplayTranscribeButton: alwaysDisplayTranscribeButton, topicAuthorId: topicAuthorId, hasBots: hasBots, translateToLanguage: translateToLanguage, maxReadStoryId: maxReadStoryId, recommendedChannels: recommendedChannels, audioTranscriptionTrial: audioTranscriptionTrial, chatThemes: chatThemes, deviceContactsNumbers: deviceContactsNumbers, isInline: isInline, showSensitiveContent: showSensitiveContent, isSuspiciousPeer: isSuspiciousPeer, accountCountry: accountCountry, isParticipant: isParticipant, invitedOn: invitedOn)
+   167→/home/z/my-project/submodules/TelegramUI/Sources/ChatHistoryListNode.swift:1912:        ) |> debug_measureTimeToFirstEvent(label: "chatHistoryNode_firstChatHistoryTransition")).startStrict(next: { [weak self] sharedData, /* MARK: Swiftgram */ update, chatPresentationData, selectedMessages, updatingMedia, networkType, preferredStoryHighQuality, animatedEmojiStickers, additionalAnimatedEmojiStickers, customChannelDiscussionReadState, customThreadOutgoingReadState, availableReactions, availableMessageEffects, savedMessageTags, defaultReaction, accountPeer, accountCountry, suggestAudioTranscription, promises, topicAuthorId, translationState, maxReadStoryId, recommendedChannels, audioTranscriptionTrial, chatThemes, deviceContactsNumbers, contentSettings in
+   168→/home/z/my-project/submodules/TelegramUI/Sources/ChatHistoryListNode.swift:2148:                // MARK: Swiftgram
+   169→/home/z/my-project/submodules/TelegramUI/Sources/ChatHistoryListNode.swift:2169:                let associatedData = extractAssociatedData(translateToLanguageSG: translateToLanguageSG, translationSettings: translationSettings, /* MARK: Swiftgram */ chatLocation: chatLocation, view: view, automaticDownloadNetworkType: networkType, preferredStoryHighQuality: preferredStoryHighQuality, animatedEmojiStickers: animatedEmojiStickers, additionalAnimatedEmojiStickers: additionalAnimatedEmojiStickers, subject: subject, currentlyPlayingMessageId: currentlyPlayingMessageIdAndType?.0, isCopyProtectionEnabled: isCopyProtectionEnabled, availableReactions: availableReactions, availableMessageEffects: availableMessageEffects, savedMessageTags: savedMessageTags, defaultReaction: defaultReaction.0, areStarReactionsEnabled: defaultReaction.1, isPremium: isPremium, alwaysDisplayTranscribeButton: alwaysDisplayTranscribeButton, accountPeer: accountPeer, topicAuthorId: topicAuthorId, hasBots: chatHasBots, translateToLanguage: translateToLanguage?.toLang, maxReadStoryId: maxReadStoryId, recommendedChannels: recommendedChannels, audioTranscriptionTrial: audioTranscriptionTrial, chatThemes: chatThemes, deviceContactsNumbers: deviceContactsNumbers, isInline: !rotated, showSensitiveContent: contentSettings.ignoreContentRestrictionReasons.contains("sensitive"), isSuspiciousPeer: isSuspiciousPeer, accountCountry: accountCountry)
+   170→/home/z/my-project/submodules/TelegramUI/Sources/SharedAccountContext.swift:1:// MARK: Swiftgram
+   171→/home/z/my-project/submodules/TelegramUI/Sources/SharedAccountContext.swift:288:    // MARK: Swiftgram
+   172→/home/z/my-project/submodules/TelegramUI/Sources/SharedAccountContext.swift:540:        // MARK: Swiftgram
+   173→/home/z/my-project/submodules/TelegramUI/Sources/SharedAccountContext.swift:1140:    // MARK: Swiftgram
+   174→/home/z/my-project/submodules/TelegramUI/Sources/SharedAccountContext.swift:1143:    // MARK: Swiftgram
+   175→/home/z/my-project/submodules/TelegramUI/Sources/SharedAccountContext.swift:1151:        // MARK: Swiftgram
+   176→/home/z/my-project/submodules/TelegramUI/Sources/SharedAccountContext.swift:4601:// MARK: Swiftgram
+   177→/home/z/my-project/submodules/TelegramUI/Sources/ApplicationContext.swift:1:// MARK: Swiftgram
+   178→/home/z/my-project/submodules/TelegramUI/Sources/ChatInterfaceStateContextMenus.swift:504:    // MARK: Swiftgram
+   179→/home/z/my-project/submodules/TelegramUI/Sources/ChatInterfaceStateContextMenus.swift:2179:            // MARK: Swiftgram
+   180→/home/z/my-project/submodules/TelegramUI/Sources/ChatInterfaceStateContextMenus.swift:2301:        // MARK: Swiftgram
+   181→/home/z/my-project/submodules/TelegramUI/Sources/ChatInterfaceStateInputPanels.swift:356:                    // MARK: Swiftgram
+   182→/home/z/my-project/submodules/TelegramUI/Sources/AppDelegate.swift:1:// MARK: Swiftgram
+   183→/home/z/my-project/submodules/TelegramUI/Sources/AppDelegate.swift:430:        // MARK: Swiftgram
+   184→/home/z/my-project/submodules/TelegramUI/Sources/AppDelegate.swift:1332:                // MARK: Swiftgram
+   185→/home/z/my-project/submodules/TelegramUI/Sources/AppDelegate.swift:1381:                    // MARK: Swiftgram
+   186→/home/z/my-project/submodules/TelegramUI/Sources/AppDelegate.swift:1466:        // MARK: Swiftgram
+   187→/home/z/my-project/submodules/TelegramUI/Sources/AppDelegate.swift:2037:                    // MARK: Swiftgram
+   188→/home/z/my-project/submodules/TelegramUI/Sources/AppDelegate.swift:3378:// MARK: Swiftgram
+   189→/home/z/my-project/submodules/TelegramUI/Sources/AppDelegate.swift:3493:        // MARK: Swiftgram
+   190→/home/z/my-project/submodules/TelegramUI/Sources/ChatPinnedMessageTitlePanelNode.swift:510:            if let translation = message.attributes.first(where: { $0 is TranslationMessageAttribute }) as? TranslationMessageAttribute, translation.toLang == translateToLanguage?.toLang || translation.toLang.hasPrefix("\(translateToLanguage?.toLang ?? "")-") /* MARK: Swiftgram */ {
+   191→/home/z/my-project/submodules/TelegramUI/Sources/ChatControllerNode.swift:1862:        // MARK: Swiftgram
+   192→/home/z/my-project/submodules/TelegramUI/Sources/Chat/ChatControllerLoadDisplayNode.swift:2066:                    // MARK: Swiftgram
+   193→/home/z/my-project/submodules/TelegramUI/Sources/Chat/ChatControllerLoadDisplayNode.swift:2096:                // MARK: Swiftgram
+   194→/home/z/my-project/submodules/TelegramUI/Sources/Chat/ChatMessageDisplaySendMessageOptions.swift:1:// MARK: Swiftgram
+   195→/home/z/my-project/submodules/TelegramUI/Sources/Chat/ChatMessageDisplaySendMessageOptions.swift:91:        // MARK: Swiftgram
+   196→/home/z/my-project/submodules/TelegramUI/Sources/Chat/ChatControllerOpenLinkContextMenu.swift:111:// MARK: Swiftgram
+   197→/home/z/my-project/submodules/TelegramUI/Sources/Chat/ChatControllerOpenLinkContextMenu.swift:175:                            // MARK: Swiftgram
+   198→/home/z/my-project/submodules/TelegramUI/Sources/Chat/ChatControllerOpenLinkContextMenu.swift:306:                // MARK: Swiftgram
+   199→/home/z/my-project/submodules/TelegramUI/Sources/Chat/ChatControllerOpenLinkContextMenu.swift:426:            // MARK: Swiftgram
+   200→/home/z/my-project/submodules/TelegramUI/Sources/ChatControllerContentData.swift:144:            // MARK: Swiftgram
+   201→/home/z/my-project/submodules/TelegramUI/Sources/ChatControllerContentData.swift:177:        // MARK: Swiftgram
+   202→/home/z/my-project/submodules/TelegramUI/Sources/ChatControllerContentData.swift:2199:                        if (isPremium || maybeSuggestPremium || hasAutoTranslate || true /* MARK: Swiftgram */) && !isHidden {
+   203→/home/z/my-project/submodules/TelegramUI/Sources/ChatControllerContentData.swift:2225:                    // MARK: Swiftgram
+   204→/home/z/my-project/submodules/TelegramUI/Sources/ChatControllerContentData.swift:2507:            // MARK: Swiftgram
+   205→/home/z/my-project/submodules/TelegramUI/Components/StorageUsageScreen/Sources/StorageKeepSizeComponent.swift:33:// MARK: Swiftgram
+   206→/home/z/my-project/submodules/TelegramUI/Components/StorageUsageScreen/Sources/StorageKeepSizeComponent.swift:87:            // MARK: Swiftgram
+   207→/home/z/my-project/submodules/TelegramUI/Components/StorageUsageScreen/Sources/StorageKeepSizeComponent.swift:147:                            valueCount: 5, // MARK: Swiftgram
+   208→/home/z/my-project/submodules/TelegramUI/Components/StorageUsageScreen/Sources/StorageUsageScreen.swift:1972:                            // MARK: Swiftgram
+   209→/home/z/my-project/submodules/TelegramUI/Components/StorageUsageScreen/Sources/StorageUsageScreen.swift:3206:                // MARK: Swiftgram
+   210→/home/z/my-project/submodules/TelegramUI/Components/PeerSelectionController/Sources/PeerSelectionControllerNode.swift:140:        // MARK: Swiftgram
+   211→/home/z/my-project/submodules/TelegramUI/Components/MessageInputPanelComponent/Sources/MessageInputPanelComponent.swift:1:// MARK: Swiftgram
+   212→/home/z/my-project/submodules/TelegramUI/Components/MessageInputPanelComponent/Sources/MessageInputPanelComponent.swift:617:        // MARK: Swiftgram
+   213→/home/z/my-project/submodules/TelegramUI/Components/MessageInputPanelComponent/Sources/MessageInputPanelComponent.swift:725:            // MARK: Swiftgram
+   214→/home/z/my-project/submodules/TelegramUI/Components/MessageInputPanelComponent/Sources/MessageInputPanelComponent.swift:936:            // MARK: Swiftgram
+   215→/home/z/my-project/submodules/TelegramUI/Components/MessageInputPanelComponent/Sources/MessageInputPanelComponent.swift:3085:            // MARK: Swiftgram
+   216→/home/z/my-project/submodules/TelegramUI/Components/ChatList/ChatListFilterTabContainerNode/Sources/ChatListFilterTabContainerNode.swift:338:        // MARK: Swiftgram
+   217→/home/z/my-project/submodules/TelegramUI/Components/ChatList/ChatListFilterTabContainerNode/Sources/ChatListFilterTabContainerNode.swift:389:        // MARK: Swiftgram
+   218→/home/z/my-project/submodules/TelegramUI/Components/ChatList/ChatListFilterTabContainerNode/Sources/ChatListFilterTabContainerNode.swift:548:    // MARK: Swiftgram
+   219→/home/z/my-project/submodules/TelegramUI/Components/ChatList/ChatListFilterTabContainerNode/Sources/ChatListFilterTabContainerNode.swift:565:        // MARK: Swiftgram
+   220→/home/z/my-project/submodules/TelegramUI/Components/ChatList/ChatListHeaderNoticeComponent/Sources/ChatListNoticeItem.swift:191:            // MARK: Swiftgram
+   221→/home/z/my-project/submodules/TelegramUI/Components/LegacyInstantVideoController/Sources/LegacyInstantVideoController.swift:1:// MARK: Swiftgram
+   222→/home/z/my-project/submodules/TelegramUI/Components/GlobalControlPanelsContext/Sources/GlobalControlPanelsContext.swift:352:                    // MARK: Swiftgram
+   223→/home/z/my-project/submodules/TelegramUI/Components/GlobalControlPanelsContext/Sources/GlobalControlPanelsContext.swift:429:                        // MARK: Swiftgram
+   224→/home/z/my-project/submodules/TelegramUI/Components/GlobalControlPanelsContext/Sources/GlobalControlPanelsContext.swift:433:                        // MARK: Swiftgram
+   225→/home/z/my-project/submodules/TelegramUI/Components/EntityKeyboard/Sources/EntityKeyboard.swift:573:                // MARK: Swiftgram
+   226→/home/z/my-project/submodules/TelegramUI/Components/Stories/StoryContainerScreen/Sources/StoryContainerScreen.swift:1:// MARK: Swiftgram
+   227→/home/z/my-project/submodules/TelegramUI/Components/Stories/StoryContainerScreen/Sources/StoryContainerScreen.swift:433:        private var requestedDisplayStoriesWarning: Bool = SGSimpleSettings.shared.warnOnStoriesOpen // MARK: Swiftgram
+   228→/home/z/my-project/submodules/TelegramUI/Components/Stories/StoryContainerScreen/Sources/StoryContainerScreen.swift:1338:                // MARK: Swiftgram
+   229→/home/z/my-project/submodules/TelegramUI/Components/Stories/StoryContainerScreen/Sources/StoryContainerScreen.swift:2004:            // MARK: Swiftgram
+   230→/home/z/my-project/submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoScreenOpenPeerInfoContextMenu.swift:22:        // MARK: Swiftgram
+   231→/home/z/my-project/submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoSettingsItems.swift:84:    // MARK: Swiftgram
+   232→/home/z/my-project/submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoSettingsItems.swift:173:        // MARK: Swiftgram
+   233→/home/z/my-project/submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoSettingsItems.swift:201:    // MARK: Swiftgram
+   234→/home/z/my-project/submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoHeaderNode.swift:1260:            // MARK: Swiftgram
+   235→/home/z/my-project/submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoHeaderNode.swift:1276:                // MARK: Swiftgram
+   236→/home/z/my-project/submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoHeaderNode.swift:2425:                buttonIcon = .discussion // MARK: Swiftgram
+   237→/home/z/my-project/submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoProfileItems.swift:1:// MARK: Swiftgram
+   238→/home/z/my-project/submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoProfileItems.swift:26:private let enabledPrivateBioEntities: EnabledEntityTypes = [.allUrl, .mention, .hashtag] // MARK: Swiftgram
+   239→/home/z/my-project/submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoProfileItems.swift:72:    // MARK: Swiftgram
+   240→/home/z/my-project/submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoProfileItems.swift:139:        // MARK: Swiftgram
+   241→/home/z/my-project/submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoProfileItems.swift:578:        // MARK: Swiftgram
+   242→/home/z/my-project/submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoProfileItems.swift:747:                    if channel.adminRights != nil || channel.flags.contains(.isCreator) { // MARK: Swiftgram
+   243→/home/z/my-project/submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoProfileItems.swift:830:                    // MARK: Swiftgram
+   244→/home/z/my-project/submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoProfileItems.swift:856:        // MARK: Swiftgram
+   245→/home/z/my-project/submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoProfileItems.swift:936:    // MARK: Swiftgram
+   246→/home/z/my-project/submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoProfileItems.swift:1426:                if /*channel.hasPermission(.banMembers) &&*/ (channel.adminRights != nil || channel.flags.contains(.isCreator)) { // MARK: Swiftgram
+   247→/home/z/my-project/submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoScreen.swift:1:// MARK: Swiftgram
+   248→/home/z/my-project/submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoScreen.swift:281:    private(set) var showProfileId: Bool = SGSimpleSettings.shared.showProfileId // MARK: Swiftgram
+   249→/home/z/my-project/submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoScreen.swift:367:        hidePhoneInSettings: Bool /* MARK: Swiftgram */, controller: PeerInfoScreenImpl,
+   250→/home/z/my-project/submodules/TelegramUI/Components/PeerInfo/PeerInfoScreen/Sources/PeerInfoScreen.swift:2555:            // MARK: Swiftgram
+   251→
+   252→[Showing results with pagination = limit: 250]

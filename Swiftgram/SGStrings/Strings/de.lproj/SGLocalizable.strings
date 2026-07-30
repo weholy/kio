@@ -1,0 +1,152 @@
+﻿"Settings.ContentSettings" = "Inhaltliche Einstellungen";
+
+"Settings.Tabs.Header" = "Tabs";
+"Settings.Tabs.HideTabBar" = "Tab-Leiste ausblenden";
+"Settings.Tabs.ShowContacts" = "Kontakte Tab anzeigen";
+"Settings.Tabs.ShowNames" = "Tabnamen anzeigen";
+
+"Settings.Folders.BottomTab" = "Ordner unten";
+"Settings.Folders.BottomTabStyle" = "Untere Ordner-Stil";
+
+/* Do not translate */
+"Settings.Folders.BottomTabStyle.ios" = "iOS";
+/* Do not translate */
+"Settings.Folders.BottomTabStyle.telegram" = "Telegram";
+/* Example: Hide "All Chats" */
+"Settings.Folders.AllChatsHidden" = "Verberge \"%@\"";
+"Settings.Folders.RememberLast" = "Letzten Ordner Г¶ffnen";
+"Settings.Folders.RememberLast.Notice" = "nameless wird den zuletzt genutzten Order Г¶ffnen, wenn du den Account wechselst oder die App neustartest";
+
+"Settings.Folders.CompactNames" = "Kleinerer Abstand";
+"Settings.Folders.AllChatsTitle" = "Titel \"Alle Chats\"";
+"Settings.Folders.AllChatsTitle.short" = "Kurze";
+"Settings.Folders.AllChatsTitle.long" = "Lang";
+/* Default behaviour for All Chats Folder Title. "All Chats" title: Default */
+"Settings.Folders.AllChatsTitle.none" = "Standard";
+
+
+"Settings.ChatList.Header" = "CHAT LISTE";
+"Settings.CompactChatList" = "Kompakte Chat-Liste";
+
+"Settings.Profiles.Header" = "PROFILES";
+
+"Settings.Stories.Hide" = "Stories verbergen";
+"Settings.Stories.WarnBeforeView" = "Vor dem Ansehen fragen";
+"Settings.Stories.DisableSwipeToRecord" = "Zum aufnehmen wischen deaktivieren";
+
+"Settings.Translation.QuickTranslateButton" = "SchnellГјbersetzen-Button";
+
+"Stories.Warning.Author" = "Autor";
+"Stories.Warning.ViewStory" = "Story ansehen?";
+/* Author will be able to see that you viewed their Story */
+"Stories.Warning.Notice" = "%@ wird sehen kГ¶nnen, dass du die Story angesehen hast.";
+"Stories.Warning.NoticeStealth" = "%@ wird nicht sehen kГ¶nnen, dass du die Story angesehen hast.";
+
+"Settings.Photo.Quality.Notice" = "QualitГ¤t der gesendeten Fotos und Fotostorys";
+"Settings.Photo.SendLarge" = "Sende groГџe Fotos";
+"Settings.Photo.SendLarge.Notice" = "Seitenlimit fГјr komprimierte Bilder auf 2560px erhГ¶hen";
+
+"Settings.VideoNotes.Header" = "RUNDE VIDEOS";
+"Settings.VideoNotes.StartWithRearCam" = "Starte mit umgedrehter Kamera";
+
+"Settings.CustomColors.Header" = "ACCOUNT FARBEN";
+"Settings.CustomColors.Saturation" = "SГ„TTIGUNG";
+/* Make sure to escape Percentage sign % */
+"Settings.CustomColors.Saturation.Notice" = "Setze SГ¤ttigung auf 0%% um Kontofarben zu deaktivieren";
+
+"Settings.UploadsBoost" = "Upload Beschleuniger";
+"Settings.DownloadsBoost" = "Download Beschleuniger";
+"Settings.DownloadsBoost.Notice" = "ErhГ¶ht die Anzahl der parallelen Verbindungen und die GrГ¶Гџe der Dateiabschnitte. Wenn Ihr Netzwerk die Last nicht bewГ¤ltigen kann, versuchen Sie verschiedene Optionen, die zu Ihrer Verbindung passen.";
+"Settings.DownloadsBoost.none" = "Deaktiviert";
+"Settings.DownloadsBoost.medium" = "Mittel";
+"Settings.DownloadsBoost.maximum" = "Maximum";
+
+"Settings.ShowProfileID" = "Profil-ID anzeigen";
+"Settings.ShowDC" = "Data Center anzeigen";
+"Settings.ShowCreationDate" = "Chat-Erstellungsdatum anzeigen";
+"Settings.ShowCreationDate.Notice" = "Das Erstellungsdatum kann fГјr einige Chats unbekannt sein.";
+
+"Settings.ShowRegDate" = "Anmeldedatum anzeigen";
+"Settings.ShowRegDate.Notice" = "Das Registrierungsdatum ist ungefГ¤hr.";
+
+"Settings.SendWithReturnKey" = "Mit \"Enter\" senden";
+"Settings.HidePhoneInSettingsUI" = "Telefon in den Einstellungen ausblenden";
+"Settings.HidePhoneInSettingsUI.Notice" = "Deine Nummer wird nur in der BenutzeroberflГ¤che versteckt. Um sie vor anderen zu verbergen, verwende bitte die PrivatsphГ¤re-Einstellungen.";
+
+"PasscodeSettings.AutoLock.InFiveSeconds" = "Falls 5 Sekunden inaktiv";
+
+"ProxySettings.UseSystemDNS" = "Benutze System DNS";
+"ProxySettings.UseSystemDNS.Notice" = "Benutze System DNS um Timeout zu umgehen, wenn du keinen Zugriff auf Google DNS hast";
+
+/* Preserve markdown asterisks! Example: You **don't** need Telegram Premium! */
+"Common.NoTelegramPremiumNeeded" = "Du brauchst %@ nicht!";
+"Common.RestartRequired" = "BenГ¶tigt Neustart";
+"Common.RestartNow" = "Jetzt neustarten";
+"Common.OpenTelegram" = "Telegram Г¶ffnen";
+"Common.UseTelegramForPremium" = "Bitte beachten Sie, dass Sie die offizielle Telegram-App verwenden mГјssen, um Telegram Premium zu erhalten. Sobald Sie Telegram Premium erhalten haben, werden alle Funktionen in nameless verfГјgbar.";
+
+"Message.HoldToShowOrReport" = "Halten, zum Ansehen oder melden.";
+
+"Auth.AccountBackupReminder" = "Stelle sicher, dass du eine weiter MГ¶glichkeit hast auf den Account zuzugreifen. Behalte die SIM Karte im SMS zum Login empfangen zu kГ¶nnen oder nutze weitere Apps/GerГ¤te mit einer aktive Sitzung deines Accounts.";
+"Auth.UnofficialAppCodeTitle" = "Du kannst den Code nur mit der offiziellen App erhalten";
+
+"Settings.SmallReactions" = "Kleine Reaktionen";
+"Settings.HideReactions" = "Verberge Reaktionen";
+
+"ContextMenu.SaveToCloud" = "In Cloud speichern";
+"ContextMenu.SelectFromUser" = "Vom Autor auswГ¤hlen";
+
+"Settings.ContextMenu" = "KONTEXTMENГњ";
+"Settings.ContextMenu.Notice" = "Deaktivierte EintrГ¤ge sind im 'nameless'-UntermenГј verfГјgbar.";
+
+
+"Settings.ChatSwipeOptions" = "Chatlisten-Wisch-Optionen";
+"Settings.DeleteChatSwipeOption" = "Wischen zum LГ¶schen des Chats";
+/* Re-word like this string on offical app https://translations.telegram.org/en/ios/groups_and_channels/Chat.NextChannelSameLocationSwipeProgress */
+"Settings.PullToNextChannel" = "Ziehen zum nГ¤chsten Kanal";
+/* Re-word like this string on offical app https://translations.telegram.org/en/ios/groups_and_channels/Chat.NextUnreadTopicSwipeProgress */
+"Settings.PullToNextTopic" = "Ziehen Sie zum nГ¤chsten Thema";
+"Settings.GalleryCamera" = "Kamera in der Galerie";
+/* "Send Message As..." button */
+"Settings.SendAsButton" = "\"%@\" SchaltflГ¤che";
+"Settings.SnapDeletionEffect" = "NachrichtenlГ¶sch-Effekte";
+
+"Settings.Stickers.Size" = "GRГ–SSE";
+"Settings.Stickers.Timestamp" = "Zeitstempel anzeigen";
+
+"Settings.RecordingButton" = "Sprachaufnahme-Button";
+
+"Settings.DefaultEmojisFirst" = "Priorisieren Sie Standard-Emojis";
+"Settings.DefaultEmojisFirst.Notice" = "Zeigen Sie Standard-Emojis vor Premium-Emojis in der Emoji-Tastatur";
+
+/* Date when chat was created. "created: 24 May 2016" */
+"Chat.Created" = "erstellt: %@";
+
+/* Date when user joined the chat. "Joined nameless Chat" */
+"Chat.JoinedDateTitle" = "Beigetreten am %@";
+/* Date when user registered in Telegram. Will be shown like "Registered\n24 May 2016" */
+"Chat.RegDate" = "Registriert";
+
+"Settings.messageDoubleTapActionOutgoingEdit" = "Doppeltippen, um Nachricht zu bearbeiten";
+
+"Settings.wideChannelPosts" = "Breite BeitrГ¤ge in KanГ¤len";
+"Settings.ForceEmojiTab" = "Emoji-Tastatur standardmГ¤Гџig";
+
+"Settings.forceBuiltInMic" = "Erzwinge GerГ¤te-Mikrofon";
+"Settings.forceBuiltInMic.Notice" = "Wenn aktiviert, verwendet die App nur das GerГ¤te-Mikrofon, auch wenn KopfhГ¶rer angeschlossen sind.";
+
+"Settings.hideChannelBottomButton" = "Kanalunteres Bedienfeld ausblenden";
+
+"Settings.CallConfirmation" = "AnrufbestГ¤tigung";
+"Settings.CallConfirmation.Notice" = "nameless wird um Ihre BestГ¤tigung bitten, bevor ein Anruf getГ¤tigt wird.";
+
+/* Confirmation before making a Call */
+"CallConfirmation.Audio.Title" = "Einen Anruf tГ¤tigen?";
+
+/* Confirmation before making a Video Call */
+"CallConfirmation.Video.Title" = "Einen Videoanruf tГ¤tigen?";
+
+"MutualContact.Label" = "gemeinsamer Kontakt";
+
+"Settings.swipeForVideoPIP" = "Video PIP mit Wischen";
+"Settings.swipeForVideoPIP.Notice" = "Wenn aktiviert, Г¶ffnet das Wischen des Videos es im Bild-in-Bild-Modus.";

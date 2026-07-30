@@ -1,0 +1,15 @@
+{
+	"bundle_id": "org.{! a random string !}.Swiftgram",
+	"api_id": "31498805",
+	"api_hash": "929ea1b8a71d19f27f21b8be686510e6",
+	"team_id": "{! check README.md !}",
+	"app_center_id": "0",
+	"is_internal_build": "true",
+	"is_appstore_build": "false",
+	"appstore_id": "0",
+	"app_specific_url_scheme": "tg",
+	"premium_iap_product_id": "",
+	"enable_siri": false,
+	"enable_icloud": false,
+	"sg_config": ""
+}

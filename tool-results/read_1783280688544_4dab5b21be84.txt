@@ -1,0 +1,308 @@
+     1→     1→import Foundation
+     2→     2→
+     3→     3→private enum NamelessSettingsKey {
+     4→     4→    static let showDeletedMessages = "nameless.showDeletedMessages"
+     5→     5→    static let saveDeletedMessagesMedia = "nameless.saveDeletedMessagesMedia"
+     6→     6→    static let saveDeletedMessagesReactions = "nameless.saveDeletedMessagesReactions"
+     7→     7→    static let saveDeletedMessagesForBots = "nameless.saveDeletedMessagesForBots"
+     8→     8→    static let saveEditHistory = "nameless.saveEditHistory"
+     9→     9→    static let enableLocalMessageEditing = "nameless.enableLocalMessageEditing"
+    10→    10→    static let keepRemovedChannels = "nameless.keepRemovedChannels"
+    11→    11→    static let disableOnlineStatus = "nameless.disableOnlineStatus"
+    12→    12→    static let disableTypingStatus = "nameless.disableTypingStatus"
+    13→    13→    static let disableRecordingVideoStatus = "nameless.disableRecordingVideoStatus"
+    14→    14→    static let disableUploadingVideoStatus = "nameless.disableUploadingVideoStatus"
+    15→    15→    static let disableVCMessageRecordingStatus = "nameless.disableVCMessageRecordingStatus"
+    16→    16→    static let disableVCMessageUploadingStatus = "nameless.disableVCMessageUploadingStatus"
+    17→    17→    static let disableUploadingPhotoStatus = "nameless.disableUploadingPhotoStatus"
+    18→    18→    static let disableUploadingFileStatus = "nameless.disableUploadingFileStatus"
+    19→    19→    static let disableChoosingLocationStatus = "nameless.disableChoosingLocationStatus"
+    20→    20→    static let disableChoosingContactStatus = "nameless.disableChoosingContactStatus"
+    21→    21→    static let disablePlayingGameStatus = "nameless.disablePlayingGameStatus"
+    22→    22→    static let disableRecordingRoundVideoStatus = "nameless.disableRecordingRoundVideoStatus"
+    23→    23→    static let disableUploadingRoundVideoStatus = "nameless.disableUploadingRoundVideoStatus"
+    24→    24→    static let disableSpeakingInGroupCallStatus = "nameless.disableSpeakingInGroupCallStatus"
+    25→    25→    static let disableChoosingStickerStatus = "nameless.disableChoosingStickerStatus"
+    26→    26→    static let disableEmojiInteractionStatus = "nameless.disableEmojiInteractionStatus"
+    27→    27→    static let disableEmojiAcknowledgementStatus = "nameless.disableEmojiAcknowledgementStatus"
+    28→    28→    static let disableMessageReadReceipt = "nameless.disableMessageReadReceipt"
+    29→    29→    static let disableStoryReadReceipt = "nameless.disableStoryReadReceipt"
+    30→    30→    static let disableAllAds = "nameless.disableAllAds"
+    31→    31→    static let hideProxySponsor = "nameless.hideProxySponsor"
+    32→    32→    static let enableSavingProtectedContent = "nameless.enableSavingProtectedContent"
+    33→    33→    static let enableSavingSelfDestructingMessages = "nameless.enableSavingSelfDestructingMessages"
+    34→    34→    static let disableScreenshotDetection = "nameless.disableScreenshotDetection"
+    35→    35→    static let disableSecretChatBlurOnScreenshot = "nameless.disableSecretChatBlurOnScreenshot"
+    36→    36→    static let enableLocalPremium = "nameless.enableLocalPremium"
+    37→    37→    static let liquidGlassEnabled = "nameless.liquidGlassEnabled"
+    38→    38→    static let disableCompactNumbers = "nameless.disableCompactNumbers"
+    39→    39→    static let disableZalgoText = "nameless.disableZalgoText"
+    40→    40→    static let chatExportEnabled = "nameless.chatExportEnabled"
+    41→    41→    static let scrollToTopButtonEnabled = "nameless.scrollToTopButtonEnabled"
+    42→    42→    static let unlimitedFavoriteStickers = "nameless.unlimitedFavoriteStickers"
+    43→    43→    static let enableTelescope = "nameless.enableTelescope"
+    44→    44→    static let enableVideoToCircleOrVoice = "nameless.enableVideoToCircleOrVoice"
+    45→    45→    static let emojiDownloaderEnabled = "nameless.emojiDownloaderEnabled"
+    46→    46→    static let feelRichEnabled = "nameless.feelRichEnabled"
+    47→    47→    static let feelRichStarsAmount = "nameless.feelRichStarsAmount"
+    48→    48→    static let fakeLocationEnabled = "nameless.fakeLocationEnabled"
+    49→    49→    static let fakeLatitude = "nameless.fakeLatitude"
+    50→    50→    static let fakeLongitude = "nameless.fakeLongitude"
+    51→    51→    static let enableOnlineStatusRecording = "nameless.enableOnlineStatusRecording"
+    52→    52→    static let onlineStatusRecordingIntervalMinutes = "nameless.onlineStatusRecordingIntervalMinutes"
+    53→    53→    static let ghostModeMessageSendDelaySeconds = "nameless.ghostModeMessageSendDelaySeconds"
+    54→    54→    static let giftIdEnabled = "nameless.giftIdEnabled"
+    55→    55→    static let fakeProfileEnabled = "nameless.fakeProfileEnabled"
+    56→    56→    static let fakeProfileTargetUserId = "nameless.fakeProfileTargetUserId"
+    57→    57→    static let fakeProfileId = "nameless.fakeProfileId"
+    58→    58→    static let fakeProfileFirstName = "nameless.fakeProfileFirstName"
+    59→    59→    static let fakeProfileLastName = "nameless.fakeProfileLastName"
+    60→    60→    static let fakeProfileUsername = "nameless.fakeProfileUsername"
+    61→    61→    static let fakeProfilePhone = "nameless.fakeProfilePhone"
+    62→    62→    static let fakeProfilePremium = "nameless.fakeProfilePremium"
+    63→    63→    static let fakeProfileVerified = "nameless.fakeProfileVerified"
+    64→    64→    static let fakeProfileScam = "nameless.fakeProfileScam"
+    65→    65→    static let fakeProfileFake = "nameless.fakeProfileFake"
+    66→    66→    static let fakeProfileSupport = "nameless.fakeProfileSupport"
+    67→    67→    static let fakeProfileBot = "nameless.fakeProfileBot"
+    68→    68→    static let enableFontReplacement = "nameless.enableFontReplacement"
+    69→    69→    static let fontReplacementName = "nameless.fontReplacementName"
+    70→    70→    static let fontReplacementFilePath = "nameless.fontReplacementFilePath"
+    71→    71→    static let fontReplacementBoldName = "nameless.fontReplacementBoldName"
+    72→    72→    static let fontReplacementBoldFilePath = "nameless.fontReplacementBoldFilePath"
+    73→    73→    static let fontReplacementSizeMultiplier = "nameless.fontReplacementSizeMultiplier"
+    74→    74→    static let profileCoverMediaPath = "nameless.profileCoverMediaPath"
+    75→    75→    static let profileCoverIsVideo = "nameless.profileCoverIsVideo"
+    76→    76→    static let pluginSystemEnabled = "nameless.pluginSystemEnabled"
+    77→    77→    static let installedPluginsJson = "nameless.installedPluginsJson"
+    78→    78→    static let doubleBottomEnabled = "nameless.doubleBottomEnabled"
+    79→    79→    static let messageReadReceiptsSendToPeerIds = "nameless.messageReadReceiptsSendToPeerIds"
+    80→    80→    static let currentAccountPeerId = "nameless.currentAccountPeerId"
+    81→    81→    static let mutedAccountIds = "nameless.mutedAccountIds"
+    82→    82→    static let gatedFeatureKeys = "nameless.gatedFeatureKeys"
+    83→    83→    static let unlockedFeatureKeys = "nameless.unlockedFeatureKeys"
+    84→    84→
+    85→    85→    static let liquidGlassMessages = "nameless.liquidGlass.messages"
+    86→    86→    static let liquidGlassSettings = "nameless.liquidGlass.settings"
+    87→    87→    static let liquidGlassProfile = "nameless.liquidGlass.profile"
+    88→    88→    static let liquidGlassProfileGifts = "nameless.liquidGlass.profileGifts"
+    89→    89→    static let liquidGlassInlineButtons = "nameless.liquidGlass.inlineButtons"
+    90→    90→    static let liquidGlassTinting = "nameless.liquidGlass.tinting"
+    91→    91→    static let videoBackgroundEnabled = "nameless.videoBackground.enabled"
+    92→    92→    static let videoBackgroundPath = "nameless.videoBackground.path"
+    93→    93→    static let musicCardStyle = "nameless.musicCardStyle"
+    94→    94→    static let roundProfileButtons = "nameless.roundProfileButtons"
+    95→    95→}
+    96→    96→
+    97→    97→private enum NamelessRollbackStorage {
+    98→    98→    static let snapshotKey = "nameless.rollback.snapshot.v1"
+    99→    99→    static let managedPrefixes = ["nameless.", "VoiceMorpher."]
+   100→   100→}
+   101→   101→
+   102→   102→private extension UserDefaults {
+   103→   103→    func namelessBool(_ key: String, default defaultValue: Bool = false) -> Bool {
+   104→   104→        if self.object(forKey: key) == nil {
+   105→   105→            return defaultValue
+   106→   106→        }
+   107→   107→        return self.bool(forKey: key)
+   108→   108→    }
+   109→   109→
+   110→   110→    func namelessInt32(_ key: String, default defaultValue: Int32 = 0) -> Int32 {
+   111→   111→        if self.object(forKey: key) == nil {
+   112→   112→            return defaultValue
+   113→   113→        }
+   114→   114→        return Int32(self.integer(forKey: key))
+   115→   115→    }
+   116→   116→
+   117→   117→    func namelessInt64(_ key: String, default defaultValue: Int64 = 0) -> Int64 {
+   118→   118→        if self.object(forKey: key) == nil {
+   119→   119→            return defaultValue
+   120→   120→        }
+   121→   121→        return Int64(self.integer(forKey: key))
+   122→   122→    }
+   123→   123→
+   124→   124→    func namelessDouble(_ key: String, default defaultValue: Double = 0.0) -> Double {
+   125→   125→        if self.object(forKey: key) == nil {
+   126→   126→            return defaultValue
+   127→   127→        }
+   128→   128→        return self.double(forKey: key)
+   129→   129→    }
+   130→   130→
+   131→   131→    func namelessString(_ key: String, default defaultValue: String = "") -> String {
+   132→   132→        return self.string(forKey: key) ?? defaultValue
+   133→   133→    }
+   134→   134→
+   135→   135→    func namelessStringArray(_ key: String) -> [String] {
+   136→   136→        return self.stringArray(forKey: key) ?? []
+   137→   137→    }
+   138→   138→}
+   139→   139→
+   140→   140→public extension Notification.Name {
+   141→   141→    static let luxgramLiquidGlassDidChange = Notification.Name("nameless.liquidGlassDidChange")
+   142→   142→    static let namelessVideoBackgroundDidChange = Notification.Name("nameless.videoBackgroundDidChange")
+   143→   143→    static let sgHideProxySponsorDidChange = Notification.Name("nameless.hideProxySponsorDidChange")
+   144→   144→}
+   145→   145→
+   146→   146→public extension SGSimpleSettings {
+   147→   147→    private var storage: UserDefaults {
+   148→   148→        return .standard
+   149→   149→    }
+   150→   150→
+   151→   151→    func beginNamelessRollbackSnapshot() {
+   152→   152→        let values = storage.dictionaryRepresentation().filter { key, _ in
+   153→   153→            for prefix in NamelessRollbackStorage.managedPrefixes {
+   154→   154→                if key.hasPrefix(prefix) {
+   155→   155→                    return true
+   156→   156→                }
+   157→   157→            }
+   158→   158→            return false
+   159→   159→        }
+   160→   160→
+   161→   161→        if let data = try? JSONSerialization.data(withJSONObject: values, options: []) {
+   162→   162→            storage.set(data, forKey: NamelessRollbackStorage.snapshotKey)
+   163→   163→        }
+   164→   164→    }
+   165→   165→
+   166→   166→    @discardableResult
+   167→   167→    func restoreNamelessRollbackSnapshot() -> Bool {
+   168→   168→        guard let data = storage.data(forKey: NamelessRollbackStorage.snapshotKey),
+   169→   169→              let values = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] else {
+   170→   170→            return false
+   171→   171→        }
+   172→   172→
+   173→   173→        let existing = storage.dictionaryRepresentation()
+   174→   174→        for key in existing.keys {
+   175→   175→            for prefix in NamelessRollbackStorage.managedPrefixes {
+   176→   176→                if key.hasPrefix(prefix) {
+   177→   177→                    storage.removeObject(forKey: key)
+   178→   178→                    break
+   179→   179→                }
+   180→   180→            }
+   181→   181→        }
+   182→   182→
+   183→   183→        for (key, value) in values {
+   184→   184→            storage.set(value, forKey: key)
+   185→   185→        }
+   186→   186→
+   187→   187→        storage.synchronize()
+   188→   188→        return true
+   189→   189→    }
+   190→   190→
+   191→   191→    var showDeletedMessages: Bool { get { storage.namelessBool(NamelessSettingsKey.showDeletedMessages) } set { storage.set(newValue, forKey: NamelessSettingsKey.showDeletedMessages) } }
+   192→   192→    var saveDeletedMessagesMedia: Bool { get { storage.namelessBool(NamelessSettingsKey.saveDeletedMessagesMedia) } set { storage.set(newValue, forKey: NamelessSettingsKey.saveDeletedMessagesMedia) } }
+   193→   193→    var saveDeletedMessagesReactions: Bool { get { storage.namelessBool(NamelessSettingsKey.saveDeletedMessagesReactions) } set { storage.set(newValue, forKey: NamelessSettingsKey.saveDeletedMessagesReactions) } }
+   194→   194→    var saveDeletedMessagesForBots: Bool { get { storage.namelessBool(NamelessSettingsKey.saveDeletedMessagesForBots) } set { storage.set(newValue, forKey: NamelessSettingsKey.saveDeletedMessagesForBots) } }
+   195→   195→    var saveEditHistory: Bool { get { storage.namelessBool(NamelessSettingsKey.saveEditHistory) } set { storage.set(newValue, forKey: NamelessSettingsKey.saveEditHistory) } }
+   196→   196→    var enableLocalMessageEditing: Bool { get { storage.namelessBool(NamelessSettingsKey.enableLocalMessageEditing) } set { storage.set(newValue, forKey: NamelessSettingsKey.enableLocalMessageEditing) } }
+   197→   197→    var keepRemovedChannels: Bool { get { storage.namelessBool(NamelessSettingsKey.keepRemovedChannels) } set { storage.set(newValue, forKey: NamelessSettingsKey.keepRemovedChannels) } }
+   198→   198→    var disableOnlineStatus: Bool { get { storage.namelessBool(NamelessSettingsKey.disableOnlineStatus) } set { storage.set(newValue, forKey: NamelessSettingsKey.disableOnlineStatus) } }
+   199→   199→    var disableTypingStatus: Bool { get { storage.namelessBool(NamelessSettingsKey.disableTypingStatus) } set { storage.set(newValue, forKey: NamelessSettingsKey.disableTypingStatus) } }
+   200→   200→    var disableRecordingVideoStatus: Bool { get { storage.namelessBool(NamelessSettingsKey.disableRecordingVideoStatus) } set { storage.set(newValue, forKey: NamelessSettingsKey.disableRecordingVideoStatus) } }
+   201→   201→    var disableUploadingVideoStatus: Bool { get { storage.namelessBool(NamelessSettingsKey.disableUploadingVideoStatus) } set { storage.set(newValue, forKey: NamelessSettingsKey.disableUploadingVideoStatus) } }
+   202→   202→    var disableVCMessageRecordingStatus: Bool { get { storage.namelessBool(NamelessSettingsKey.disableVCMessageRecordingStatus) } set { storage.set(newValue, forKey: NamelessSettingsKey.disableVCMessageRecordingStatus) } }
+   203→   203→    var disableVCMessageUploadingStatus: Bool { get { storage.namelessBool(NamelessSettingsKey.disableVCMessageUploadingStatus) } set { storage.set(newValue, forKey: NamelessSettingsKey.disableVCMessageUploadingStatus) } }
+   204→   204→    var disableUploadingPhotoStatus: Bool { get { storage.namelessBool(NamelessSettingsKey.disableUploadingPhotoStatus) } set { storage.set(newValue, forKey: NamelessSettingsKey.disableUploadingPhotoStatus) } }
+   205→   205→    var disableUploadingFileStatus: Bool { get { storage.namelessBool(NamelessSettingsKey.disableUploadingFileStatus) } set { storage.set(newValue, forKey: NamelessSettingsKey.disableUploadingFileStatus) } }
+   206→   206→    var disableChoosingLocationStatus: Bool { get { storage.namelessBool(NamelessSettingsKey.disableChoosingLocationStatus) } set { storage.set(newValue, forKey: NamelessSettingsKey.disableChoosingLocationStatus) } }
+   207→   207→    var disableChoosingContactStatus: Bool { get { storage.namelessBool(NamelessSettingsKey.disableChoosingContactStatus) } set { storage.set(newValue, forKey: NamelessSettingsKey.disableChoosingContactStatus) } }
+   208→   208→    var disablePlayingGameStatus: Bool { get { storage.namelessBool(NamelessSettingsKey.disablePlayingGameStatus) } set { storage.set(newValue, forKey: NamelessSettingsKey.disablePlayingGameStatus) } }
+   209→   209→    var disableRecordingRoundVideoStatus: Bool { get { storage.namelessBool(NamelessSettingsKey.disableRecordingRoundVideoStatus) } set { storage.set(newValue, forKey: NamelessSettingsKey.disableRecordingRoundVideoStatus) } }
+   210→   210→    var disableUploadingRoundVideoStatus: Bool { get { storage.namelessBool(NamelessSettingsKey.disableUploadingRoundVideoStatus) } set { storage.set(newValue, forKey: NamelessSettingsKey.disableUploadingRoundVideoStatus) } }
+   211→   211→    var disableSpeakingInGroupCallStatus: Bool { get { storage.namelessBool(NamelessSettingsKey.disableSpeakingInGroupCallStatus) } set { storage.set(newValue, forKey: NamelessSettingsKey.disableSpeakingInGroupCallStatus) } }
+   212→   212→    var disableChoosingStickerStatus: Bool { get { storage.namelessBool(NamelessSettingsKey.disableChoosingStickerStatus) } set { storage.set(newValue, forKey: NamelessSettingsKey.disableChoosingStickerStatus) } }
+   213→   213→    var disableEmojiInteractionStatus: Bool { get { storage.namelessBool(NamelessSettingsKey.disableEmojiInteractionStatus) } set { storage.set(newValue, forKey: NamelessSettingsKey.disableEmojiInteractionStatus) } }
+   214→   214→    var disableEmojiAcknowledgementStatus: Bool { get { storage.namelessBool(NamelessSettingsKey.disableEmojiAcknowledgementStatus) } set { storage.set(newValue, forKey: NamelessSettingsKey.disableEmojiAcknowledgementStatus) } }
+   215→   215→    var disableMessageReadReceipt: Bool { get { storage.namelessBool(NamelessSettingsKey.disableMessageReadReceipt) } set { storage.set(newValue, forKey: NamelessSettingsKey.disableMessageReadReceipt) } }
+   216→   216→    var disableStoryReadReceipt: Bool { get { storage.namelessBool(NamelessSettingsKey.disableStoryReadReceipt) } set { storage.set(newValue, forKey: NamelessSettingsKey.disableStoryReadReceipt) } }
+   217→   217→    var disableAllAds: Bool { get { storage.namelessBool(NamelessSettingsKey.disableAllAds) } set { storage.set(newValue, forKey: NamelessSettingsKey.disableAllAds) } }
+   218→   218→    var hideProxySponsor: Bool { get { storage.namelessBool(NamelessSettingsKey.hideProxySponsor) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideProxySponsor) } }
+   219→   219→    var enableSavingProtectedContent: Bool { get { storage.namelessBool(NamelessSettingsKey.enableSavingProtectedContent) } set { storage.set(newValue, forKey: NamelessSettingsKey.enableSavingProtectedContent) } }
+   220→   220→    var enableSavingSelfDestructingMessages: Bool { get { storage.namelessBool(NamelessSettingsKey.enableSavingSelfDestructingMessages) } set { storage.set(newValue, forKey: NamelessSettingsKey.enableSavingSelfDestructingMessages) } }
+   221→   221→    var disableScreenshotDetection: Bool { get { storage.namelessBool(NamelessSettingsKey.disableScreenshotDetection) } set { storage.set(newValue, forKey: NamelessSettingsKey.disableScreenshotDetection) } }
+   222→   222→    var disableSecretChatBlurOnScreenshot: Bool { get { storage.namelessBool(NamelessSettingsKey.disableSecretChatBlurOnScreenshot) } set { storage.set(newValue, forKey: NamelessSettingsKey.disableSecretChatBlurOnScreenshot) } }
+   223→   223→    var enableLocalPremium: Bool { get { storage.namelessBool(NamelessSettingsKey.enableLocalPremium) } set { storage.set(newValue, forKey: NamelessSettingsKey.enableLocalPremium) } }
+   224→   224→    var liquidGlassEnabled: Bool { get { storage.namelessBool(NamelessSettingsKey.liquidGlassEnabled, default: true) } set { storage.set(newValue, forKey: NamelessSettingsKey.liquidGlassEnabled) } }
+   225→   225→    var disableCompactNumbers: Bool { get { storage.namelessBool(NamelessSettingsKey.disableCompactNumbers) } set { storage.set(newValue, forKey: NamelessSettingsKey.disableCompactNumbers) } }
+   226→   226→    var disableZalgoText: Bool { get { storage.namelessBool(NamelessSettingsKey.disableZalgoText) } set { storage.set(newValue, forKey: NamelessSettingsKey.disableZalgoText) } }
+   227→   227→    var chatExportEnabled: Bool { get { storage.namelessBool(NamelessSettingsKey.chatExportEnabled) } set { storage.set(newValue, forKey: NamelessSettingsKey.chatExportEnabled) } }
+   228→   228→    var scrollToTopButtonEnabled: Bool { get { storage.namelessBool(NamelessSettingsKey.scrollToTopButtonEnabled) } set { storage.set(newValue, forKey: NamelessSettingsKey.scrollToTopButtonEnabled) } }
+   229→   229→    var unlimitedFavoriteStickers: Bool { get { storage.namelessBool(NamelessSettingsKey.unlimitedFavoriteStickers) } set { storage.set(newValue, forKey: NamelessSettingsKey.unlimitedFavoriteStickers) } }
+   230→   230→    var enableTelescope: Bool { get { storage.namelessBool(NamelessSettingsKey.enableTelescope) } set { storage.set(newValue, forKey: NamelessSettingsKey.enableTelescope) } }
+   231→   231→    var enableVideoToCircleOrVoice: Bool { get { storage.namelessBool(NamelessSettingsKey.enableVideoToCircleOrVoice) } set { storage.set(newValue, forKey: NamelessSettingsKey.enableVideoToCircleOrVoice) } }
+   232→   232→    var emojiDownloaderEnabled: Bool { get { storage.namelessBool(NamelessSettingsKey.emojiDownloaderEnabled) } set { storage.set(newValue, forKey: NamelessSettingsKey.emojiDownloaderEnabled) } }
+   233→   233→    var feelRichEnabled: Bool { get { storage.namelessBool(NamelessSettingsKey.feelRichEnabled) } set { storage.set(newValue, forKey: NamelessSettingsKey.feelRichEnabled) } }
+   234→   234→    var feelRichStarsAmount: String { get { storage.namelessString(NamelessSettingsKey.feelRichStarsAmount, default: "1000") } set { storage.set(newValue, forKey: NamelessSettingsKey.feelRichStarsAmount) } }
+   235→   235→    var fakeLocationEnabled: Bool { get { storage.namelessBool(NamelessSettingsKey.fakeLocationEnabled) } set { storage.set(newValue, forKey: NamelessSettingsKey.fakeLocationEnabled) } }
+   236→   236→    var fakeLatitude: Double { get { storage.namelessDouble(NamelessSettingsKey.fakeLatitude) } set { storage.set(newValue, forKey: NamelessSettingsKey.fakeLatitude) } }
+   237→   237→    var fakeLongitude: Double { get { storage.namelessDouble(NamelessSettingsKey.fakeLongitude) } set { storage.set(newValue, forKey: NamelessSettingsKey.fakeLongitude) } }
+   238→   238→    var enableOnlineStatusRecording: Bool { get { storage.namelessBool(NamelessSettingsKey.enableOnlineStatusRecording) } set { storage.set(newValue, forKey: NamelessSettingsKey.enableOnlineStatusRecording) } }
+   239→   239→    var onlineStatusRecordingIntervalMinutes: Int32 { get { storage.namelessInt32(NamelessSettingsKey.onlineStatusRecordingIntervalMinutes, default: 10) } set { storage.set(Int(newValue), forKey: NamelessSettingsKey.onlineStatusRecordingIntervalMinutes) } }
+   240→   240→    var ghostModeMessageSendDelaySeconds: Int32 { get { storage.namelessInt32(NamelessSettingsKey.ghostModeMessageSendDelaySeconds) } set { storage.set(Int(newValue), forKey: NamelessSettingsKey.ghostModeMessageSendDelaySeconds) } }
+   241→   241→    var giftIdEnabled: Bool { get { storage.namelessBool(NamelessSettingsKey.giftIdEnabled) } set { storage.set(newValue, forKey: NamelessSettingsKey.giftIdEnabled) } }
+   242→   242→    var fakeProfileEnabled: Bool { get { storage.namelessBool(NamelessSettingsKey.fakeProfileEnabled) } set { storage.set(newValue, forKey: NamelessSettingsKey.fakeProfileEnabled) } }
+   243→   243→    var fakeProfileTargetUserId: Int64 { get { storage.namelessInt64(NamelessSettingsKey.fakeProfileTargetUserId) } set { storage.set(Int(newValue), forKey: NamelessSettingsKey.fakeProfileTargetUserId) } }
+   244→   244→    var fakeProfileId: Int64 { get { storage.namelessInt64(NamelessSettingsKey.fakeProfileId) } set { storage.set(Int(newValue), forKey: NamelessSettingsKey.fakeProfileId) } }
+   245→   245→    var fakeProfileFirstName: String { get { storage.namelessString(NamelessSettingsKey.fakeProfileFirstName) } set { storage.set(newValue, forKey: NamelessSettingsKey.fakeProfileFirstName) } }
+   246→   246→    var fakeProfileLastName: String { get { storage.namelessString(NamelessSettingsKey.fakeProfileLastName) } set { storage.set(newValue, forKey: NamelessSettingsKey.fakeProfileLastName) } }
+   247→   247→    var fakeProfileUsername: String { get { storage.namelessString(NamelessSettingsKey.fakeProfileUsername) } set { storage.set(newValue, forKey: NamelessSettingsKey.fakeProfileUsername) } }
+   248→   248→    var fakeProfilePhone: String { get { storage.namelessString(NamelessSettingsKey.fakeProfilePhone) } set { storage.set(newValue, forKey: NamelessSettingsKey.fakeProfilePhone) } }
+   249→   249→    var fakeProfilePremium: Bool { get { storage.namelessBool(NamelessSettingsKey.fakeProfilePremium) } set { storage.set(newValue, forKey: NamelessSettingsKey.fakeProfilePremium) } }
+   250→   250→    var fakeProfileVerified: Bool { get { storage.namelessBool(NamelessSettingsKey.fakeProfileVerified) } set { storage.set(newValue, forKey: NamelessSettingsKey.fakeProfileVerified) } }
+   251→   251→    var fakeProfileScam: Bool { get { storage.namelessBool(NamelessSettingsKey.fakeProfileScam) } set { storage.set(newValue, forKey: NamelessSettingsKey.fakeProfileScam) } }
+   252→   252→    var fakeProfileFake: Bool { get { storage.namelessBool(NamelessSettingsKey.fakeProfileFake) } set { storage.set(newValue, forKey: NamelessSettingsKey.fakeProfileFake) } }
+   253→   253→    var fakeProfileSupport: Bool { get { storage.namelessBool(NamelessSettingsKey.fakeProfileSupport) } set { storage.set(newValue, forKey: NamelessSettingsKey.fakeProfileSupport) } }
+   254→   254→    var fakeProfileBot: Bool { get { storage.namelessBool(NamelessSettingsKey.fakeProfileBot) } set { storage.set(newValue, forKey: NamelessSettingsKey.fakeProfileBot) } }
+   255→   255→    var enableFontReplacement: Bool { get { storage.namelessBool(NamelessSettingsKey.enableFontReplacement) } set { storage.set(newValue, forKey: NamelessSettingsKey.enableFontReplacement) } }
+   256→   256→    var fontReplacementName: String { get { storage.namelessString(NamelessSettingsKey.fontReplacementName) } set { storage.set(newValue, forKey: NamelessSettingsKey.fontReplacementName) } }
+   257→   257→    var fontReplacementFilePath: String { get { storage.namelessString(NamelessSettingsKey.fontReplacementFilePath) } set { storage.set(newValue, forKey: NamelessSettingsKey.fontReplacementFilePath) } }
+   258→   258→    var fontReplacementBoldName: String { get { storage.namelessString(NamelessSettingsKey.fontReplacementBoldName) } set { storage.set(newValue, forKey: NamelessSettingsKey.fontReplacementBoldName) } }
+   259→   259→    var fontReplacementBoldFilePath: String { get { storage.namelessString(NamelessSettingsKey.fontReplacementBoldFilePath) } set { storage.set(newValue, forKey: NamelessSettingsKey.fontReplacementBoldFilePath) } }
+   260→   260→    var fontReplacementSizeMultiplier: Int32 { get { storage.namelessInt32(NamelessSettingsKey.fontReplacementSizeMultiplier, default: 100) } set { storage.set(Int(newValue), forKey: NamelessSettingsKey.fontReplacementSizeMultiplier) } }
+   261→   261→    var profileCoverMediaPath: String { get { storage.namelessString(NamelessSettingsKey.profileCoverMediaPath) } set { storage.set(newValue, forKey: NamelessSettingsKey.profileCoverMediaPath) } }
+   262→   262→    var profileCoverIsVideo: Bool { get { storage.namelessBool(NamelessSettingsKey.profileCoverIsVideo) } set { storage.set(newValue, forKey: NamelessSettingsKey.profileCoverIsVideo) } }
+   263→   263→    var pluginSystemEnabled: Bool { get { storage.namelessBool(NamelessSettingsKey.pluginSystemEnabled) } set { storage.set(newValue, forKey: NamelessSettingsKey.pluginSystemEnabled) } }
+   264→   264→    var installedPluginsJson: String { get { storage.namelessString(NamelessSettingsKey.installedPluginsJson, default: "[]") } set { storage.set(newValue, forKey: NamelessSettingsKey.installedPluginsJson) } }
+   265→   265→    var doubleBottomEnabled: Bool { get { storage.namelessBool(NamelessSettingsKey.doubleBottomEnabled) } set { storage.set(newValue, forKey: NamelessSettingsKey.doubleBottomEnabled) } }
+   266→   266→    var messageReadReceiptsSendToPeerIds: [String] { get { storage.namelessStringArray(NamelessSettingsKey.messageReadReceiptsSendToPeerIds) } set { storage.set(newValue, forKey: NamelessSettingsKey.messageReadReceiptsSendToPeerIds) } }
+   267→   267→    var unlockedFeatureKeys: [String] { get { storage.namelessStringArray(NamelessSettingsKey.unlockedFeatureKeys) } set { storage.set(newValue, forKey: NamelessSettingsKey.unlockedFeatureKeys) } }
+   268→   268→
+   269→   269→    var currentAccountPeerId: String { get { storage.namelessString(NamelessSettingsKey.currentAccountPeerId) } set { storage.set(newValue, forKey: NamelessSettingsKey.currentAccountPeerId) } }
+   270→   270→
+   271→   271→    var namelessLiquidGlassMessages: Bool { get { storage.namelessBool(NamelessSettingsKey.liquidGlassMessages, default: true) } set { storage.set(newValue, forKey: NamelessSettingsKey.liquidGlassMessages) } }
+   272→   272→    var namelessLiquidGlassSettings: Bool { get { storage.namelessBool(NamelessSettingsKey.liquidGlassSettings, default: true) } set { storage.set(newValue, forKey: NamelessSettingsKey.liquidGlassSettings) } }
+   273→   273→    var namelessLiquidGlassProfile: Bool { get { storage.namelessBool(NamelessSettingsKey.liquidGlassProfile, default: true) } set { storage.set(newValue, forKey: NamelessSettingsKey.liquidGlassProfile) } }
+   274→   274→    var namelessLiquidGlassProfileGifts: Bool { get { storage.namelessBool(NamelessSettingsKey.liquidGlassProfileGifts, default: true) } set { storage.set(newValue, forKey: NamelessSettingsKey.liquidGlassProfileGifts) } }
+   275→   275→    var namelessLiquidGlassInlineButtons: Bool { get { storage.namelessBool(NamelessSettingsKey.liquidGlassInlineButtons, default: true) } set { storage.set(newValue, forKey: NamelessSettingsKey.liquidGlassInlineButtons) } }
+   276→   276→    var namelessLiquidGlassTinting: Bool { get { storage.namelessBool(NamelessSettingsKey.liquidGlassTinting) } set { storage.set(newValue, forKey: NamelessSettingsKey.liquidGlassTinting) } }
+   277→   277→    var namelessVideoBackgroundEnabled: Bool { get { storage.namelessBool(NamelessSettingsKey.videoBackgroundEnabled) } set { storage.set(newValue, forKey: NamelessSettingsKey.videoBackgroundEnabled) } }
+   278→   278→    var namelessVideoBackgroundPath: String { get { storage.namelessString(NamelessSettingsKey.videoBackgroundPath) } set { storage.set(newValue, forKey: NamelessSettingsKey.videoBackgroundPath) } }
+   279→   279→    var namelessMusicCardStyle: Bool { get { storage.namelessBool(NamelessSettingsKey.musicCardStyle) } set { storage.set(newValue, forKey: NamelessSettingsKey.musicCardStyle) } }
+   280→   280→    var namelessRoundProfileButtons: Bool { get { storage.namelessBool(NamelessSettingsKey.roundProfileButtons) } set { storage.set(newValue, forKey: NamelessSettingsKey.roundProfileButtons) } }
+   281→   281→
+   282→   282→    func updateGatedFeatures(_ features: [(key: String, deeplinkPath: String)]) {
+   283→   283→        storage.set(features.map(\.key), forKey: NamelessSettingsKey.gatedFeatureKeys)
+   284→   284→    }
+   285→   285→
+   286→   286→    func isFeatureVisible(_ key: String) -> Bool {
+   287→   287→        let gated = Set(storage.namelessStringArray(NamelessSettingsKey.gatedFeatureKeys))
+   288→   288→        if !gated.contains(key) {
+   289→   289→            return true
+   290→   290→        }
+   291→   291→        return Set(self.unlockedFeatureKeys).contains(key)
+   292→   292→    }
+   293→   293→
+   294→   294→    func isAccountNotificationMuted(recordId: Int64) -> Bool {
+   295→   295→        return Set(storage.namelessStringArray(NamelessSettingsKey.mutedAccountIds)).contains(String(recordId))
+   296→   296→    }
+   297→   297→
+   298→   298→    func setAccountNotificationMuted(recordId: Int64, muted: Bool) {
+   299→   299→        var ids = Set(storage.namelessStringArray(NamelessSettingsKey.mutedAccountIds))
+   300→   300→        if muted {
+   301→   301→            ids.insert(String(recordId))
+   302→   302→        } else {
+   303→   303→            ids.remove(String(recordId))
+   304→   304→        }
+   305→   305→        storage.set(Array(ids).sorted(), forKey: NamelessSettingsKey.mutedAccountIds)
+   306→   306→    }
+   307→   307→}
+   308→   308→

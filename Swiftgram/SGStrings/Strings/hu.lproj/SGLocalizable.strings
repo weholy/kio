@@ -1,0 +1,152 @@
+﻿"Settings.ContentSettings" = "TartalombeГЎllГ­tГЎsok";
+
+"Settings.Tabs.Header" = "FГњLEK";
+"Settings.Tabs.HideTabBar" = "FeliratcsГ­k elrejtГ©se";
+"Settings.Tabs.ShowContacts" = "Kapcsolatok fГјl megjelenГ­tГ©se";
+"Settings.Tabs.ShowNames" = "FeliratcsГ­k nevek megjelenГ­tГ©se";
+
+"Settings.Folders.BottomTab" = "KГ¶nyvtГЎrak az aljГЎn";
+"Settings.Folders.BottomTabStyle" = "AlsГі kГ¶nyvtГЎr stГ­lus";
+
+/* Do not translate */
+"Settings.Folders.BottomTabStyle.ios" = "iOS";
+/* Do not translate */
+"Settings.Folders.BottomTabStyle.telegram" = "Telegram";
+/* Example: Hide "All Chats" */
+"Settings.Folders.AllChatsHidden" = "ElrejtГ©se \"%@\"";
+"Settings.Folders.RememberLast" = "UtolsГі mappa megnyitГЎsa";
+"Settings.Folders.RememberLast.Notice" = "A nameless az utoljГЎra hasznГЎlt mappГЎt fogja megnyitni, amikor ГєjraindГ­tja az alkalmazГЎst vagy fiГіkok kГ¶zГ¶tt vГЎlt.";
+
+"Settings.Folders.CompactNames" = "Kisebb tГ©rkГ¶z";
+"Settings.Folders.AllChatsTitle" = "\"Minden BeszГ©lgetГ©s\" cГ­m";
+"Settings.Folders.AllChatsTitle.short" = "RГ¶vid";
+"Settings.Folders.AllChatsTitle.long" = "HosszГє";
+/* Default behaviour for All Chats Folder Title. "All Chats" title: Default */
+"Settings.Folders.AllChatsTitle.none" = "AlapГ©rtelmezett";
+
+
+"Settings.ChatList.Header" = "BESZГ‰LGETГ‰S LISTA";
+"Settings.CompactChatList" = "Kompakt BeszГ©lgetГ©s Lista";
+
+"Settings.Profiles.Header" = "PROFIL";
+
+"Settings.Stories.Hide" = "TГ¶rtГ©netek elrejtГ©se";
+"Settings.Stories.WarnBeforeView" = "KГ©rdezzen megtekintГ©s elЕ‘tt";
+"Settings.Stories.DisableSwipeToRecord" = "HГєzГЎs letiltГЎsa felvГ©telhez";
+
+"Settings.Translation.QuickTranslateButton" = "Gyors FordГ­tГЎs gomb";
+
+"Stories.Warning.Author" = "SzerzЕ‘";
+"Stories.Warning.ViewStory" = "TГ¶rtГ©net megtekintГ©se?";
+/* Author will be able to see that you viewed their Story */
+"Stories.Warning.Notice" = "%@ LГЃTNI FOGJA, hogy megtekintetted a tГ¶rtГ©netГјket.";
+"Stories.Warning.NoticeStealth" = "%@ nem fogja lГЎtni, hogy megtekintetted a tГ¶rtГ©netГјket.";
+
+"Settings.Photo.Quality.Notice" = "FeltГ¶ltГ¶tt fГ©nykГ©pek Г©s tГ¶rtГ©netek minЕ‘sГ©ge.";
+"Settings.Photo.SendLarge" = "Nagy fГ©nykГ©pek kГјldГ©se";
+"Settings.Photo.SendLarge.Notice" = "NГ¶velje a tГ¶mГ¶rГ­tett kГ©pek oldalmГ©retГ©nek hatГЎrГЎt 2560px-re.";
+
+"Settings.VideoNotes.Header" = "KEREK VIDEГ“K";
+"Settings.VideoNotes.StartWithRearCam" = "Kezdje a hГЎtsГі kamerГЎval";
+
+"Settings.CustomColors.Header" = "FIГ“K SZГЌNEI";
+"Settings.CustomColors.Saturation" = "TELГЌTETTSГ‰G";
+/* Make sure to escape Percentage sign % */
+"Settings.CustomColors.Saturation.Notice" = "SzГ­nГ©rtГ©ket 0%%-ra ГЎllГ­tva az fiГіkszГ­neket letiltja.";
+
+"Settings.UploadsBoost" = "FeltГ¶ltГ©s fokozГЎsa";
+"Settings.DownloadsBoost" = "LetГ¶ltГ©s fokozГЎsa";
+"Settings.DownloadsBoost.Notice" = "NГ¶veli a pГЎrhuzamos kapcsolatok szГЎmГЎt Г©s a fГЎjlok darabjainak mГ©retГ©t. Ha a hГЎlГіzatod nem kГ©pes kezelni a terhelГ©st, prГіbГЎlj ki kГјlГ¶nbГ¶zЕ‘ opciГіkat, amelyek illeszkednek a kapcsolatodhoz.";
+"Settings.DownloadsBoost.none" = "Kikapcsolva";
+"Settings.DownloadsBoost.medium" = "KГ¶zepes";
+"Settings.DownloadsBoost.maximum" = "MaximГЎlis";
+
+"Settings.ShowProfileID" = "Profil azonosГ­tГі megjelenГ­tГ©se";
+"Settings.ShowDC" = "AdatkГ¶zpont megjelenГ­tГ©se";
+"Settings.ShowCreationDate" = "BeszГ©lgetГ©s lГ©trehozГЎsГЎnak dГЎtumГЎnak megjelenГ­tГ©se";
+"Settings.ShowCreationDate.Notice" = "A beszГ©lgetГ©s lГ©trehozГЎsГЎnak dГЎtuma ismeretlen lehet nГ©hГЎny csevegГ©snГ©l.";
+
+"Settings.ShowRegDate" = "RegisztrГЎciГіs DГЎtum MegjelenГ­tГ©se";
+"Settings.ShowRegDate.Notice" = "A regisztrГЎciГіs dГЎtum csak hozzГЎvetЕ‘leges.";
+
+"Settings.SendWithReturnKey" = "KГјldГ©s 'vissza' gombbal";
+"Settings.HidePhoneInSettingsUI" = "TelefonszГЎm elrejtГ©se a beГЎllГ­tГЎsokban";
+"Settings.HidePhoneInSettingsUI.Notice" = "Ezzel csak a telefonszГЎmГЎt rejti el a beГЎllГ­tГЎsok felГјleten. Ha mГЎsok szГЎmГЎra is el akarja rejteni, menjen a AdatvГ©delem Г©s biztonsГЎg menГјbe.";
+
+"PasscodeSettings.AutoLock.InFiveSeconds" = "Ha 5 mГЎsodpercig tГЎvol van";
+
+"ProxySettings.UseSystemDNS" = "Rendszer DNS hasznГЎlata";
+"ProxySettings.UseSystemDNS.Notice" = "HasznГЎlja a rendszer DNS-t, ha nem fГ©r hozzГЎ a Google DNS-hez";
+
+/* Preserve markdown asterisks! Example: You **don't** need Telegram Premium! */
+"Common.NoTelegramPremiumNeeded" = "Nem **szГјksГ©ges** %@!";
+"Common.RestartRequired" = "ГљjraindГ­tГЎs szГјksГ©ges";
+"Common.RestartNow" = "ГљjraindГ­tГЎs most";
+"Common.OpenTelegram" = "Telegram megnyitГЎsa";
+"Common.UseTelegramForPremium" = "KГ©rjГјk vegye figyelembe, hogy a Telegram PrГ©miumhoz az hivatalos Telegram appot kell hasznГЎlnia. Amint megkapta a Telegram PrГ©miumot, nameless Г¶sszes funkciГіja elГ©rhetЕ‘ lesz.";
+
+"Message.HoldToShowOrReport" = "Tartsa lenyomva a MegjelenГ­tГ©shez vagy JelentГ©shez.";
+
+"Auth.AccountBackupReminder" = "GyЕ‘zЕ‘djГ¶n meg rГіla, hogy van biztonsГЎgi mГЎsolat hozzГЎfГ©rГ©si mГіdszere. Tartsa meg a SMS-hez hasznГЎlt SIM-et vagy egy mГЎsik bejelentkezett munkamenetet, hogy elkerГјlje a kizГЎrГЎst.";
+"Auth.UnofficialAppCodeTitle" = "A kГіdot csak a hivatalos alkalmazГЎssal szerezheti meg";
+
+"Settings.SmallReactions" = "Kis reakciГіk";
+"Settings.HideReactions" = "ReakciГіk ElrejtГ©se";
+
+"ContextMenu.SaveToCloud" = "MentГ©s a FelhЕ‘be";
+"ContextMenu.SelectFromUser" = "KivГЎlasztГЎs a SzerzЕ‘tЕ‘l";
+
+"Settings.ContextMenu" = "KONTEXTUS MENГњ";
+"Settings.ContextMenu.Notice" = "A kikapcsolt bejegyzГ©sek elГ©rhetЕ‘k lesznek a 'nameless' almenГјjГ©ben.";
+
+
+"Settings.ChatSwipeOptions" = "CsevegЕ‘lista hГєzГЎs opciГіk";
+"Settings.DeleteChatSwipeOption" = "HГєzza ГЎt az Гјzenet tГ¶rlГ©sГ©hez";
+/* Re-word like this string on offical app https://translations.telegram.org/en/ios/groups_and_channels/Chat.NextChannelSameLocationSwipeProgress */
+"Settings.PullToNextChannel" = "HГєzza a kГ¶vetkezЕ‘ olvasatlan csatornГЎhoz";
+/* Re-word like this string on offical app https://translations.telegram.org/en/ios/groups_and_channels/Chat.NextUnreadTopicSwipeProgress */
+"Settings.PullToNextTopic" = "HГєzza le a kГ¶vetkezЕ‘ tГ©mГЎhoz";
+"Settings.GalleryCamera" = "Kamera a GalГ©riГЎban";
+/* "Send Message As..." button */
+"Settings.SendAsButton" = "\"%@\" Gomb";
+"Settings.SnapDeletionEffect" = "Гњzenet tГ¶rlГ©s hatГЎsok";
+
+"Settings.Stickers.Size" = "MГ‰RET";
+"Settings.Stickers.Timestamp" = "IdЕ‘bГ©lyeg MegjelenГ­tГ©se";
+
+"Settings.RecordingButton" = "HangrГ¶gzГ­tГ©s Gomb";
+
+"Settings.DefaultEmojisFirst" = "Prioritize standard emojis";
+"Settings.DefaultEmojisFirst.Notice" = "Mutassa az alap emojisokat az emoji billentyЕ±zet elЕ‘tt a prГ©miumok helyett";
+
+/* Date when chat was created. "created: 24 May 2016" */
+"Chat.Created" = "lГ©trehozva: %@";
+
+/* Date when user joined the chat. "Joined nameless Chat" */
+"Chat.JoinedDateTitle" = "Csatlakozott %@";
+/* Date when user registered in Telegram. Will be shown like "Registered\n24 May 2016" */
+"Chat.RegDate" = "RegisztrГЎlt";
+
+"Settings.messageDoubleTapActionOutgoingEdit" = "Dupla koppintГЎs a Гјzenet szerkesztГ©sГ©hez";
+
+"Settings.wideChannelPosts" = "SzГ©les posztok csatornГЎkban";
+"Settings.ForceEmojiTab" = "AlapГ©rtelmezett Emoji billentyЕ±zet";
+
+"Settings.forceBuiltInMic" = "EszkГ¶z mikrofonjГЎnak kГ©nyszerГ­tГ©se";
+"Settings.forceBuiltInMic.Notice" = "Ha engedГ©lyezve van, az alkalmazГЎs csak az eszkГ¶z mikrofonjГЎt fogja hasznГЎlni, mГ©g akkor is, ha a fejhallgatГі csatlakoztatva van.";
+
+"Settings.hideChannelBottomButton" = "Kanal AlsГі Panel ElrejtГ©se";
+
+"Settings.CallConfirmation" = "HГ­vГЎs megerЕ‘sГ­tГ©se";
+"Settings.CallConfirmation.Notice" = "A nameless megkГ©ri a megerЕ‘sГ­tГ©sГ©t, mielЕ‘tt hГ­vГЎst indГ­tana.";
+
+/* Confirmation before making a Call */
+"CallConfirmation.Audio.Title" = "HГ­vГЎst kezdeni?";
+
+/* Confirmation before making a Video Call */
+"CallConfirmation.Video.Title" = "VideГіhГ­vГЎst kezdeni?";
+
+"MutualContact.Label" = "kГ¶zГ¶ns kontakt";
+
+"Settings.swipeForVideoPIP" = "VideГі PIP a hГєzГЎssal";
+"Settings.swipeForVideoPIP.Notice" = "Ha engedГ©lyezve van, a videГі hГєzГЎsa kГ©pet-kГ©pben ГјzemmГіdban nyitja meg.";

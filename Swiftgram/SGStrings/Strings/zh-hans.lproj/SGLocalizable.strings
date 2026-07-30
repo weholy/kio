@@ -1,0 +1,249 @@
+﻿"Settings.ContentSettings" = "ж•Џж„џе†…е®№и®ѕзЅ®";
+
+"Settings.Tabs.Header" = "ж ‡з­ѕ";
+"Settings.Tabs.HideTabBar" = "йљђи—Џеє•йѓЁеЇји€Єж Џ";
+"Settings.Tabs.ShowContacts" = "жѕз¤єиЃ”зі»дєєж ‡з­ѕ";
+"Settings.Tabs.ShowNames" = "жѕз¤єж ‡з­ѕеђЌз§°";
+
+"Settings.Folders.BottomTab" = "еє•йѓЁе€†з»„";
+"Settings.Folders.BottomTabStyle" = "еє•йѓЁе€†з»„ж ·ејЏ";
+
+/* Do not translate */
+"Settings.Folders.BottomTabStyle.ios" = "iOSж ·ејЏ";
+/* Do not translate */
+"Settings.Folders.BottomTabStyle.telegram" = "Telegramж ·ејЏ";
+/* Example: Hide "All Chats" */
+"Settings.Folders.AllChatsHidden" = "йљђи—Џ \"%@\"";
+"Settings.Folders.RememberLast" = "ж‰“ејЂдёЉж¬Ўе€†з»„";
+"Settings.Folders.RememberLast.Notice" = "nameless е°†ењЁй‡ЌеђЇж€–е€‡жЌўиґ¦ж€·еђЋж‰“ејЂжњЂеђЋдЅїз”Ёзљ„е€†з»„";
+
+"Settings.Folders.CompactNames" = "зј©е°Џе€†з»„й—ґи·ќ";
+"Settings.Folders.AllChatsTitle" = "\"ж‰Ђжњ‰еЇ№иЇќ\"ж ‡йў";
+"Settings.Folders.AllChatsTitle.short" = "зџ­ж ‡йў";
+"Settings.Folders.AllChatsTitle.long" = "й•їж ‡йў";
+/* Default behaviour for All Chats Folder Title. "All Chats" title: Default */
+"Settings.Folders.AllChatsTitle.none" = "й»и®¤";
+
+
+"Settings.ChatList.Header" = "еЇ№иЇќе€—иЎЁ";
+"Settings.CompactChatList" = "зґ§е‡‘ећ‹еЇ№иЇќе€—иЎЁ";
+"Settings.ChatList.Lines" = "еЇ№иЇќе€—иЎЁиЎЊж•°";
+"Settings.ChatList.Lines.1" = "1 иЎЊ";
+"Settings.ChatList.Lines.2" = "2 иЎЊ";
+"Settings.ChatList.Lines.3" = "3 иЎЊпј€й»и®¤пј‰";
+
+"Settings.Profiles.Header" = "иµ„ж–™";
+
+"Settings.Stories.Hide" = "йљђи—ЏеЉЁжЂЃ";
+"Settings.Stories.WarnBeforeView" = "жџҐзњ‹е‰ЌиЇўй—®";
+"Settings.Stories.DisableSwipeToRecord" = "з¦Ѓз”Ёдѕ§ж»‘ж‹Ќж‘„";
+
+"Settings.Translation.QuickTranslateButton" = "еї«йЂџзї»иЇ‘жЊ‰й’®";
+
+"Stories.Warning.Author" = "дЅњиЂ…";
+"Stories.Warning.ViewStory" = "и¦ЃжџҐзњ‹еЉЁжЂЃеђ—пјџ";
+/* Author will be able to see that you viewed their Story */
+"Stories.Warning.Notice" = "%@ е°†иѓЅе¤џзњ‹е€°дЅ жџҐзњ‹дє†д»–д»¬зљ„еЉЁжЂЃ";
+"Stories.Warning.NoticeStealth" = "%@ е°†ж— жі•зњ‹е€°ж‚ЁжџҐзњ‹д»–д»¬зљ„еЉЁжЂЃ";
+
+"Settings.Photo.Quality.Notice" = "еЏ‘йЂЃе›ѕз‰‡зљ„иґЁй‡Џ";
+"Settings.Photo.SendLarge" = "еЏ‘йЂЃе¤§е°єеЇёз…§з‰‡";
+"Settings.Photo.SendLarge.Notice" = "е°†еЋ‹зј©е›ѕз‰‡зљ„е°єеЇёй™ђе€¶жЏђй«е€° 2560px";
+
+"Settings.VideoNotes.Header" = "ењ†еЅўи§†йў‘";
+"Settings.VideoNotes.StartWithRearCam" = "й»и®¤дЅїз”ЁеђЋзЅ®з›ёжњє";
+
+"Settings.CustomColors.Header" = "иґ¦ж€·йўњи‰І";
+"Settings.CustomColors.Saturation" = "йҐ±е’Њеє¦";
+/* Make sure to escape Percentage sign % */
+"Settings.CustomColors.Saturation.Notice" = "и®ѕзЅ®йҐ±е’Њеє¦дёє 0%% д»Ґз¦Ѓз”Ёиґ¦ж€·йўњи‰І";
+
+"Settings.UploadsBoost" = "дёЉдј еЉ йЂџ";
+"Settings.DownloadsBoost" = "дё‹иЅЅеЉ йЂџ";
+"Settings.DownloadsBoost.Notice" = "еўћеЉ е№¶иЎЊиїћжЋҐзљ„ж•°й‡Џе’Њж–‡д»¶еќ—зљ„е¤§е°ЏгЂ‚е¦‚жћњж‚Ёзљ„зЅ‘з»њж— жі•ж‰їеЏ—иґџиЅЅпјЊиЇ·е°ќиЇ•дёЌеђЊйЂ‚еђ€ж‚ЁиїћжЋҐзљ„йЂ‰йЎ№гЂ‚";
+"Settings.DownloadsBoost.none" = "еЃњз”Ё";
+"Settings.DownloadsBoost.medium" = "дё­з­‰";
+"Settings.DownloadsBoost.maximum" = "жњЂе¤§";
+
+"Settings.ShowProfileID" = "жѕз¤єз”Ёж€· UID";
+"Settings.ShowDC" = "жѕз¤єж•°жЌ®дё­еїѓ";
+"Settings.ShowCreationDate" = "жѕз¤єзѕ¤з»„ж€–йў‘йЃ“зљ„е€›е»єж—Ґжњџ";
+"Settings.ShowCreationDate.Notice" = "жџђдє›зѕ¤з»„ж€–йў‘йЃ“еЏЇиѓЅзјєе°‘е€›е»єж—Ґжњџ";
+
+"Settings.ShowRegDate" = "жѕз¤єжіЁе†Њж—Ґжњџ";
+"Settings.ShowRegDate.Notice" = "иї™жЇе¤§ж¦‚зљ„жіЁе†Њж—Ґжњџ";
+
+"Settings.SendWithReturnKey" = "дЅїз”Ёиї”е›ћй”®еЏ‘йЂЃ";
+"Settings.HidePhoneInSettingsUI" = "ењЁи®ѕзЅ®дё­йљђи—Џз”µиЇќеЏ·з Ѓ";
+"Settings.HidePhoneInSettingsUI.Notice" = "ж‚Ёзљ„з”µиЇќеЏ·з ЃеЏЄдјљењЁи®ѕзЅ®з•Њйќўдё­йљђи—ЏгЂ‚и¦ЃеЇ№е…¶д»–дєєйљђи—ЏпјЊеЏЇиї›е…Ґйљђз§Ѓи®ѕзЅ®и°ѓж•ґгЂ‚";
+
+"PasscodeSettings.AutoLock.InFiveSeconds" = "з¦»ејЂ 5 з§’еђЋ";
+
+"ProxySettings.UseSystemDNS" = "дЅїз”Ёзі»з»џDNS";
+"ProxySettings.UseSystemDNS.Notice" = "е¦‚жћњж‚Ёж— жі•дЅїз”Ё Google DNSпјЊиЇ·дЅїз”Ёзі»з»џ DNS";
+
+/* Preserve markdown asterisks! Example: You **don't** need Telegram Premium! */
+"Common.NoTelegramPremiumNeeded" = "ж­¤еЉџиѓЅ**ж— йњЂ** %@ и®ўй…пјЃ";
+"Common.RestartRequired" = "йњЂи¦Ѓй‡ЌеђЇ";
+"Common.RestartNow" = "з«‹еЌій‡ЌеђЇ";
+"Common.OpenTelegram" = "ж‰“ејЂ Telegram";
+"Common.UseTelegramForPremium" = "иЇ·жіЁж„ЏпјЊж‚Ёеї…йЎ»дЅїз”Ёе®ж–№зљ„ Telegram е®ўж€·з«Їж‰ЌеЏЇиґ­д№° Telegram PremiumпјЊдёЂж—¦ж‚ЁиЋ·еѕ— Telegram PremiumпјЊе…¶ж‰Ђжњ‰еЉџиѓЅд№џе°†ењЁ nameless дё­з”џж•€гЂ‚";
+"Common.UpdateOS" = "йњЂи¦Ѓ iOS ж›ґж–°";
+
+"Message.HoldToShowOrReport" = "й•їжЊ‰жѕз¤єж€–дёѕжЉҐ";
+
+"Auth.AccountBackupReminder" = "иЇ·зЎ®дїќж‚Ёжњ‰дёЂдёЄе¤‡з”Ёзљ„и®їй—®ж–№ејЏгЂ‚дїќз•™дёЂеј з”ЁдєЋжЋҐж”¶зџ­дїЎзљ„ SIM еЌЎж€–е¤љз™»еЅ•дёЂдёЄдјљиЇќпјЊд»Ґе…Ќиў«й”Ѓе®љгЂ‚";
+"Auth.UnofficialAppCodeTitle" = "ж‚ЁеЏЄиѓЅйЂљиї‡е®ж–№еє”з”ЁзЁ‹еєЏиЋ·еѕ—д»Јз Ѓ";
+
+"Settings.SmallReactions" = "зј©е°ЏиЎЁжѓ…е›ћеє”";
+"Settings.HideReactions" = "йљђи—Џе›ћеє”";
+
+"ContextMenu.SaveToCloud" = "дїќе­е€°ж”¶и—Џе¤№";
+"ContextMenu.SelectFromUser" = "йЂ‰ж‹©ж­¤дєєж‰Ђжњ‰ж¶€жЃЇ";
+
+"Settings.ContextMenu" = "ж¶€жЃЇиЏњеЌ•";
+"Settings.ContextMenu.Notice" = "е·Із¦Ѓз”Ёзљ„йЎ№з›®еЏЇењЁ nameless е­ђиЏњеЌ•дё­ж‰ѕе€°";
+
+
+"Settings.ChatSwipeOptions" = "еЇ№иЇќе€—иЎЁж»‘еЉЁйЂ‰йЎ№";
+"Settings.DeleteChatSwipeOption" = "ж»‘еЉЁе€ й™¤еЇ№иЇќ";
+/* Re-word like this string on offical app https://translations.telegram.org/en/ios/groups_and_channels/Chat.NextChannelSameLocationSwipeProgress */
+"Settings.PullToNextChannel" = "дёЉж»‘е€°дё‹дёЂжњЄиЇ»йў‘йЃ“";
+/* Re-word like this string on offical app https://translations.telegram.org/en/ios/groups_and_channels/Chat.NextUnreadTopicSwipeProgress */
+"Settings.PullToNextTopic" = "дёЉж»‘е€°дё‹дёЂдёЄдё»йў";
+"Settings.GalleryCamera" = "е›ѕеє“дё­зљ„з›ёжњє";
+"Settings.GalleryCameraPreview" = "е›ѕеє“дё­зљ„з›ёжњєйў„и§€";
+/* "Send Message As..." button */
+"Settings.SendAsButton" = "\"%@\" жЊ‰й’®";
+"Settings.SnapDeletionEffect" = "е€ й™¤ж¶€жЃЇзљ„з‰№ж•€";
+
+"Settings.Stickers.Size" = "е°єеЇё";
+"Settings.Stickers.Timestamp" = "жѕз¤єж—¶й—ґ";
+
+"Settings.RecordingButton" = "еЅ•йџіжЊ‰й’®";
+
+"Settings.DefaultEmojisFirst" = "дје…€дЅїз”Ёж ‡е‡†иЎЁжѓ…з¬¦еЏ·";
+"Settings.DefaultEmojisFirst.Notice" = "ењЁиЎЁжѓ…е€—иЎЁдё­е°†ж ‡е‡†иЎЁжѓ…з¬¦еЏ·зЅ®дєЋй«зє§иЎЁжѓ…з¬¦еЏ·д№‹е‰Ќ";
+
+/* Date when chat was created. "created: 24 May 2016" */
+"Chat.Created" = "е€›е»єж—Ґжњџ: %@";
+
+/* Date when user joined the chat. "Joined nameless Chat" */
+"Chat.JoinedDateTitle" = "еЉ е…Ґ %@ зљ„ж—Ґжњџ";
+/* Date when user registered in Telegram. Will be shown like "Registered\n24 May 2016" */
+"Chat.RegDate" = "жіЁе†Њж—Ґжњџ";
+
+"Settings.messageDoubleTapActionOutgoingEdit" = "еЏЊе‡»зј–иѕ‘ж¶€жЃЇ";
+
+"Settings.wideChannelPosts" = "ењЁйў‘йЃ“дё­д»Ґж›ґе®Ѕзљ„з‰€йќўжѕз¤єж¶€жЃЇ";
+"Settings.ForceEmojiTab" = "й»и®¤е±•з¤єиЎЁжѓ…з¬¦еЏ·";
+
+"Settings.forceBuiltInMic" = "ејєе€¶дЅїз”Ёи®ѕе¤‡йє¦е…‹йЈЋ";
+"Settings.forceBuiltInMic.Notice" = "и‹ҐеђЇз”ЁпјЊеЌідЅїе·ІиїћжЋҐиЂіжњєпјЊеє”з”Ёд№џеЏЄдЅїз”Ёи®ѕе¤‡и‡Єиє«зљ„йє¦е…‹йЈЋгЂ‚";
+
+"Settings.showChannelBottomButton" = "йў‘йЃ“еє•йѓЁйќўжќї";
+
+"Settings.secondsInMessages" = "ж¶€жЃЇдё­зљ„з§’ж•°";
+
+"Settings.CallConfirmation" = "йЂљиЇќзЎ®и®¤";
+"Settings.CallConfirmation.Notice" = "nameless е°†ењЁж‹Ёж‰“з”µиЇќе‰ЌеѕЃж±‚ж‚Ёзљ„зЎ®и®¤";
+
+/* Confirmation before making a Call */
+"CallConfirmation.Audio.Title" = "ж‹Ёж‰“иЇ­йџійЂљиЇќпјџ";
+
+/* Confirmation before making a Video Call */
+"CallConfirmation.Video.Title" = "ж‹Ёж‰“и§†йў‘йЂљиЇќпјџ";
+
+"MutualContact.Label" = "еЏЊеђ‘иЃ”зі»дєє";
+
+"Settings.swipeForVideoPIP" = "дёЉж»‘ж‰“ејЂз”»дё­з”»";
+"Settings.swipeForVideoPIP.Notice" = "е¦‚жћњеђЇз”ЁпјЊж»‘еЉЁи§†йў‘е°†д»Ґз”»дё­з”»жЁЎејЏж‰“ејЂгЂ‚";
+
+"SessionBackup.Title" = "дјљиЇќе¤‡д»Ѕ";
+"SessionBackup.Sessions.Title" = "дјљиЇќ";
+"SessionBackup.Actions.Backup" = "е¤‡д»Ѕе€°й’ҐеЊ™дёІ";
+"SessionBackup.Actions.Restore" = "д»Ћй’ҐеЊ™дёІжЃўе¤Ќ";
+"SessionBackup.Actions.DeleteAll" = "е€ й™¤й’ҐеЊ™дёІе¤‡д»Ѕ";
+"SessionBackup.Actions.DeleteOne" = "д»Ће¤‡д»Ѕдё­е€ й™¤";
+"SessionBackup.Actions.RemoveFromApp" = "д»Ћеє”з”ЁзЁ‹еєЏдё­з§»й™¤";
+"SessionBackup.LastBackupAt" = "жњЂеђЋе¤‡д»Ѕпјљ%@";
+"SessionBackup.RestoreOK" = "зЎ®е®љгЂ‚е·ІжЃўе¤ЌдјљиЇќпјљ%@";
+"SessionBackup.LoggedIn" = "е·Із™»еЅ•";
+"SessionBackup.LoggedOut" = "е·Із™»е‡є";
+"SessionBackup.DeleteAll.Title" = "е€ й™¤ж‰Ђжњ‰дјљиЇќпјџ";
+"SessionBackup.DeleteAll.Text" = "ж‰Ђжњ‰дјљиЇќе°†д»Ћй’ҐеЊ™дёІдё­е€ й™¤гЂ‚\n\nеёђеЏ·е°†дёЌдјљд»Ћ nameless з™»е‡єгЂ‚";
+"SessionBackup.DeleteSingle.Title" = "е€ й™¤ 1 дёЄдјљиЇќпјџ";
+"SessionBackup.DeleteSingle.Text" = "%@ дјљиЇќе°†д»Ћй’ҐеЊ™дёІдё­е€ й™¤гЂ‚\n\nеёђеЏ·е°†дёЌдјљд»Ћ nameless з™»е‡єгЂ‚";
+"SessionBackup.RemoveFromApp.Title" = "д»Ћеє”з”ЁзЁ‹еєЏдё­з§»й™¤еёђж€·пјџ";
+"SessionBackup.RemoveFromApp.Text" = "%@ дјљиЇќе°†д»Ћ nameless дё­з§»й™¤пјЃдјљиЇќе°†дїќжЊЃжґ»еЉЁзЉ¶жЂЃпјЊд»ҐдѕїзЁЌеђЋжЃўе¤ЌгЂ‚";
+"SessionBackup.Notice" = "дјљиЇќе·ІеЉ еЇ†е№¶е­е‚ЁењЁи®ѕе¤‡зљ„й’ҐеЊ™дёІдё­гЂ‚дјљиЇќж°ёиїњдёЌдјљз¦»ејЂж‚Ёзљ„и®ѕе¤‡гЂ‚\n\nй‡Ќи¦ЃжЏђз¤єпјљи¦ЃењЁж–°и®ѕе¤‡ж€–ж“ЌдЅњзі»з»џй‡ЌзЅ®еђЋжЃўе¤ЌдјљиЇќпјЊж‚Ёеї…йЎ»еђЇз”ЁеЉ еЇ†е¤‡д»ЅпјЊеђ¦е€™й’ҐеЊ™дёІе°†ж— жі•иЅ¬з§»гЂ‚\n\nжіЁж„ЏпјљдјљиЇќд»ЌеЏЇиѓЅиў«Telegramж€–еЏ¦дёЂеЏ°и®ѕе¤‡ж’¤й”ЂгЂ‚";
+
+"MessageFilter.Title" = "ж¶€жЃЇиї‡ж»¤е™Ё";
+"MessageFilter.SubTitle" = "з§»й™¤е№Іж‰°пјЊе‡Џе°‘еЊ…еђ«д»Ґдё‹е…ій”®е­—зљ„ж¶€жЃЇзљ„еЏЇи§ЃжЂ§гЂ‚\nе…ій”®е­—еЊєе€†е¤§е°Џе†™гЂ‚";
+"MessageFilter.Keywords.Title" = "е…ій”®е­—";
+"MessageFilter.InputPlaceholder" = "иѕ“е…Ґе…ій”®е­—";
+
+"InputToolbar.Title" = "ж јејЏйќўжќї";
+
+"Notifications.MentionsAndReplies.Title" = "@жЏђеЏЉе’Ње›ће¤Ќ";
+"Notifications.MentionsAndReplies.value.default" = "й»и®¤";
+"Notifications.MentionsAndReplies.value.silenced" = "е·Ійќ™йџі";
+"Notifications.MentionsAndReplies.value.disabled" = "еЃњз”Ё";
+"Notifications.PinnedMessages.Title" = "зЅ®йЎ¶ж¶€жЃЇ";
+"Notifications.PinnedMessages.value.default" = "й»и®¤";
+"Notifications.PinnedMessages.value.silenced" = "е·Ійќ™йџі";
+"Notifications.PinnedMessages.value.disabled" = "еЃњз”Ё";
+
+
+"PayWall.Text" = "еўћејєдє†дё“дёљеЉџиѓЅ";
+
+"PayWall.SessionBackup.Title" = "иґ¦еЏ·е¤‡д»Ѕ";
+"PayWall.SessionBackup.Notice" = "еЌідЅїењЁй‡Ќж–°е®‰иЈ…еђЋд№џеЏЇд»Ґз™»еЅ•е€°жІЎжњ‰д»Јз Ѓзљ„еёђж€·гЂ‚дЅїз”Ёи®ѕе¤‡дёЉзљ„еЇ†й’Ґй“ѕжќҐе®‰е…Ёе­е‚ЁгЂ‚";
+"PayWall.SessionBackup.Description" = "ж›ґж”№и®ѕе¤‡ж€–е€ й™¤ nameless е·ІдёЌе†ЌжЇдёЂдёЄй—®йўгЂ‚иїеЋџењЁTelegram жњЌеЉЎе™ЁдёЉд»Ќз„¶жґ»и·ѓзљ„ж‰Ђжњ‰дјљиЇќгЂ‚";
+
+"PayWall.MessageFilter.Title" = "ж¶€жЃЇиї‡ж»¤е™Ё";
+"PayWall.MessageFilter.Notice" = "е‡Џе°‘ SPAMгЂЃдїѓй”Ђе’Њд»¤дєєзѓ¦жЃјзљ„ж¶€жЃЇзљ„еЏЇи§ЃжЂ§гЂ‚";
+"PayWall.MessageFilter.Description" = "е€›е»єдёЂдёЄж‚ЁдёЌжѓіз»Џеёёзњ‹е€°зљ„е…ій”®е­—е€—иЎЁпјЊиЂЊnameless дјље‡Џе°‘е№Іж‰°гЂ‚";
+
+"PayWall.Notifications.Title" = "з¦Ѓз”Ё @жЏђеЏЉе’Ње›ће¤Ќ";
+"PayWall.Notifications.Notice" = "йљђи—Џж€–йќ™йџідёЌй‡Ќи¦Ѓзљ„йЂљзџҐгЂ‚";
+"PayWall.Notifications.Description" = "еЅ“дЅ йњЂи¦ЃдёЂз‚№еїѓжѓ…ж—¶пјЊдёЌе†Ќжњ‰е›єе®љзљ„ж¶€жЃЇж€– @reference.";
+
+"PayWall.InputToolbar.Title" = "ж јејЏйќўжќї";
+"PayWall.InputToolbar.Notice" = "еЏЄйњЂеЌ•е‡»еЌіеЏЇиЉ‚зњЃж—¶й—ґж јејЏеЊ–ж¶€жЃЇгЂ‚";
+"PayWall.InputToolbar.Description" = "еє”з”Ёе№¶жё…й™¤ж јејЏеЊ–ж€–жЏ’е…ҐеѓЏдё“дёљз‰€иї™ж ·зљ„ж–°иЎЊгЂ‚";
+
+"PayWall.AppIcons.Title" = "з‹¬з‰№зљ„еє”з”Ёе›ѕж ‡";
+"PayWall.AppIcons.Notice" = "и‡Єе®љд№‰ nameless ењЁдё»е±Џе№•дёЉзљ„е¤–и§‚гЂ‚";
+
+"PayWall.About.Title" = "е…ідєЋ nameless Pro";
+"PayWall.About.Notice" = "nameless зљ„е…Ќиґ№з‰€жњ¬жЏђдѕ›и¶…иї‡ Telegram еє”з”Ёзљ„е¤љдёЄеЉџиѓЅе’Њж”№иї›гЂ‚е€›ж–°е№¶дїќжЊЃ nameless дёЋжЇЏжњ€зљ„ Telegram ж›ґж–°еђЊж­ҐжЇдёЂйЎ№еєће¤§зљ„е·ҐдЅњпјЊйњЂи¦ЃиЂ—иґ№е¤§й‡Џзљ„ж—¶й—ґе’Њж‚иґµзљ„зЎ¬д»¶гЂ‚\n\nnameless жЇдёЂдёЄејЂжєђеє”з”ЁпјЊе°Љй‡Ќж‚Ёзљ„йљђз§ЃпјЊе№¶дё”дёЌж‰“ж‰°ж‚Ёе№їе‘ЉгЂ‚и®ўй… nameless ProпјЊж‚Ёе°†иЋ·еѕ—з‹¬дє«з‰№жЂ§е№¶ж”ЇжЊЃз‹¬з«‹ејЂеЏ‘иЂ…гЂ‚\n\n- @Kylmakalle";
+/* DO NOT TRANSLATE */
+"PayWall.About.Signature" = "@Kylmakalle";
+/* DO NOT TRANSLATE */
+"PayWall.About.SignatureURL" = "https://t.me/Kylmakalle";
+
+"PayWall.ProSupport.Title" = "ж”Їд»й—®йўпјџ";
+"PayWall.ProSupport.Contact" = "дёЌз”Ёж‹…еїѓпјЃ";
+
+"PayWall.RestorePurchases" = "жЃўе¤Ќиґ­д№°";
+"PayWall.Terms" = "жњЌеЉЎжќЎж¬ѕ";
+"PayWall.Privacy" = "йљђз§Ѓж”їз­–";
+"PayWall.TermsURL" = "https://swiftgram.app/terms";
+"PayWall.PrivacyURL" = "https://swiftgram.app/privacy";
+"PayWall.Notice.Markdown" = "йЂљиї‡и®ўй… nameless ProпјЊж‚ЁеђЊж„Џ [nameless жњЌеЉЎжќЎж¬ѕ](%1$@) е’Њ [йљђз§Ѓж”їз­–](%2$@)гЂ‚";
+"PayWall.Notice.Raw" = "йЂљиї‡и®ўй… nameless ProпјЊж‚ЁеђЊж„Џ nameless жњЌеЉЎжќЎж¬ѕе’Њйљђз§Ѓж”їз­–гЂ‚";
+
+"PayWall.Button.OpenPro" = "дЅїз”Ёдё“дёљеЉџиѓЅ";
+"PayWall.Button.Purchasing" = "ж­ЈењЁиґ­д№°вЂ¦вЂ¦";
+"PayWall.Button.Restoring" = "ж­ЈењЁжЃўе¤Ќиґ­д№°вЂ¦вЂ¦";
+"PayWall.Button.Validating" = "ж­ЈењЁйЄЊиЇЃиґ­д№°вЂ¦вЂ¦";
+"PayWall.Button.PaymentsUnavailable" = "д»ж¬ѕдёЌеЏЇз”Ё";
+"PayWall.Button.BuyInAppStore" = "и®ўй… App Store з‰€жњ¬";
+"PayWall.Button.Subscribe" = "и®ўй… %@ / жњ€";
+"PayWall.Button.ContactingAppStore" = "ж­ЈењЁиЃ”зі» App StoreвЂ¦вЂ¦";
+
+"Paywall.Error.Title" = "й”™иЇЇ";
+"PayWall.ValidationError" = "йЄЊиЇЃй”™иЇЇ";
+"PayWall.ValidationError.TryAgain" = "иґ­д№°йЄЊиЇЃиї‡зЁ‹дё­е‡єзЋ°й—®йўгЂ‚дёЌз”Ёж‹…еїѓпјЃзЁЌеђЋе†ЌиЇ•жЃўе¤Ќиґ­д№°гЂ‚";
+"PayWall.ValidationError.Expired" = "ж‚Ёзљ„и®ўй…е·Іиї‡жњџгЂ‚е†Ќж¬Ўи®ўй…д»Ґй‡Ќж–°иЋ·еѕ—дё“дёљз‰€еЉџиѓЅгЂ‚";
