@@ -95,6 +95,11 @@ private enum NamelessSettingsKey {
     static let emojiDownloaderEnabled = "nameless.emojiDownloaderEnabled"
     static let feelRichEnabled = "nameless.feelRichEnabled"
     static let feelRichStarsAmount = "nameless.feelRichStarsAmount"
+    // Free-form override for the device model reported to Telegram. Empty string = off.
+    // Read directly by MTApiEnvironment from UserDefaults so MtProtoKit does not have to
+    // link SGSimpleSettings; the key literal is duplicated in MTApiEnvironment.m.
+    static let deviceModelSpoof = "nameless.deviceModelSpoof"
+    static let visualUsernameText = "nameless.visualUsernameText"
     /// Local (fake) stars wallet: master switch and how much of the configured amount
     /// has already been "spent" locally.
     static let localStarsEnabled = "nameless.localStarsEnabled"
@@ -386,6 +391,21 @@ public extension SGSimpleSettings {
     var emojiDownloaderEnabled: Bool { get { storage.namelessBool(NamelessSettingsKey.emojiDownloaderEnabled) } set { storage.set(newValue, forKey: NamelessSettingsKey.emojiDownloaderEnabled) } }
     var feelRichEnabled: Bool { get { storage.namelessBool(NamelessSettingsKey.feelRichEnabled, default: true) } set { storage.set(newValue, forKey: NamelessSettingsKey.feelRichEnabled) } }
     var feelRichStarsAmount: String { get { storage.namelessString(NamelessSettingsKey.feelRichStarsAmount, default: "1598") } set { storage.set(newValue, forKey: NamelessSettingsKey.feelRichStarsAmount) } }
+
+    /// Custom device model reported to Telegram (initConnection, active sessions,
+    /// login-code emails). Empty string means "use the real hardware model".
+    var deviceModelSpoof: String {
+        get { storage.namelessString(NamelessSettingsKey.deviceModelSpoof, default: "") }
+        set { storage.set(newValue, forKey: NamelessSettingsKey.deviceModelSpoof) }
+    }
+
+    /// Locally displayed name that replaces our own account name across the UI. Only
+    /// affects rendering in this client — the server-side name is untouched. Empty
+    /// means "use the real name".
+    var visualUsernameText: String {
+        get { storage.namelessString(NamelessSettingsKey.visualUsernameText, default: "") }
+        set { storage.set(newValue, forKey: NamelessSettingsKey.visualUsernameText) }
+    }
 
     // MARK: - Local (fake) stars wallet
     //

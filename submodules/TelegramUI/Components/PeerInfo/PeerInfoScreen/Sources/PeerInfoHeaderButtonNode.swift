@@ -8,6 +8,7 @@ import TelegramPresentationData
 import ComponentFlow
 import LottieComponent
 import SGSimpleSettings
+import GlassBackgroundComponent
 
 enum PeerInfoHeaderButtonKey: Hashable {
     case message
@@ -55,19 +56,26 @@ final class PeerInfoHeaderButtonNode: HighlightableButtonNode {
     
     let backgroundContainerView: UIView
     let backgroundView: UIView
-    
+    // MARK: Nameless — real Liquid Glass fill for the round-button mode. The classic pill
+    // buttons keep their existing tinted-mask fill; only round circles get UIGlassEffect.
+    private let namelessGlassBackgroundView: GlassBackgroundView
+
     init(key: PeerInfoHeaderButtonKey, action: @escaping (PeerInfoHeaderButtonNode, ContextGesture?) -> Void) {
         self.key = key
         self.action = action
-        
+
         self.referenceNode = ContextReferenceContentNode()
         self.containerNode = ContextControllerSourceNode()
         self.containerNode.animateScale = false
-        
+
         self.backgroundContainerView = UIView()
         self.backgroundView = UIView()
         self.backgroundView.backgroundColor = .white
         self.backgroundContainerView.addSubview(self.backgroundView)
+
+        self.namelessGlassBackgroundView = GlassBackgroundView()
+        self.namelessGlassBackgroundView.isUserInteractionEnabled = false
+        self.namelessGlassBackgroundView.isHidden = true
         
         /*self.backgroundNode = NavigationBackgroundNode(color: UIColor(white: 1.0, alpha: 0.2), enableBlur: true, enableSaturation: false)
         self.backgroundNode.isUserInteractionEnabled = false*/
@@ -90,6 +98,8 @@ final class PeerInfoHeaderButtonNode: HighlightableButtonNode {
         
         self.containerNode.addSubnode(self.referenceNode)
         //self.referenceNode.addSubnode(self.backgroundNode)
+        // Glass sits below content so the icon stays visible on top.
+        self.referenceNode.view.addSubview(self.namelessGlassBackgroundView)
         self.referenceNode.addSubnode(self.contentNode)
         self.contentNode.addSubnode(self.iconNode)
         self.addSubnode(self.containerNode)
@@ -285,8 +295,26 @@ final class PeerInfoHeaderButtonNode: HighlightableButtonNode {
 
         if iconOnlyRoundButton {
             transition.updateCornerRadius(layer: self.backgroundView.layer, cornerRadius: backgroundFrame.height * 0.5)
+            // MARK: Nameless — real UIGlassEffect fill for round buttons. The classic pill
+            // fill (`backgroundView`) gets hidden; on iOS 26 the glass layer replaces it,
+            // on older iOS `GlassBackgroundView` falls back to its own blur so the button
+            // still shows something instead of being empty.
+            self.backgroundView.isHidden = true
+            self.namelessGlassBackgroundView.isHidden = false
+            self.namelessGlassBackgroundView.frame = CGRect(origin: .zero, size: size)
+            self.namelessGlassBackgroundView.update(
+                size: size,
+                cornerRadius: size.height * 0.5,
+                isDark: true,
+                tintColor: .init(kind: .panel),
+                isInteractive: false,
+                isVisible: true,
+                transition: .immediate
+            )
         } else {
             transition.updateCornerRadius(layer: self.backgroundView.layer, cornerRadius: min(16.0, backgroundFrame.height * 0.5))
+            self.backgroundView.isHidden = false
+            self.namelessGlassBackgroundView.isHidden = true
         }
         //self.backgroundNode.update(size: backgroundFrame.size, cornerRadius: min(11.0, backgroundFrame.height * 0.5), transition: transition)
         //self.backgroundNode.updateColor(color: backgroundColor, transition: transition)

@@ -62,8 +62,8 @@ private enum NAEntry: ItemListNodeEntry {
                 }
             })
         case .developerLink:
-            return ItemListActionItem(presentationData: presentationData, title: "Разработчик noheya", kind: .generic, alignment: .natural, sectionId: self.section, style: .blocks, action: {
-                if let url = URL(string: "https://t.me/noheya") {
+            return ItemListActionItem(presentationData: presentationData, title: "👑 Разработчик @weholy", kind: .generic, alignment: .natural, sectionId: self.section, style: .blocks, action: {
+                if let url = URL(string: "https://t.me/weholy") {
                     UIApplication.shared.open(url)
                 }
             })

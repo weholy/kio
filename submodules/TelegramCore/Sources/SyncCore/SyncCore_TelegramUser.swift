@@ -1,6 +1,7 @@
 import Postbox
 import FlatBuffers
 import FlatSerialization
+import SGSimpleSettings
 
 public struct UserInfoFlags: OptionSet {
     public var rawValue: Int32
@@ -154,6 +155,17 @@ public struct PeerVerification: Codable, Equatable {
     }
 }
 
+// MARK: Nameless — visual username helper.
+// Returns the user-defined alias only when `peerId` matches the currently active nameless
+// account. Any non-nil result replaces the peer's real display name in this client only.
+private func namelessVisualUsernameOverride(for peerId: PeerId) -> String? {
+    let alias = SGSimpleSettings.shared.visualUsernameText
+    guard !alias.isEmpty else { return nil }
+    let currentIdString = SGSimpleSettings.shared.currentAccountPeerId
+    guard !currentIdString.isEmpty else { return nil }
+    return "\(peerId.id._internalGetInt64Value())" == currentIdString ? alias : nil
+}
+
 public final class TelegramUser: Peer, Equatable {
     public let id: PeerId
     public let accessHash: TelegramPeerAccessHash?
@@ -176,6 +188,12 @@ public final class TelegramUser: Peer, Equatable {
     public let verificationIconFileId: Int64?
     
     public var nameOrPhone: String {
+        // MARK: Nameless — visual username: if the user set a custom name in nameless
+        // settings, use it in place of the real one — but only for OUR own account, so
+        // other people never appear renamed to us and the server never sees the alias.
+        if let alias = namelessVisualUsernameOverride(for: self.id) {
+            return alias
+        }
         if let firstName = self.firstName {
             if let lastName = self.lastName {
                 return "\(firstName) \(lastName)"
@@ -190,8 +208,11 @@ public final class TelegramUser: Peer, Equatable {
             return ""
         }
     }
-    
+
     public var shortNameOrPhone: String {
+        if let alias = namelessVisualUsernameOverride(for: self.id) {
+            return alias
+        }
         if let firstName = self.firstName {
             return firstName
         } else if let lastName = self.lastName {

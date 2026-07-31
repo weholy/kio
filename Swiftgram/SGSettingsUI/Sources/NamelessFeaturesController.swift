@@ -253,6 +253,7 @@ private enum NLDisclosureLink: String {
     case ghostDetailsToggle
     case fakeLocationPicker
     case localStarsAmount
+    case deviceModelSpoof
 }
 
 private enum NLAction: Int, CaseIterable {
@@ -312,7 +313,7 @@ private enum NLHubCategory: String, CaseIterable {
         case .hubGhost: return .ghost
         case .hubOther: return .other
         case .hubSearch: return .search
-        case .none, .onlineHistory, .ghostDetailsToggle, .fakeLocationPicker, .localStarsAmount: return nil
+        case .none, .onlineHistory, .ghostDetailsToggle, .fakeLocationPicker, .localStarsAmount, .deviceModelSpoof: return nil
         }
     }
 }
@@ -517,10 +518,11 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
     let query = (state.searchQuery ?? "").trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
     let searching = !query.isEmpty
 
-    // Hub root — 4 glass pills
+    // Hub root — 4 glass pills.
+    // MARK: Nameless — dropped the "12.8 · Liquid Glass edition" tagline; it drifted out of
+    // sync with the actual version and cluttered the header.
     if !searching, state.hubCategory == nil {
         entries.append(.notice(id: id.count, section: .hero, text: "**nameless**"))
-        entries.append(.notice(id: id.count, section: .hero, text: "12.8 · Liquid Glass edition"))
         entries.append(.searchInput(id: id.count, section: .search, title: NSAttributedString(string: "🔍"), text: state.searchQuery ?? "", placeholder: "Поиск настроек"))
         for cat in NLHubCategory.allCases {
             entries.append(.disclosureDetail(
@@ -606,9 +608,9 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
     entries.append(.toggle(id: id.count, section: sec, settingName: .forceEmojiTab, value: s.forceEmojiTab, text: "Вкладка эмодзи первой", enabled: true))
     entries.append(.toggle(id: id.count, section: sec, settingName: .defaultEmojisFirst, value: s.defaultEmojisFirst, text: "Стандартные эмодзи первыми", enabled: true))
 
-    // СООБЩЕНИЯ (перенесены из вкладки Сообщения — БЕЗ удалённых/прозрачности/корзины)
-    entries.append(.header(id: id.count, section: sec, text: "СООБЩЕНИЯ", badge: nil))
-    entries.append(.header(id: id.count, section: sec, text: "ПОВЕДЕНИЕ", badge: nil))
+    // MARK: Nameless — dropped the duplicate "СООБЩЕНИЯ" header; the "ПОВЕДЕНИЕ" subheader
+    // alone is enough (the section already reads as a whole from context).
+    entries.append(.header(id: id.count, section: sec, text: "СООБЩЕНИЯ · ПОВЕДЕНИЕ", badge: nil))
     entries.append(.toggle(id: id.count, section: sec, settingName: .saveEditHistory, value: s.saveEditHistory, text: "Сохранять историю чатов", enabled: true))
     entries.append(.toggle(id: id.count, section: sec, settingName: .enableLocalMessageEditing, value: s.enableLocalMessageEditing, text: "Локальное редактирование", enabled: true))
     entries.append(.toggle(id: id.count, section: sec, settingName: .truncateLongMessages, value: s.truncateLongMessages, text: "Сокращать сообщения", enabled: true))
@@ -793,6 +795,11 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
         id.increment(1)
     }
     entries.append(.notice(id: id.count, section: sec, text: "Баланс виден только вам и не связан с сервером. При отправке подарков и платных реакций сумма списывается локально."))
+
+    // УСТРОЙСТВО
+    entries.append(.header(id: id.count, section: sec, text: "УСТРОЙСТВО", badge: nil))
+    entries.append(.disclosureDetail(id: id.count, section: sec, link: .deviceModelSpoof, text: "Название устройства", detail: s.deviceModelSpoof.isEmpty ? "Реальное (по умолчанию)" : s.deviceModelSpoof))
+    entries.append(.notice(id: id.count, section: sec, text: "Отображается в списке активных сессий и в письмах о входе. Меняется при следующем подключении."))
 
     // ДОПОЛНИТЕЛЬНО
     entries.append(.header(id: id.count, section: sec, text: "ДОПОЛНИТЕЛЬНО", badge: nil))
@@ -1255,6 +1262,13 @@ private func namelessFeaturesControllerImpl(context: AccountContext, initialCate
             if link == .localStarsAmount {
                 pushControllerImpl?(namelessLocalStarsController(context: context, onSave: {
                     simplePromise.set(true)
+                }))
+                return
+            }
+            if link == .deviceModelSpoof {
+                pushControllerImpl?(namelessDeviceModelSpoofController(context: context, onSave: {
+                    simplePromise.set(true)
+                    askForRestart?()
                 }))
                 return
             }

@@ -368,12 +368,26 @@ static NSData *base64_decode(NSString *str) {
     self = [super init];
     if (self != nil)
     {
-        if (deviceModelName != nil) {
+        // MARK: Nameless — device model spoof. If the user has set a custom name in
+        // nameless settings, that string replaces the real hardware model everywhere the
+        // client reports device info (initConnection, active sessions, login emails).
+        NSString *namelessOverride = [[NSUserDefaults standardUserDefaults] stringForKey:@"nameless.deviceModelSpoof"];
+        if (namelessOverride != nil) {
+            namelessOverride = [namelessOverride stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+            if (namelessOverride.length == 0) {
+                namelessOverride = nil;
+            }
+        }
+        if (namelessOverride != nil) {
+            _deviceModel = namelessOverride;
+            _deviceModelName = namelessOverride;
+        } else if (deviceModelName != nil) {
             _deviceModel = deviceModelName;
+            _deviceModelName = deviceModelName;
         } else {
             _deviceModel = [self platformString];
+            _deviceModelName = deviceModelName;
         }
-        _deviceModelName = deviceModelName;
 #if TARGET_OS_IPHONE
         _systemVersion = [[UIDevice currentDevice] systemVersion];
 #else
