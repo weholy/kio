@@ -1068,6 +1068,26 @@ extension ChatControllerImpl {
                     }
                 }
                 
+                // MARK: Megram — 'Forward-to-author guard'. If the message we're about to
+                // forward originally came from the peer we're now forwarding it INTO, and
+                // the user has forwardWarnAuthor on, cancel the send and pop a warning so
+                // they can pick a different destination. They have to tap Send again after
+                // dismissing the alert — safer than trying to resume async send flow from a
+                // closure boundary.
+                if SGSimpleSettings.shared.forwardWarnAuthor,
+                   let targetPeerId = strongSelf.chatLocation.peerId,
+                   forwardSourcePeerIds.contains(targetPeerId) {
+                    let presentationData = strongSelf.context.sharedContext.currentPresentationData.with { $0 }
+                    let alert = textAlertController(
+                        context: strongSelf.context,
+                        title: "Осторожно",
+                        text: "Вы отправляете это сообщение обратно тому, кто его написал. Проверьте адресата.",
+                        actions: [TextAlertAction(type: .defaultAction, title: presentationData.strings.Common_OK, action: {})]
+                    )
+                    strongSelf.controller?.present(alert, in: .window(.root))
+                    return
+                }
+
                 let _ = (strongSelf.shouldDivertMessagesToScheduled(messages: transformedMessages)
                 |> deliverOnMainQueue).start(next: { shouldDivert in
                     let signal: Signal<[MessageId?], NoError>
