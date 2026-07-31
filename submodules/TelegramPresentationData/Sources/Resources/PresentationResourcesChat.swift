@@ -7,7 +7,7 @@ import AppBundle
 // MARK: Nameless — plus icon for the attachment button, drawn in code so we don't need to
 // ship a new asset just to swap the paperclip for a `+`. Matches the paperclip's visual
 // weight (~24pt, 2pt strokes) so the layout doesn't jump.
-func generateNamelessPlusIcon(color: UIColor) -> UIImage? {
+public func generateNamelessPlusIcon(color: UIColor) -> UIImage? {
     return generateImage(CGSize(width: 24.0, height: 24.0), rotatedContext: { size, context in
         context.clear(CGRect(origin: .zero, size: size))
         context.setStrokeColor(color.cgColor)
