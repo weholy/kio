@@ -8,9 +8,9 @@ on:
   workflow_dispatch:
 
 concurrency:
-  # Serialize per branch so we don't burn runners, but do NOT cancel in-progress
-  # builds — user wants older commits' builds to finish (parallel telemetry).
-  group: build-${{ github.ref }}
+  # Every commit gets its own build slot (unique group), so several builds run
+  # side by side and can be compared. Nothing is cancelled, nothing is queued.
+  group: build-${{ github.sha }}-${{ github.run_id }}
   cancel-in-progress: false
 
 jobs:
