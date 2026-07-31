@@ -239,11 +239,11 @@ public enum SGItemListUIEntry<Section: SGItemListSection, BoolSetting: Hashable,
         case let .toggle(_, _, setting, value, text, enabled):
             return ItemListSwitchItem(presentationData: presentationData, systemStyle: .glass, title: text, text: arguments.boolDescription(setting), value: value, enabled: enabled, maximumNumberOfLines: 0, isolatedCard: true, sectionId: self.section, style: .blocks, updated: { value in
                 arguments.setBoolValue(setting, value)
-            }, longTapAction: { arguments.longPressBool(setting) })
+            })
         case let .toggleWithIcon(_, _, setting, value, text, _, enabled):
             return ItemListSwitchItem(presentationData: presentationData, systemStyle: .glass, title: text, text: arguments.boolDescription(setting), value: value, enabled: enabled, maximumNumberOfLines: 0, isolatedCard: true, sectionId: self.section, style: .blocks, updated: { value in
                 arguments.setBoolValue(setting, value)
-            }, longTapAction: { arguments.longPressBool(setting) })
+            })
         case let .notice(_, _, string):
             return ItemListTextItem(presentationData: presentationData, text: .markdown(string), sectionId: self.section)
         case let .disclosure(_, _, link, text):
