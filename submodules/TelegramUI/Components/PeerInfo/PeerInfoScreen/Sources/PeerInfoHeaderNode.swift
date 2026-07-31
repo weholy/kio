@@ -2318,19 +2318,28 @@ final class PeerInfoHeaderNode: ASDisplayNode {
             }
         }
         
-        // MARK: Nameless — "Круглые вкладки": profile header buttons become fixed-size circles, centered as a group
+        // MARK: Nameless — "Круглые вкладки": profile header buttons become circles.
+        // Distribute them evenly across the full width (same math as the default pill row)
+        // so they don't bunch up in the middle. The diameter is capped at 56pt so on very
+        // wide layouts they stay round instead of turning into ovals.
         let roundProfileButtons = SGSimpleSettings.shared.roundTabs
         let buttonSize: CGSize
         var buttonRightOrigin: CGPoint
+        // Distance between the right edges of adjacent buttons. For the default pill row
+        // this is naturally `buttonSize.width + buttonSpacing`; in the round-button mode
+        // the circle is narrower than its slot, so the step has to be based on the slot
+        // width instead — otherwise the circles bunch up on the left side of the row.
+        let perSlotStep: CGFloat
         if roundProfileButtons {
-            let circleDiameter: CGFloat = 56.0
-            buttonSize = CGSize(width: circleDiameter, height: circleDiameter)
-            let totalContentWidth = CGFloat(buttonKeys.count) * circleDiameter + CGFloat(max(0, buttonKeys.count - 1)) * buttonSpacing
-            let startX = (width + totalContentWidth) / 2.0
-            buttonRightOrigin = CGPoint(x: startX, y: backgroundHeight - bottomInset - 16.0 - buttonSize.height)
+            let slotWidth = (width - buttonSideInset * 2.0 + buttonSpacing) / CGFloat(buttonKeys.count) - buttonSpacing
+            let diameter = min(56.0, max(40.0, slotWidth))
+            buttonSize = CGSize(width: diameter, height: diameter)
+            perSlotStep = slotWidth + buttonSpacing
+            buttonRightOrigin = CGPoint(x: width - buttonSideInset - floor((slotWidth - diameter) / 2.0), y: backgroundHeight - bottomInset - 16.0 - buttonSize.height)
         } else {
             let buttonWidth = (width - buttonSideInset * 2.0 + buttonSpacing) / CGFloat(buttonKeys.count) - buttonSpacing
             buttonSize = CGSize(width: buttonWidth, height: 58.0)
+            perSlotStep = buttonSize.width + buttonSpacing
             buttonRightOrigin = CGPoint(x: width - buttonSideInset, y: backgroundHeight - bottomInset - 16.0 - buttonSize.height)
         }
         if !actionButtonKeys.isEmpty {
@@ -2446,7 +2455,7 @@ final class PeerInfoHeaderNode: ASDisplayNode {
             } else {
                 transition.updateAlpha(node: buttonNode.containerNode, alpha: 1.0)
             }
-            buttonRightOrigin.x -= buttonSize.width + buttonSpacing
+            buttonRightOrigin.x -= perSlotStep
         }
         
         for key in self.buttonNodes.keys {
