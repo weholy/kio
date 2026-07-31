@@ -258,6 +258,7 @@ private enum NLDisclosureLink: String {
     case localStarsAmount
     case deviceModelSpoof
     case visualUsernameEditor
+    case accountSwitcher
 }
 
 private enum NLAction: Int, CaseIterable {
@@ -317,7 +318,7 @@ private enum NLHubCategory: String, CaseIterable {
         case .hubGhost: return .ghost
         case .hubOther: return .other
         case .hubSearch: return .search
-        case .none, .onlineHistory, .ghostDetailsToggle, .fakeLocationPicker, .localStarsAmount, .deviceModelSpoof, .visualUsernameEditor: return nil
+        case .none, .onlineHistory, .ghostDetailsToggle, .fakeLocationPicker, .localStarsAmount, .deviceModelSpoof, .visualUsernameEditor, .accountSwitcher: return nil
         }
     }
 }
@@ -551,6 +552,9 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
     // bar), the top search input (only the bottom one is kept), and the Export / Import /
     // Reset actions from the hub root per user request.
     if !searching, state.hubCategory == nil {
+        // MARK: Nameless — quick account switcher right in the hub root. One tap → action
+        // sheet with every logged-in account, another tap → switched.
+        entries.append(.disclosureDetail(id: id.count, section: .hero, link: .accountSwitcher, text: "🔁 Переключить аккаунт", detail: "Быстрое переключение между аккаунтами"))
         for cat in NLHubCategory.allCases {
             entries.append(.disclosureDetail(
                 id: id.count,
@@ -1285,6 +1289,12 @@ private func namelessFeaturesControllerImpl(context: AccountContext, initialCate
                     simplePromise.set(true)
                     askForRestart?()
                 }))
+                return
+            }
+            if link == .accountSwitcher {
+                namelessShowAccountSwitcher(context: context, present: { c, a in
+                    presentControllerImpl?(c, a as? ViewControllerPresentationArguments)
+                })
                 return
             }
             if link == .visualUsernameEditor {
