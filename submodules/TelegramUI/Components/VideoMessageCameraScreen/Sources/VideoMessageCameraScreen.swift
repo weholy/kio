@@ -951,8 +951,8 @@ public class VideoMessageCameraScreen: ViewController {
             self.previewContainerView.addSubview(self.previewContainerContentView)
                         
             let isDualCameraEnabled = Camera.isDualCameraSupported(forRoundVideo: true)
-            // MARK: Swiftgram
-            let isFrontPosition = !SGSimpleSettings.shared.startTelescopeWithRearCam
+            // MARK: Nameless — see CameraOutput: enableTelescope gates the rear-cam preference.
+            let isFrontPosition = !(SGSimpleSettings.shared.enableTelescope && SGSimpleSettings.shared.startTelescopeWithRearCam)
             
             self.mainPreviewView = CameraSimplePreviewView(frame: .zero, main: true, roundVideo: true)
             self.additionalPreviewView = CameraSimplePreviewView(frame: .zero, main: false, roundVideo: true)

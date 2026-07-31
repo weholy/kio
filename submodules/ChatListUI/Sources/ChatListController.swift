@@ -296,7 +296,9 @@ public class ChatListControllerImpl: TelegramBaseController, ChatListController 
         switch self.location {
         case let .chatList(groupId):
             if groupId == .root {
-                title = self.presentationData.strings.DialogList_Title
+                // MARK: Nameless — "Надпись «Чаты» в списке": when the toggle is off, hide
+                // the "Chats" title above the list to give the chat rows more vertical space.
+                title = SGSimpleSettings.shared.chatListTitle ? self.presentationData.strings.DialogList_Title : ""
             } else {
                 title = self.presentationData.strings.ChatList_ArchivedChatsTitle
             }
@@ -3975,12 +3977,13 @@ public class ChatListControllerImpl: TelegramBaseController, ChatListController 
         let filterItems = chatListFilterItems(context: self.context)
         var notifiedFirstUpdate = false
         
-        // MARK: Swiftgram
+        // MARK: Nameless — surface the nameless "Папки снизу" toggle as an OR with the
+        // native experimental flag so either setting places the folder tabs at the bottom.
         let experimentalUISettingsKey: ValueBoxKey = ApplicationSpecificSharedDataKeys.experimentalUISettings
         let displayTabsAtBottomSignal = self.context.sharedContext.accountManager.sharedData(keys: Set([experimentalUISettingsKey]))
         |> map { sharedData -> Bool in
             let settings: ExperimentalUISettings = sharedData.entries[experimentalUISettingsKey]?.get(ExperimentalUISettings.self) ?? ExperimentalUISettings.defaultSettings
-            return settings.foldersTabAtBottom
+            return settings.foldersTabAtBottom || SGSimpleSettings.shared.foldersAtBottom
         }
         |> distinctUntilChanged
         

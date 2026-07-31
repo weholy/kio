@@ -383,8 +383,10 @@ final class CameraOutput: NSObject {
                 AVVideoWidthKey: Int(dimensions.width),
                 AVVideoHeightKey: Int(dimensions.height)
             ]
-            // MARK: Swiftgram
-            if SGSimpleSettings.shared.startTelescopeWithRearCam {
+            // MARK: Nameless — enableTelescope is the master switch for the telescope zoom
+            // feature; startTelescopeWithRearCam is its "which camera" preference. When the
+            // master is off, the rear-cam preference doesn't kick in.
+            if SGSimpleSettings.shared.enableTelescope && SGSimpleSettings.shared.startTelescopeWithRearCam {
                 self.currentPosition = .back
             }
         } else {
