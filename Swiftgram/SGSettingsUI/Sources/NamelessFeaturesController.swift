@@ -238,6 +238,35 @@ private enum NLBoolSetting: String {
     // Additional
     case vibrationEnabled
     case speedBoostEnabled
+    // MARK: Megram — Nextgram parity toggles (UI only, wiring intentionally deferred)
+    case nxHideGiftsTab
+    case nxHideContactsTab
+    case nxHideCallsTab
+    case nxSearchButtonNearTabBar
+    case nxFoldersAtBottom
+    case nxRememberLastFolder
+    case nxNewChatListLook
+    case nxHideChatsTitle
+    case nxRamUnderClock
+    case nxPremiumBadgeInChatList
+    case nxAccountSwitcherInChatList
+    case nxPipOnSwipe
+    case nxRoundVideoBackCamera
+    case nxCameraInGallery
+    case nxStripPhotoMetadata
+    case nxFormattingPanel
+    case nxVoiceOneTime
+    case nxTranscribeAppleSpeech
+    case nxVoiceMorpherEnabled
+    case nxForceTCPCalls
+    case nxMusicCrossfade
+    case nxMusicEqualizer
+    case nxLiveActivityWidget
+    case nxWinterSnow
+    case nxCustomFontEnabled
+    case nxAutoClearCacheOnLaunch
+    case nxHapticsOnUI
+    case nxThermalCalmDown
 }
 
 private enum NLSliderSetting: String {
@@ -986,9 +1015,84 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
     entries.append(.toggle(id: id.count, section: sec, settingName: .swipeForVideoPIP, value: s.videoPIPSwipeDirection == SGSimpleSettings.VideoPIPSwipeDirection.up.rawValue, text: "Свайп для PiP видео", enabled: true))
     entries.append(.toggle(id: id.count, section: sec, settingName: .forceBuiltInMic, value: s.forceBuiltInMic, text: "Встроенный микрофон", enabled: true))
 
-    // MARK: Nameless — dropped the "ЭКСПОРТ / ИМПОРТ / Сбросить" block from the UI per
-    // user request. The NLAction cases are kept in the enum so old handlers still compile;
-    // they're just not surfaced anywhere.
+    // MARK: Megram — Nextgram parity block. Every row below is UI-only for now
+    // (no behavioural wiring). Layout mirrors the reference screen groups.
+    entries.append(.header(id: id.count, section: sec, text: "NEXTGRAM · ТАББАР", badge: nil))
+    entries.append(.toggle(id: id.count, section: sec, settingName: .nxHideContactsTab, value: s.nxHideContactsTab, text: "Скрыть вкладку «Контакты»", enabled: true))
+    entries.append(.notice(id: id.count, section: sec, text: "Убирает «Контакты» из нижнего таббара, не затрагивая адресную книгу."))
+    entries.append(.toggle(id: id.count, section: sec, settingName: .nxHideCallsTab, value: s.nxHideCallsTab, text: "Скрыть вкладку «Звонки»", enabled: true))
+    entries.append(.notice(id: id.count, section: sec, text: "Убирает «Звонки» из нижнего таббара, сохраняя историю звонков в других разделах."))
+    entries.append(.toggle(id: id.count, section: sec, settingName: .nxSearchButtonNearTabBar, value: s.nxSearchButtonNearTabBar, text: "Кнопка поиска рядом с таббаром", enabled: true))
+    entries.append(.notice(id: id.count, section: sec, text: "Добавляет отдельную кнопку поиска рядом с нижним таббаром для быстрого доступа."))
+
+    entries.append(.header(id: id.count, section: sec, text: "NEXTGRAM · ПАПКИ", badge: nil))
+    entries.append(.toggle(id: id.count, section: sec, settingName: .nxFoldersAtBottom, value: s.nxFoldersAtBottom, text: "Папки снизу", enabled: true))
+    entries.append(.notice(id: id.count, section: sec, text: "Переносит выбор папок чатов к нижним элементам управления для удобства одной рукой."))
+    entries.append(.toggle(id: id.count, section: sec, settingName: .nxRememberLastFolder, value: s.nxRememberLastFolder, text: "Открывать последнюю папку", enabled: true))
+    entries.append(.notice(id: id.count, section: sec, text: "Возвращает последнюю выбранную папку вместо постоянного открытия «Все чаты»."))
+
+    entries.append(.header(id: id.count, section: sec, text: "NEXTGRAM · СПИСОК ЧАТОВ", badge: nil))
+    entries.append(.toggle(id: id.count, section: sec, settingName: .nxNewChatListLook, value: s.nxNewChatListLook, text: "Обновлённый вид списка чатов", enabled: true))
+    entries.append(.notice(id: id.count, section: sec, text: "Применяет к списку диалогов обновлённую компоновку и оформление Megram."))
+    entries.append(.toggle(id: id.count, section: sec, settingName: .nxHideChatsTitle, value: s.nxHideChatsTitle, text: "Убрать надпись «Чаты»", enabled: true))
+    entries.append(.notice(id: id.count, section: sec, text: "Скрывает крупный заголовок «Чаты», освобождая место над списком диалогов."))
+    entries.append(.toggle(id: id.count, section: sec, settingName: .nxRamUnderClock, value: s.nxRamUnderClock, text: "ОЗУ под часами", enabled: true))
+    entries.append(.notice(id: id.count, section: sec, text: "Показывает текущее потребление памяти приложением под часами в статус-баре."))
+    entries.append(.toggle(id: id.count, section: sec, settingName: .nxPremiumBadgeInChatList, value: s.nxPremiumBadgeInChatList, text: "Premium-значок в списке", enabled: true))
+    entries.append(.notice(id: id.count, section: sec, text: "Показывает ваш значок Premium в верхней части списка чатов."))
+    entries.append(.toggle(id: id.count, section: sec, settingName: .nxAccountSwitcherInChatList, value: s.nxAccountSwitcherInChatList, text: "Переключение аккаунтов в списке", enabled: true))
+    entries.append(.notice(id: id.count, section: sec, text: "Добавляет быстрый переход между аккаунтами без открытия настроек."))
+
+    entries.append(.header(id: id.count, section: sec, text: "NEXTGRAM · ПРОФИЛИ", badge: nil))
+    entries.append(.toggle(id: id.count, section: sec, settingName: .nxHideGiftsTab, value: s.nxHideGiftsTab, text: "Скрыть вкладку «Подарки»", enabled: true))
+    entries.append(.notice(id: id.count, section: sec, text: "Скрывает вкладку «Подарки» в профиле."))
+
+    entries.append(.header(id: id.count, section: sec, text: "NEXTGRAM · МЕДИА И КАМЕРА", badge: nil))
+    entries.append(.toggle(id: id.count, section: sec, settingName: .nxPipOnSwipe, value: s.nxPipOnSwipe, text: "Картинка в картинке", enabled: true))
+    entries.append(.notice(id: id.count, section: sec, text: "Свайп видео вверх для перехода в режим PiP."))
+    entries.append(.toggle(id: id.count, section: sec, settingName: .nxRoundVideoBackCamera, value: s.nxRoundVideoBackCamera, text: "Кружок с задней камеры", enabled: true))
+    entries.append(.notice(id: id.count, section: sec, text: "Начинать запись видеосообщений с задней камеры."))
+    entries.append(.toggle(id: id.count, section: sec, settingName: .nxCameraInGallery, value: s.nxCameraInGallery, text: "Камера в галерее", enabled: true))
+    entries.append(.notice(id: id.count, section: sec, text: "Показывать ячейку камеры в медиа-галерее."))
+    entries.append(.toggle(id: id.count, section: sec, settingName: .nxStripPhotoMetadata, value: s.nxStripPhotoMetadata, text: "Очищать метаданные", enabled: true))
+    entries.append(.notice(id: id.count, section: sec, text: "Удаляет EXIF/геолокацию из отправляемых фото."))
+
+    entries.append(.header(id: id.count, section: sec, text: "NEXTGRAM · ВВОД", badge: nil))
+    entries.append(.toggle(id: id.count, section: sec, settingName: .nxFormattingPanel, value: s.nxFormattingPanel, text: "Панель форматирования", enabled: true))
+    entries.append(.notice(id: id.count, section: sec, text: "Добавляет над клавиатурой панель для быстрого применения жирного, курсива, подчёркивания, зачёркивания, моноширинного, спойлера, цитаты и ссылок."))
+
+    entries.append(.header(id: id.count, section: sec, text: "NEXTGRAM · ГОЛОСОВЫЕ", badge: nil))
+    entries.append(.toggle(id: id.count, section: sec, settingName: .nxVoiceOneTime, value: s.nxVoiceOneTime, text: "Записи сразу одноразовые", enabled: true))
+    entries.append(.notice(id: id.count, section: sec, text: "Новые голосовые по умолчанию отправляются как одноразовые."))
+    entries.append(.toggle(id: id.count, section: sec, settingName: .nxTranscribeAppleSpeech, value: s.nxTranscribeAppleSpeech, text: "Транскрипция через Apple Speech", enabled: true))
+    entries.append(.notice(id: id.count, section: sec, text: "Переводит голосовые сообщения и кружки в текст без ограничений и без Premium."))
+    entries.append(.toggle(id: id.count, section: sec, settingName: .nxVoiceMorpherEnabled, value: s.nxVoiceMorpherEnabled, text: "Смена голоса", enabled: true))
+    entries.append(.notice(id: id.count, section: sec, text: "Применяет выбранный эффект к новым голосовым сообщениям и кружкам."))
+
+    entries.append(.header(id: id.count, section: sec, text: "NEXTGRAM · ЗВОНКИ", badge: nil))
+    entries.append(.toggle(id: id.count, section: sec, settingName: .nxForceTCPCalls, value: s.nxForceTCPCalls, text: "Использовать TCP", enabled: true))
+    entries.append(.notice(id: id.count, section: sec, text: "Принудительно использовать TCP для звонков."))
+
+    entries.append(.header(id: id.count, section: sec, text: "NEXTGRAM · МУЗЫКА", badge: nil))
+    entries.append(.toggle(id: id.count, section: sec, settingName: .nxMusicCrossfade, value: s.nxMusicCrossfade, text: "Кроссфейд", enabled: true))
+    entries.append(.notice(id: id.count, section: sec, text: "Плавное переключение треков."))
+    entries.append(.toggle(id: id.count, section: sec, settingName: .nxMusicEqualizer, value: s.nxMusicEqualizer, text: "Эквалайзер", enabled: true))
+    entries.append(.notice(id: id.count, section: sec, text: "Включает встроенный эквалайзер для плеера."))
+
+    entries.append(.header(id: id.count, section: sec, text: "NEXTGRAM · ПРОЧЕЕ", badge: nil))
+    entries.append(.toggle(id: id.count, section: sec, settingName: .nxLiveActivityWidget, value: s.nxLiveActivityWidget, text: "Live Activity виджет", enabled: true))
+    entries.append(.notice(id: id.count, section: sec, text: "Чёрный виджет Megram с иконкой на экране блокировки, показывает входящие уведомления. Требует iOS 16.1+."))
+    entries.append(.toggle(id: id.count, section: sec, settingName: .nxWinterSnow, value: s.nxWinterSnow, text: "Новогодний снег в чате", enabled: true))
+    entries.append(.notice(id: id.count, section: sec, text: "Показывать падающий снег поверх обоев чата и снежинки по краям виджета."))
+    entries.append(.toggle(id: id.count, section: sec, settingName: .nxCustomFontEnabled, value: s.nxCustomFontEnabled, text: "Использовать свой шрифт", enabled: true))
+    entries.append(.notice(id: id.count, section: sec, text: "Позволяет заменить системный шрифт на пользовательский TTF/OTF."))
+    entries.append(.toggle(id: id.count, section: sec, settingName: .nxAutoClearCacheOnLaunch, value: s.nxAutoClearCacheOnLaunch, text: "Автоочистка кэша при входе", enabled: true))
+    entries.append(.notice(id: id.count, section: sec, text: "Проверяет общий размер медиа-кэша при каждом входе и безопасно очищает его в фоне после достижения лимита."))
+    entries.append(.toggle(id: id.count, section: sec, settingName: .nxHapticsOnUI, value: s.nxHapticsOnUI, text: "Вибрация по интерфейсу", enabled: true))
+    entries.append(.notice(id: id.count, section: sec, text: "Добавляет лёгкий отклик при открытии чата, тапах и нарастающую вибрацию при раскрытии панели вложений."))
+    entries.append(.toggle(id: id.count, section: sec, settingName: .nxThermalCalmDown, value: s.nxThermalCalmDown, text: "Успокаивать при нагреве", enabled: true))
+    entries.append(.notice(id: id.count, section: sec, text: "При нагреве устройства Megram упрощает себя: стеклянные сообщения становятся сплошной заливкой, снег останавливается."))
+
     } // end other
 
     return filterSGItemListUIEntrires(entries: entries, by: state.searchQuery)
@@ -1240,6 +1344,36 @@ private func namelessFeaturesControllerImpl(context: AccountContext, initialCate
             case .hideNewChatSticker: s.hideNewChatSticker = value; askForRestart?()
             case .hideBusinessChats: s.hideBusinessChats = value; simplePromise.set(true)
             case .settingsBigAvatar: s.settingsBigAvatar = value; askForRestart?()
+            // MARK: Megram — Nextgram parity handlers. Just persist the flag; no behaviour
+            // is wired yet, so we don't call askForRestart/simplePromise here.
+            case .nxHideGiftsTab: s.nxHideGiftsTab = value
+            case .nxHideContactsTab: s.nxHideContactsTab = value
+            case .nxHideCallsTab: s.nxHideCallsTab = value
+            case .nxSearchButtonNearTabBar: s.nxSearchButtonNearTabBar = value
+            case .nxFoldersAtBottom: s.nxFoldersAtBottom = value
+            case .nxRememberLastFolder: s.nxRememberLastFolder = value
+            case .nxNewChatListLook: s.nxNewChatListLook = value
+            case .nxHideChatsTitle: s.nxHideChatsTitle = value
+            case .nxRamUnderClock: s.nxRamUnderClock = value
+            case .nxPremiumBadgeInChatList: s.nxPremiumBadgeInChatList = value
+            case .nxAccountSwitcherInChatList: s.nxAccountSwitcherInChatList = value
+            case .nxPipOnSwipe: s.nxPipOnSwipe = value
+            case .nxRoundVideoBackCamera: s.nxRoundVideoBackCamera = value
+            case .nxCameraInGallery: s.nxCameraInGallery = value
+            case .nxStripPhotoMetadata: s.nxStripPhotoMetadata = value
+            case .nxFormattingPanel: s.nxFormattingPanel = value
+            case .nxVoiceOneTime: s.nxVoiceOneTime = value
+            case .nxTranscribeAppleSpeech: s.nxTranscribeAppleSpeech = value
+            case .nxVoiceMorpherEnabled: s.nxVoiceMorpherEnabled = value
+            case .nxForceTCPCalls: s.nxForceTCPCalls = value
+            case .nxMusicCrossfade: s.nxMusicCrossfade = value
+            case .nxMusicEqualizer: s.nxMusicEqualizer = value
+            case .nxLiveActivityWidget: s.nxLiveActivityWidget = value
+            case .nxWinterSnow: s.nxWinterSnow = value
+            case .nxCustomFontEnabled: s.nxCustomFontEnabled = value
+            case .nxAutoClearCacheOnLaunch: s.nxAutoClearCacheOnLaunch = value
+            case .nxHapticsOnUI: s.nxHapticsOnUI = value
+            case .nxThermalCalmDown: s.nxThermalCalmDown = value
             case .enableVideoToCircleOrVoice: s.enableVideoToCircleOrVoice = value
             case .namelessVideoBackgroundEnabled: s.namelessVideoBackgroundEnabled = value
             case .squareAvatars: s.squareAvatars = value; simplePromise.set(true)

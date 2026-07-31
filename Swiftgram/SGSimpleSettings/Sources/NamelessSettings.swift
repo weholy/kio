@@ -105,6 +105,35 @@ private enum NamelessSettingsKey {
     static let hideNewChatSticker = "nameless.hideNewChatSticker"
     static let hideBusinessChats = "nameless.hideBusinessChats"
     static let megramGlobalClearGlass = "megram.globalClearGlass"
+    // MARK: Megram — Nextgram parity keys (UI-only for now, no consumers)
+    static let nxHideGiftsTab = "megram.nx.hideGiftsTab"
+    static let nxHideContactsTab = "megram.nx.hideContactsTab"
+    static let nxHideCallsTab = "megram.nx.hideCallsTab"
+    static let nxSearchButtonNearTabBar = "megram.nx.searchButtonNearTabBar"
+    static let nxFoldersAtBottom = "megram.nx.foldersAtBottom"
+    static let nxRememberLastFolder = "megram.nx.rememberLastFolder"
+    static let nxNewChatListLook = "megram.nx.newChatListLook"
+    static let nxHideChatsTitle = "megram.nx.hideChatsTitle"
+    static let nxRamUnderClock = "megram.nx.ramUnderClock"
+    static let nxPremiumBadgeInChatList = "megram.nx.premiumBadgeInChatList"
+    static let nxAccountSwitcherInChatList = "megram.nx.accountSwitcherInChatList"
+    static let nxPipOnSwipe = "megram.nx.pipOnSwipe"
+    static let nxRoundVideoBackCamera = "megram.nx.roundVideoBackCamera"
+    static let nxCameraInGallery = "megram.nx.cameraInGallery"
+    static let nxStripPhotoMetadata = "megram.nx.stripPhotoMetadata"
+    static let nxFormattingPanel = "megram.nx.formattingPanel"
+    static let nxVoiceOneTime = "megram.nx.voiceOneTime"
+    static let nxTranscribeAppleSpeech = "megram.nx.transcribeAppleSpeech"
+    static let nxVoiceMorpherEnabled = "megram.nx.voiceMorpherEnabled"
+    static let nxForceTCPCalls = "megram.nx.forceTCPCalls"
+    static let nxMusicCrossfade = "megram.nx.musicCrossfade"
+    static let nxMusicEqualizer = "megram.nx.musicEqualizer"
+    static let nxLiveActivityWidget = "megram.nx.liveActivityWidget"
+    static let nxWinterSnow = "megram.nx.winterSnow"
+    static let nxCustomFontEnabled = "megram.nx.customFontEnabled"
+    static let nxAutoClearCacheOnLaunch = "megram.nx.autoClearCacheOnLaunch"
+    static let nxHapticsOnUI = "megram.nx.hapticsOnUI"
+    static let nxThermalCalmDown = "megram.nx.thermalCalmDown"
     static let settingsBigAvatar = "nameless.settingsBigAvatar"
     static let forwardWarnAuthor = "nameless.forwardWarnAuthor"
     static let profileMusicCard = "nameless.profileMusicCard"
@@ -522,6 +551,38 @@ public extension SGSimpleSettings {
         get { storage.namelessBool(NamelessSettingsKey.megramGlobalClearGlass, default: true) }
         set { storage.set(newValue, forKey: NamelessSettingsKey.megramGlobalClearGlass) }
     }
+
+    // MARK: Megram — Nextgram parity properties. Every one is a plain Bool with no
+    // downstream consumer; they exist so the settings UI can list the toggle now and the
+    // behaviour can be wired in later without a settings-model change.
+    var nxHideGiftsTab: Bool { get { storage.namelessBool(NamelessSettingsKey.nxHideGiftsTab) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxHideGiftsTab) } }
+    var nxHideContactsTab: Bool { get { storage.namelessBool(NamelessSettingsKey.nxHideContactsTab) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxHideContactsTab) } }
+    var nxHideCallsTab: Bool { get { storage.namelessBool(NamelessSettingsKey.nxHideCallsTab) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxHideCallsTab) } }
+    var nxSearchButtonNearTabBar: Bool { get { storage.namelessBool(NamelessSettingsKey.nxSearchButtonNearTabBar) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxSearchButtonNearTabBar) } }
+    var nxFoldersAtBottom: Bool { get { storage.namelessBool(NamelessSettingsKey.nxFoldersAtBottom) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxFoldersAtBottom) } }
+    var nxRememberLastFolder: Bool { get { storage.namelessBool(NamelessSettingsKey.nxRememberLastFolder) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxRememberLastFolder) } }
+    var nxNewChatListLook: Bool { get { storage.namelessBool(NamelessSettingsKey.nxNewChatListLook) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxNewChatListLook) } }
+    var nxHideChatsTitle: Bool { get { storage.namelessBool(NamelessSettingsKey.nxHideChatsTitle) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxHideChatsTitle) } }
+    var nxRamUnderClock: Bool { get { storage.namelessBool(NamelessSettingsKey.nxRamUnderClock) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxRamUnderClock) } }
+    var nxPremiumBadgeInChatList: Bool { get { storage.namelessBool(NamelessSettingsKey.nxPremiumBadgeInChatList) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxPremiumBadgeInChatList) } }
+    var nxAccountSwitcherInChatList: Bool { get { storage.namelessBool(NamelessSettingsKey.nxAccountSwitcherInChatList) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxAccountSwitcherInChatList) } }
+    var nxPipOnSwipe: Bool { get { storage.namelessBool(NamelessSettingsKey.nxPipOnSwipe) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxPipOnSwipe) } }
+    var nxRoundVideoBackCamera: Bool { get { storage.namelessBool(NamelessSettingsKey.nxRoundVideoBackCamera) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxRoundVideoBackCamera) } }
+    var nxCameraInGallery: Bool { get { storage.namelessBool(NamelessSettingsKey.nxCameraInGallery) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxCameraInGallery) } }
+    var nxStripPhotoMetadata: Bool { get { storage.namelessBool(NamelessSettingsKey.nxStripPhotoMetadata) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxStripPhotoMetadata) } }
+    var nxFormattingPanel: Bool { get { storage.namelessBool(NamelessSettingsKey.nxFormattingPanel) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxFormattingPanel) } }
+    var nxVoiceOneTime: Bool { get { storage.namelessBool(NamelessSettingsKey.nxVoiceOneTime) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxVoiceOneTime) } }
+    var nxTranscribeAppleSpeech: Bool { get { storage.namelessBool(NamelessSettingsKey.nxTranscribeAppleSpeech) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxTranscribeAppleSpeech) } }
+    var nxVoiceMorpherEnabled: Bool { get { storage.namelessBool(NamelessSettingsKey.nxVoiceMorpherEnabled) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxVoiceMorpherEnabled) } }
+    var nxForceTCPCalls: Bool { get { storage.namelessBool(NamelessSettingsKey.nxForceTCPCalls) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxForceTCPCalls) } }
+    var nxMusicCrossfade: Bool { get { storage.namelessBool(NamelessSettingsKey.nxMusicCrossfade) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxMusicCrossfade) } }
+    var nxMusicEqualizer: Bool { get { storage.namelessBool(NamelessSettingsKey.nxMusicEqualizer) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxMusicEqualizer) } }
+    var nxLiveActivityWidget: Bool { get { storage.namelessBool(NamelessSettingsKey.nxLiveActivityWidget) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxLiveActivityWidget) } }
+    var nxWinterSnow: Bool { get { storage.namelessBool(NamelessSettingsKey.nxWinterSnow) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxWinterSnow) } }
+    var nxCustomFontEnabled: Bool { get { storage.namelessBool(NamelessSettingsKey.nxCustomFontEnabled) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxCustomFontEnabled) } }
+    var nxAutoClearCacheOnLaunch: Bool { get { storage.namelessBool(NamelessSettingsKey.nxAutoClearCacheOnLaunch) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxAutoClearCacheOnLaunch) } }
+    var nxHapticsOnUI: Bool { get { storage.namelessBool(NamelessSettingsKey.nxHapticsOnUI) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxHapticsOnUI) } }
+    var nxThermalCalmDown: Bool { get { storage.namelessBool(NamelessSettingsKey.nxThermalCalmDown) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxThermalCalmDown) } }
 
     /// Open Settings with the avatar already expanded (fills the top of the screen).
     var settingsBigAvatar: Bool {
