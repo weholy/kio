@@ -209,12 +209,12 @@ public final class ContextControllerActionsListActionItemNode: HighlightTracking
     }
     
     public func update(presentationData: PresentationData, constrainedSize: CGSize) -> (minSize: CGSize, apply: (_ size: CGSize, _ transition: ContainedViewLayoutTransition) -> Void) {
-        let sideInset: CGFloat = 18.0
-        let verticalInset: CGFloat = 11.0
+        let sideInset: CGFloat = 28.0
+        let verticalInset: CGFloat = 15.0
         let titleSubtitleSpacing: CGFloat = 1.0
-        let iconSideInset: CGFloat = 20.0
+        let iconSideInset: CGFloat = 26.0
         let standardIconWidth: CGFloat = 32.0
-        let iconSpacing: CGFloat = 8.0
+        let iconSpacing: CGFloat = 16.0
         
         var forcedHeight: CGFloat?
         var titleVerticalOffset: CGFloat?
@@ -227,12 +227,12 @@ public final class ContextControllerActionsListActionItemNode: HighlightTracking
             forcedHeight = height
             titleVerticalOffset = verticalOffset
         case .small:
-            let smallTextFont = Font.regular(floor(presentationData.listsFontSize.baseDisplaySize * 14.0 / 17.0))
+            let smallTextFont = Font.regular(max(15.0, floor(presentationData.listsFontSize.baseDisplaySize * 15.0 / 17.0)))
             titleFont = smallTextFont
-            titleBoldFont = Font.semibold(floor(presentationData.listsFontSize.baseDisplaySize * 14.0 / 17.0))
+            titleBoldFont = Font.semibold(max(15.0, floor(presentationData.listsFontSize.baseDisplaySize * 15.0 / 17.0)))
         case .regular:
-            titleFont = Font.regular(presentationData.listsFontSize.baseDisplaySize)
-            titleBoldFont = Font.semibold(presentationData.listsFontSize.baseDisplaySize)
+            titleFont = Font.semibold(max(19.0, presentationData.listsFontSize.baseDisplaySize + 1.0))
+            titleBoldFont = titleFont
         }
         
         let subtitleFont = Font.regular(presentationData.listsFontSize.baseDisplaySize * 14.0 / 17.0)
@@ -555,7 +555,7 @@ public final class ContextControllerActionsListActionItemNode: HighlightTracking
             minSize.width += iconSpacing
         }
         if let forcedHeight {
-            minSize.height = forcedHeight
+            minSize.height = max(62.0, forcedHeight)
         } else {
             minSize.height += verticalInset * 2.0
             minSize.height += titleSize.height
@@ -563,6 +563,7 @@ public final class ContextControllerActionsListActionItemNode: HighlightTracking
                 minSize.height += titleSubtitleSpacing
                 minSize.height += subtitleSize.height
             }
+            minSize.height = max(62.0, minSize.height)
         }
         
         return (minSize: minSize, apply: { size, transition in
@@ -575,7 +576,7 @@ public final class ContextControllerActionsListActionItemNode: HighlightTracking
             }
             var subtitleFrame = CGRect(origin: CGPoint(x: titleFrame.minX, y: titleFrame.maxY + titleSubtitleSpacing), size: subtitleSize)
             if iconSize != nil {
-                titleFrame.origin.x = iconSideInset + 40.0
+                titleFrame.origin.x = iconSideInset + 48.0
                 subtitleFrame.origin.x = titleFrame.minX
             }
             
@@ -669,8 +670,8 @@ private final class ContextControllerActionsListSeparatorItemNode: ASDisplayNode
     func update(presentationData: PresentationData, constrainedSize: CGSize) -> (minSize: CGSize, apply: (_ size: CGSize, _ transition: ContainedViewLayoutTransition) -> Void) {
         return (minSize: CGSize(width: 0.0, height: 20.0), apply: { size, transition in
             let sideInset: CGFloat = 18.0
-            self.separatorView.tintColor = presentationData.theme.contextMenu.itemSeparatorColor
-            transition.updateFrame(view: self.separatorView, frame: CGRect(origin: CGPoint(x: sideInset, y: floorToScreenPixels((size.height - 1.0) * 0.5)), size: CGSize(width: max(0.0, size.width - sideInset * 2.0), height: 1.0)))
+            self.separatorView.tintColor = (presentationData.theme.overallDarkAppearance ? UIColor.white : UIColor.black).withAlphaComponent(0.12)
+            transition.updateFrame(view: self.separatorView, frame: CGRect(origin: CGPoint(x: sideInset + 44.0, y: floorToScreenPixels((size.height - 1.0) * 0.5)), size: CGSize(width: max(0.0, size.width - (sideInset + 44.0) - sideInset), height: 1.0)))
         })
     }
 }
@@ -1092,7 +1093,7 @@ public final class ContextControllerActionsListStackItem: ContextControllerActio
             }
             
             if let highlightedItemFrame {
-                self.highlightedItemBackgroundView.backgroundColor = presentationData.theme.overallDarkAppearance ? UIColor.white : UIColor.black
+                self.highlightedItemBackgroundView.backgroundColor = presentationData.theme.overallDarkAppearance ? UIColor(rgb: 0x8D5CFF) : UIColor.white
                 self.highlightedItemBackgroundView.setMonochromaticEffect(tintColor: self.highlightedItemBackgroundView.backgroundColor)
                 
                 var highlightTransition = ComponentTransition(transition)
@@ -1103,15 +1104,15 @@ public final class ContextControllerActionsListStackItem: ContextControllerActio
                     }
                     animateIn = true
                 }
-                let highlightFrame = CGRect(origin: CGPoint(x: 10.0, y: highlightedItemFrame.minY), size: CGSize(width: combinedSize.width - 10.0 * 2.0, height: highlightedItemFrame.height))
+                let highlightFrame = CGRect(origin: CGPoint(x: 10.0, y: highlightedItemFrame.minY + 3.0), size: CGSize(width: combinedSize.width - 10.0 * 2.0, height: max(0.0, highlightedItemFrame.height - 6.0)))
                 highlightTransition.setFrame(view: self.highlightedItemBackgroundView, frame: highlightFrame)
-                highlightTransition.setCornerRadius(layer: self.highlightedItemBackgroundView.layer, cornerRadius: min(20.0, highlightFrame.height * 0.5))
+                highlightTransition.setCornerRadius(layer: self.highlightedItemBackgroundView.layer, cornerRadius: min(22.0, highlightFrame.height * 0.5))
                 if animateIn {
                     var alphaTransition = transition
                     if transition.isAnimated {
                         alphaTransition = .animated(duration: 0.2, curve: .easeInOut)
                     }
-                    ComponentTransition(alphaTransition).setAlpha(view: self.highlightedItemBackgroundView, alpha: 0.1)
+                    ComponentTransition(alphaTransition).setAlpha(view: self.highlightedItemBackgroundView, alpha: presentationData.theme.overallDarkAppearance ? 0.18 : 0.22)
                 }
             } else if self.highlightedItemBackgroundView.alpha != 0.0 {
                 ComponentTransition(transition).setAlpha(view: self.highlightedItemBackgroundView, alpha: 0.0)
@@ -1635,6 +1636,7 @@ public final class ContextControllerActionsStackNodeImpl: ASDisplayNode, Context
         let backgroundContainerInset: CGFloat
         var sourceExtractableContainer: ContextExtractableContainer?
         let contentContainer: LensTransitionContainer
+        private let borderView: UIView
         
         var requestUpdate: ((ContainedViewLayoutTransition) -> Void)?
         var requestPop: (() -> Void)?
@@ -1651,6 +1653,7 @@ public final class ContextControllerActionsStackNodeImpl: ASDisplayNode, Context
         override init() {
             self.backgroundContainer = GlassBackgroundContainerView(spacing: 28.0)
             self.contentContainer = LensTransitionContainer(effectView: LensTransitionContainerEffectViewImpl(contentView: nil))
+            self.borderView = UIView()
             
             self.backgroundContainerInset = 32.0
             
@@ -1658,6 +1661,11 @@ public final class ContextControllerActionsStackNodeImpl: ASDisplayNode, Context
             
             self.view.addSubview(self.backgroundContainer)
             self.backgroundContainer.contentView.addSubview(self.contentContainer)
+            self.contentContainer.addSubview(self.borderView)
+            self.borderView.isUserInteractionEnabled = false
+            self.borderView.backgroundColor = .clear
+            self.borderView.layer.borderWidth = UIScreenPixel
+            self.borderView.layer.cornerCurve = .continuous
             
             let panRecognizer = InteractiveTransitionGestureRecognizer(target: self, action: #selector(self.panGesture(_:)), allowedDirections: { [weak self] point in
                 guard let strongSelf = self else {
@@ -1724,7 +1732,7 @@ public final class ContextControllerActionsStackNodeImpl: ASDisplayNode, Context
             let sourceEffectView = LensTransitionContainerEffectViewImpl(contentView: extractableContainer.extractableContentView)
             sourceEffectView.update(theme: presentationData.theme)
             
-            self.contentContainer.animateIn(fromRect: fromRect, toRect: CGRect(origin: CGPoint(), size: currentSize), fromCornerRadius: normalCornerRadius, toCornerRadius: 30.0, isDark: presentationData.theme.overallDarkAppearance, sourceEffectView: sourceEffectView)
+            self.contentContainer.animateIn(fromRect: fromRect, toRect: CGRect(origin: CGPoint(), size: currentSize), fromCornerRadius: normalCornerRadius, toCornerRadius: 34.0, isDark: presentationData.theme.overallDarkAppearance, sourceEffectView: sourceEffectView)
         }
         
         func animateOut(toExtractableContainer extractableContainer: ContextExtractableContainer, toRect: CGRect, presentationData: PresentationData, transition: ComponentTransition) {
@@ -1737,7 +1745,7 @@ public final class ContextControllerActionsStackNodeImpl: ASDisplayNode, Context
             let sourceEffectView = LensTransitionContainerEffectViewImpl(contentView: extractableContainer.extractableContentView)
             sourceEffectView.update(theme: presentationData.theme)
 
-            self.contentContainer.animateOut(fromRect: CGRect(origin: CGPoint(), size: currentSize), toRect: toRect, fromCornerRadius: 30.0, toCornerRadius: normalCornerRadius, isDark: presentationData.theme.overallDarkAppearance, sourceEffectView: sourceEffectView)
+            self.contentContainer.animateOut(fromRect: CGRect(origin: CGPoint(), size: currentSize), toRect: toRect, fromCornerRadius: 34.0, toCornerRadius: normalCornerRadius, isDark: presentationData.theme.overallDarkAppearance, sourceEffectView: sourceEffectView)
         }
         
         func didAnimateOut(toExtractableContainer extractableContainer: ContextExtractableContainer) {
@@ -1760,7 +1768,11 @@ public final class ContextControllerActionsStackNodeImpl: ASDisplayNode, Context
             }
             transition.setPosition(view: self.contentContainer, position: CGRect(origin: CGPoint(), size: size).center)
             transition.setBounds(view: self.contentContainer, bounds: CGRect(origin: CGPoint(), size: size))
-            self.contentContainer.update(size: size, cornerRadius: min(30.0, size.height * 0.5), isDark: presentationData.theme.overallDarkAppearance, transition: transition)
+            let cornerRadius = min(34.0, size.height * 0.5)
+            self.contentContainer.update(size: size, cornerRadius: cornerRadius, isDark: presentationData.theme.overallDarkAppearance, transition: transition)
+            transition.setFrame(view: self.borderView, frame: CGRect(origin: .zero, size: size))
+            transition.setCornerRadius(layer: self.borderView.layer, cornerRadius: cornerRadius)
+            self.borderView.layer.borderColor = (presentationData.theme.overallDarkAppearance ? UIColor(rgb: 0x8D5CFF) : UIColor.white).withAlphaComponent(presentationData.theme.overallDarkAppearance ? 0.34 : 0.5).cgColor
             
             //let backgroundContainerFrame = CGRect(origin: CGPoint(), size: size).insetBy(dx: -self.backgroundContainerInset, dy: -self.backgroundContainerInset)
             

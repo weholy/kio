@@ -31,6 +31,7 @@ import OverlayStatusController
 import UndoUI
 import TabSelectionRecognizer
 import EmojiTextAttachmentView
+import SGSimpleSettings
 
 private let legacyButtonSize = CGSize(width: 88.0, height: 49.0)
 private let glassButtonSize = CGSize(width: 72.0, height: 62.0)
@@ -1004,6 +1005,19 @@ final class AttachmentPanel: ASDisplayNode, ASScrollViewDelegate, ASGestureRecog
     private var tabSelectionRecognizer: TabSelectionRecognizer?
     private var selectionGestureState: (startX: CGFloat, currentX: CGFloat, itemId: AnyHashable, isLifted: Bool)?
     private var lensIsLifted = false
+
+    // Nameless: compact vertical attachment sheet (opt-in via `namelessCompactAttachmentSheet`).
+    // When on, the classic horizontal tab bar is hidden and a rounded blur card with a
+    // stacked list of buttons floats above the input.
+    private var compactSheetView: UIVisualEffectView?
+    private var compactSheetStack: UIStackView?
+    private var compactSheetButtons: [(type: AttachmentButtonType, button: UIControl)] = []
+    private var compactSheetExpanded = false
+
+    private var useCompactAttachmentSheet: Bool {
+        guard case .glass = self.panelStyle else { return false }
+        return SGSimpleSettings.shared.liquidGlassEnabled || SGSimpleSettings.shared.namelessCompactAttachmentSheet
+    }
 
     private var textInputPanelNode: AttachmentTextInputPanelNode?
     private var progressNode: LoadingProgressNode?
@@ -2675,13 +2689,23 @@ final class AttachmentPanel: ASDisplayNode, ASScrollViewDelegate, ASGestureRecog
             containerTransition = transition
         }
         let alphaTransition = ContainedViewLayoutTransition.animated(duration: isSelecting ? 0.1 : 0.25, curve: .easeInOut)
-        alphaTransition.updateAlpha(node: self.scrollNode, alpha: isSelecting || isAnyButtonVisible ? 0.0 : 1.0)
+        let compactSheetActive = self.useCompactAttachmentSheet && !isSelecting && !isAnyButtonVisible && !buttons.isEmpty && !hideButtons
+        // When the compact sheet is on, hide the classic tab-bar tokens outright — they
+        // stay in the tree so we can fall back cleanly if the setting toggles off.
+        let classicBarHidden = compactSheetActive
+        alphaTransition.updateAlpha(node: self.scrollNode, alpha: (isSelecting || isAnyButtonVisible || classicBarHidden) ? 0.0 : 1.0)
         containerTransition.updateTransformScale(node: self.scrollNode, scale: isSelecting || isAnyButtonVisible ? 0.85 : 1.0)
 
         if let liquidLensView = self.liquidLensView {
-            alphaTransition.updateAlpha(layer: liquidLensView.layer, alpha: isSelecting || isAnyButtonVisible ? 0.0 : 1.0)
+            alphaTransition.updateAlpha(layer: liquidLensView.layer, alpha: (isSelecting || isAnyButtonVisible || classicBarHidden) ? 0.0 : 1.0)
             containerTransition.updateTransformScale(layer: liquidLensView.layer, scale: isSelecting || isAnyButtonVisible ? 0.85 : 1.0)
         }
+        if classicBarHidden, let backgroundView = self.backgroundView {
+            alphaTransition.updateAlpha(layer: backgroundView.layer, alpha: 0.0)
+        } else if !isSelecting && !isAnyButtonVisible, let backgroundView = self.backgroundView {
+            alphaTransition.updateAlpha(layer: backgroundView.layer, alpha: 1.0)
+        }
+        self.updateCompactAttachmentSheet(buttons: buttons, active: compactSheetActive, layout: layout, transition: transition)
 
         if isSelectingUpdated {
             if isSelecting {
@@ -2921,6 +2945,236 @@ final class AttachmentPanel: ASDisplayNode, ASScrollViewDelegate, ASGestureRecog
 
         let inset: CGFloat = 3.0
         liquidLensView.update(size: CGSize(width: panelSize.width - inset * 2.0, height: panelSize.height - inset * 2.0), cornerRadius: 28.0, selectionOrigin: CGPoint(x: lensSelection.x, y: 0.0), selectionSize: CGSize(width: lensSelection.width, height: panelSize.height - inset * 2.0), inset: 0.0, isDark: self.presentationData.theme.overallDarkAppearance, isLifted: isLifted, isCollapsed: self.isSelecting || self.buttons.count < 2 || self.hideButtons, transition: transition)
+    }
+
+    // MARK: - Nameless compact attachment sheet
+    //
+    // Renders a rounded UIVisualEffectView floating above the input, with a vertical
+    // UIStackView of icon + label rows — one per attachment button. Reuses the same
+    // `selectionChanged` callback as the classic tab bar, so tapping a row picks the
+    // corresponding attachment source. Rebuilds the row list any time the button set
+    // changes; otherwise just repositions.
+    private func updateCompactAttachmentSheet(buttons: [AttachmentButtonType], active: Bool, layout: ContainerViewLayout, transition: ContainedViewLayoutTransition) {
+        guard active else {
+            if let sheet = self.compactSheetView {
+                sheet.alpha = 0.0
+                sheet.isHidden = true
+            }
+            return
+        }
+
+        let sheet: UIVisualEffectView
+        let stack: UIStackView
+        if let existingSheet = self.compactSheetView, let existingStack = self.compactSheetStack {
+            sheet = existingSheet
+            stack = existingStack
+            sheet.isHidden = false
+        } else {
+            sheet = makeOfficialLiquidGlassEffectView(isDark: self.presentationData.theme.overallDarkAppearance, interactive: true)
+            sheet.layer.cornerRadius = 30.0
+            sheet.layer.cornerCurve = .continuous
+            sheet.clipsToBounds = true
+            sheet.alpha = 0.0
+            sheet.layer.borderWidth = UIScreenPixel
+            sheet.layer.borderColor = UIColor.white.withAlphaComponent(self.presentationData.theme.overallDarkAppearance ? 0.18 : 0.38).cgColor
+
+            let panGesture = UIPanGestureRecognizer(target: self, action: #selector(self.compactSheetPanGesture(_:)))
+            sheet.contentView.addGestureRecognizer(panGesture)
+
+            stack = UIStackView()
+            stack.axis = .vertical
+            stack.alignment = .fill
+            stack.spacing = 0.0
+            stack.translatesAutoresizingMaskIntoConstraints = false
+            sheet.contentView.addSubview(stack)
+            NSLayoutConstraint.activate([
+                stack.leadingAnchor.constraint(equalTo: sheet.contentView.leadingAnchor),
+                stack.trailingAnchor.constraint(equalTo: sheet.contentView.trailingAnchor),
+                stack.topAnchor.constraint(equalTo: sheet.contentView.topAnchor, constant: 6.0),
+                stack.bottomAnchor.constraint(equalTo: sheet.contentView.bottomAnchor, constant: -6.0)
+            ])
+
+            self.containerNode.view.addSubview(sheet)
+            self.compactSheetView = sheet
+            self.compactSheetStack = stack
+        }
+
+        sheet.effect = makeOfficialLiquidGlassEffect(isDark: self.presentationData.theme.overallDarkAppearance, interactive: true)
+        sheet.layer.borderColor = UIColor.white.withAlphaComponent(self.presentationData.theme.overallDarkAppearance ? 0.18 : 0.38).cgColor
+
+        let displayedButtons = self.compactSheetDisplayedButtons(from: buttons)
+
+        // Rebuild rows if the button set changed
+        let currentKeys = self.compactSheetButtons.map { $0.type.key }
+        let newKeys = displayedButtons.map { $0.key }
+        if currentKeys != newKeys {
+            for row in stack.arrangedSubviews {
+                stack.removeArrangedSubview(row)
+                row.removeFromSuperview()
+            }
+            self.compactSheetButtons.removeAll()
+
+            for (index, type) in displayedButtons.enumerated() {
+                let row = self.makeCompactSheetRow(type: type, index: index, isLast: index == displayedButtons.count - 1)
+                stack.addArrangedSubview(row.container)
+                self.compactSheetButtons.append((type, row.button))
+            }
+        }
+
+        let rowHeight: CGFloat = 72.0
+        let sheetHeight = CGFloat(displayedButtons.count) * rowHeight + 16.0
+        let sheetWidth: CGFloat = min(layout.size.width - layout.safeInsets.left - layout.safeInsets.right - 40.0, self.compactSheetExpanded ? 360.0 : 304.0)
+        let sheetX = floorToScreenPixels((layout.size.width - sheetWidth) / 2.0)
+        // Position above the panel's own top edge with a small gap.
+        let sheetY: CGFloat = -sheetHeight - 12.0
+        transition.updateFrame(view: sheet, frame: CGRect(x: sheetX, y: sheetY, width: sheetWidth, height: sheetHeight))
+        transition.updateAlpha(layer: sheet.layer, alpha: 1.0)
+    }
+
+    private func compactSheetDisplayedButtons(from buttons: [AttachmentButtonType]) -> [AttachmentButtonType] {
+        let preferredCollapsedOrder: [AttachmentButtonType] = [.gallery, .file, .location, .todo]
+        if self.compactSheetExpanded {
+            return buttons
+        }
+        var result: [AttachmentButtonType] = []
+        for preferred in preferredCollapsedOrder {
+            if let button = buttons.first(where: { $0 == preferred }) {
+                result.append(button)
+            }
+        }
+        for button in buttons where !result.contains(button) && result.count < 4 {
+            result.append(button)
+        }
+        return result
+    }
+
+    @objc private func compactSheetPanGesture(_ recognizer: UIPanGestureRecognizer) {
+        guard case .ended = recognizer.state else {
+            return
+        }
+        let translation = recognizer.translation(in: recognizer.view)
+        let velocity = recognizer.velocity(in: recognizer.view)
+        if translation.y < -18.0 || velocity.y < -180.0 {
+            self.compactSheetExpanded = true
+        } else if translation.y > 18.0 || velocity.y > 180.0 {
+            self.compactSheetExpanded = false
+        }
+        self.requestLayout(transition: .animated(duration: 0.35, curve: .spring))
+    }
+
+    private func makeCompactSheetRow(type: AttachmentButtonType, index: Int, isLast: Bool) -> (container: UIView, button: UIControl) {
+        let container = UIView()
+        container.heightAnchor.constraint(equalToConstant: 72.0).isActive = true
+
+        let button = UIControl()
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.tag = index
+        button.addTarget(self, action: #selector(self.compactSheetRowPressed(_:)), for: .touchUpInside)
+        container.addSubview(button)
+        NSLayoutConstraint.activate([
+            button.leadingAnchor.constraint(equalTo: container.leadingAnchor),
+            button.trailingAnchor.constraint(equalTo: container.trailingAnchor),
+            button.topAnchor.constraint(equalTo: container.topAnchor),
+            button.bottomAnchor.constraint(equalTo: container.bottomAnchor)
+        ])
+
+        let iconTintColor = self.presentationData.theme.rootController.tabBar.selectedIconColor
+        let icon = UIImageView()
+        icon.tintColor = iconTintColor
+        icon.contentMode = .scaleAspectFit
+        icon.translatesAutoresizingMaskIntoConstraints = false
+        icon.image = self.compactSheetIcon(for: type)
+        button.addSubview(icon)
+
+        let label = UILabel()
+        label.text = self.compactSheetTitle(for: type)
+        label.textColor = self.presentationData.theme.list.itemPrimaryTextColor
+        label.font = UIFont.systemFont(ofSize: 28.0, weight: .regular)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        button.addSubview(label)
+
+        NSLayoutConstraint.activate([
+            icon.leadingAnchor.constraint(equalTo: button.leadingAnchor, constant: 26.0),
+            icon.centerYAnchor.constraint(equalTo: button.centerYAnchor),
+            icon.widthAnchor.constraint(equalToConstant: 34.0),
+            icon.heightAnchor.constraint(equalToConstant: 34.0),
+            label.leadingAnchor.constraint(equalTo: icon.trailingAnchor, constant: 22.0),
+            label.trailingAnchor.constraint(lessThanOrEqualTo: button.trailingAnchor, constant: -20.0),
+            label.centerYAnchor.constraint(equalTo: button.centerYAnchor)
+        ])
+
+        if !isLast {
+            let separator = UIView()
+            separator.backgroundColor = self.presentationData.theme.list.itemBlocksSeparatorColor.withAlphaComponent(0.5)
+            separator.translatesAutoresizingMaskIntoConstraints = false
+            container.addSubview(separator)
+            NSLayoutConstraint.activate([
+                separator.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 82.0),
+                separator.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -20.0),
+                separator.bottomAnchor.constraint(equalTo: container.bottomAnchor),
+                separator.heightAnchor.constraint(equalToConstant: UIScreenPixel)
+            ])
+        }
+
+        return (container, button)
+    }
+
+    private func compactSheetTitle(for type: AttachmentButtonType) -> String {
+        let strings = self.presentationData.strings
+        switch type {
+        case .gallery: return strings.Attachment_Gallery
+        case .file: return strings.Attachment_File
+        case .location: return strings.Attachment_Location
+        case .todo: return strings.Attachment_Todo
+        case .contact: return strings.Attachment_Contact
+        case .poll: return strings.Attachment_Poll
+        case .gift: return strings.Attachment_Gift
+        case .sticker: return strings.Attachment_Sticker
+        case .emoji: return "Emoji"
+        case .audio: return strings.Attachment_Audio
+        case .link: return strings.Attachment_Link
+        case let .app(bot): return bot.shortName
+        case .standalone: return ""
+        case .quickReply: return strings.Attachment_Reply
+        }
+    }
+
+    private func compactSheetIcon(for type: AttachmentButtonType) -> UIImage? {
+        // Rely on SF Symbols for the stub — richer per-type illustrations can be swapped in later.
+        let name: String
+        switch type {
+        case .gallery: name = "photo.on.rectangle"
+        case .file: name = "doc"
+        case .location: name = "location"
+        case .todo: name = "checklist"
+        case .contact: name = "person.crop.circle"
+        case .poll: name = "chart.bar"
+        case .gift: name = "gift"
+        case .sticker: name = "face.smiling"
+        case .emoji: name = "smiley"
+        case .audio: name = "music.note"
+        case .link: name = "link"
+        case .app: name = "square.grid.2x2"
+        case .standalone: name = "square"
+        case .quickReply: name = "arrowshape.turn.up.left"
+        }
+        if #available(iOS 13.0, *) {
+            return UIImage(systemName: name)?.withRenderingMode(.alwaysTemplate)
+        }
+        return nil
+    }
+
+    @objc private func compactSheetRowPressed(_ sender: UIControl) {
+        let index = sender.tag
+        guard index >= 0 && index < self.compactSheetButtons.count else { return }
+        let type = self.compactSheetButtons[index].type
+        let sourceIndex = self.buttons.firstIndex(where: { $0 == type }) ?? index
+        self.selectionOverrideIndex = sourceIndex
+        if self.selectionChanged(type) {
+            self.selectedIndex = sourceIndex
+            self.updateViews(transition: .init(animation: .curve(duration: 0.2, curve: .spring)))
+        }
+        self.selectionOverrideIndex = nil
     }
 
     override func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {

@@ -22,6 +22,7 @@ public final class ContextMenuContainerNode: ASDisplayNode {
     public var relativeArrowPosition: (CGFloat, Bool)?
     
     private var effectView: UIVisualEffectView?
+    private let borderView = ContextMenuContainerMaskView()
     
     public init(isBlurred: Bool, isDark: Bool) {
         self.containerNode = ASDisplayNode()
@@ -41,9 +42,18 @@ public final class ContextMenuContainerNode: ASDisplayNode {
         self.layer.shadowRadius = 10.0
         self.layer.shadowOpacity = 0.2
         self.layer.shadowOffset = CGSize(width: 0.0, height: 5.0)
+
+        self.borderView.isUserInteractionEnabled = false
+        self.borderView.backgroundColor = .clear
+        if let layer = self.borderView.layer as? CAShapeLayer {
+            layer.fillColor = UIColor.clear.cgColor
+            layer.strokeColor = (isDark ? UIColor(rgb: 0x8D5CFF) : UIColor.white).withAlphaComponent(isDark ? 0.42 : 0.55).cgColor
+            layer.lineWidth = UIScreenPixel
+        }
         
         self.containerNode.view.mask = self.maskView
         self.addSubnode(self.containerNode)
+        self.view.addSubview(self.borderView)
     }
     
     override public func didLoad() {
@@ -62,20 +72,21 @@ public final class ContextMenuContainerNode: ASDisplayNode {
         transition.updateFrame(node: self.containerNode, frame: self.bounds)
         
         self.effectView?.frame = self.bounds
+        transition.updateFrame(view: self.borderView, frame: self.bounds)
         
         let maskParams = CachedMaskParams(size: self.bounds.size, relativeArrowPosition: self.relativeArrowPosition?.0 ?? self.bounds.size.width / 2.0, arrowOnBottom: self.relativeArrowPosition?.1 ?? true)
         if self.cachedMaskParams != maskParams {
             let path = UIBezierPath()
-            let cornerRadius: CGFloat = 10.0
-            let verticalInset: CGFloat = 9.0
-            let arrowWidth: CGFloat = 18.0
+            let cornerRadius: CGFloat = 28.0
+            let verticalInset: CGFloat = 0.0
+            let arrowWidth: CGFloat = 0.0
             let requestedArrowPosition = maskParams.relativeArrowPosition
             let arrowPosition = max(cornerRadius + arrowWidth / 2.0, min(maskParams.size.width - cornerRadius - arrowWidth / 2.0, requestedArrowPosition))
             let arrowOnBottom = maskParams.arrowOnBottom
             
             path.move(to: CGPoint(x: 0.0, y: verticalInset + cornerRadius))
             path.addArc(withCenter: CGPoint(x: cornerRadius, y: verticalInset + cornerRadius), radius: cornerRadius, startAngle: CGFloat.pi, endAngle: CGFloat(3.0 * CGFloat.pi / 2.0), clockwise: true)
-            if !arrowOnBottom {
+            if !arrowOnBottom && arrowWidth > 0.0 {
                 path.addLine(to: CGPoint(x: arrowPosition - arrowWidth / 2.0, y: verticalInset))
                 path.addLine(to: CGPoint(x: arrowPosition, y: 0.0))
                 path.addLine(to: CGPoint(x: arrowPosition + arrowWidth / 2.0, y: verticalInset))
@@ -84,7 +95,7 @@ public final class ContextMenuContainerNode: ASDisplayNode {
             path.addArc(withCenter: CGPoint(x: maskParams.size.width - cornerRadius, y: verticalInset + cornerRadius), radius: cornerRadius, startAngle: CGFloat(3.0 * CGFloat.pi / 2.0), endAngle: 0.0, clockwise: true)
             path.addLine(to: CGPoint(x: maskParams.size.width, y: maskParams.size.height - cornerRadius - verticalInset))
             path.addArc(withCenter: CGPoint(x: maskParams.size.width - cornerRadius, y: maskParams.size.height - cornerRadius - verticalInset), radius: cornerRadius, startAngle: 0.0, endAngle: CGFloat(CGFloat.pi / 2.0), clockwise: true)
-            if arrowOnBottom {
+            if arrowOnBottom && arrowWidth > 0.0 {
                 path.addLine(to: CGPoint(x: arrowPosition + arrowWidth / 2.0, y: maskParams.size.height - verticalInset))
                 path.addLine(to: CGPoint(x: arrowPosition, y: maskParams.size.height))
                 path.addLine(to: CGPoint(x: arrowPosition - arrowWidth / 2.0, y: maskParams.size.height - verticalInset))
@@ -95,6 +106,13 @@ public final class ContextMenuContainerNode: ASDisplayNode {
             
             self.cachedMaskParams = maskParams
             if let layer = self.maskView.layer as? CAShapeLayer {
+                if case let .animated(duration, curve) = transition, let previousPath = layer.path {
+                    layer.animate(from: previousPath, to: path.cgPath, keyPath: "path", timingFunction: curve.timingFunction, duration: duration)
+                }
+                layer.path = path.cgPath
+            }
+
+            if let layer = self.borderView.layer as? CAShapeLayer {
                 if case let .animated(duration, curve) = transition, let previousPath = layer.path {
                     layer.animate(from: previousPath, to: path.cgPath, keyPath: "path", timingFunction: curve.timingFunction, duration: duration)
                 }

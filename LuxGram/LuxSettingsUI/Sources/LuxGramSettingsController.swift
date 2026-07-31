@@ -418,6 +418,7 @@ private enum SGBoolSetting: String, Hashable {
     case namelessLiquidGlassProfileGifts
     case namelessLiquidGlassInlineButtons
     case namelessLiquidGlassTinting
+    case namelessCompactAttachmentSheet
     case namelessVideoBackgroundEnabled
     case confirmCalls
     case hideStories
@@ -822,6 +823,7 @@ private func luxGramEntries(presentationData: PresentationData, contentSettingsC
     entries.append(.toggle(id: id.count, section: .liquidGlass, settingName: .namelessLiquidGlassProfileGifts, value: SGSimpleSettings.shared.namelessLiquidGlassProfileGifts, text: lang == "ru" ? "Liquid Glass подарки" : "Liquid Glass gifts", enabled: SGSimpleSettings.shared.liquidGlassEnabled))
     entries.append(.toggle(id: id.count, section: .liquidGlass, settingName: .namelessLiquidGlassInlineButtons, value: SGSimpleSettings.shared.namelessLiquidGlassInlineButtons, text: lang == "ru" ? "Liquid Glass кнопки" : "Liquid Glass buttons", enabled: SGSimpleSettings.shared.liquidGlassEnabled))
     entries.append(.toggle(id: id.count, section: .liquidGlass, settingName: .namelessLiquidGlassTinting, value: SGSimpleSettings.shared.namelessLiquidGlassTinting, text: lang == "ru" ? "Тонирование стекла" : "Glass tinting", enabled: SGSimpleSettings.shared.liquidGlassEnabled))
+    entries.append(.toggle(id: id.count, section: .liquidGlass, settingName: .namelessCompactAttachmentSheet, value: SGSimpleSettings.shared.namelessCompactAttachmentSheet, text: lang == "ru" ? "Стеклянное меню вложений" : "Glass attachment menu", enabled: SGSimpleSettings.shared.liquidGlassEnabled))
     entries.append(.notice(id: id.count, section: .liquidGlass, text: liquidGlassNotice))
 
     entries.append(.header(id: id.count, section: .appearance, text: lang == "ru" ? "ВИДЕО И КАРТОЧКИ" : "VIDEO & CARDS", badge: nil))
@@ -1120,6 +1122,8 @@ public func luxGramSettingsController(context: AccountContext) -> ViewController
             case .namelessLiquidGlassTinting:
                 SGSimpleSettings.shared.namelessLiquidGlassTinting = value
                 NotificationCenter.default.post(name: .luxgramLiquidGlassDidChange, object: nil)
+            case .namelessCompactAttachmentSheet:
+                SGSimpleSettings.shared.namelessCompactAttachmentSheet = value
             case .namelessVideoBackgroundEnabled:
                 SGSimpleSettings.shared.namelessVideoBackgroundEnabled = value
                 NotificationCenter.default.post(name: .namelessVideoBackgroundDidChange, object: nil)

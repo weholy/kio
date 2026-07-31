@@ -162,6 +162,7 @@ private enum NLBoolSetting: String {
     case namelessLiquidGlassContextMenu
     case namelessLiquidGlassSearch
     case namelessLiquidGlassFadeAnimation
+    case namelessCompactAttachmentSheet
     case enableTelescope
     case emojiDownloaderEnabled
     case hideNewChatSticker
@@ -686,6 +687,7 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
     // LIQUID GLASS — один тумблер
     entries.append(.header(id: id.count, section: sec, text: "LIQUID GLASS", badge: nil))
     entries.append(.toggle(id: id.count, section: sec, settingName: .liquidGlassEnabled, value: s.liquidGlassEnabled, text: "Liquid Glass на сообщения", enabled: true))
+    entries.append(.toggle(id: id.count, section: sec, settingName: .namelessCompactAttachmentSheet, value: s.namelessCompactAttachmentSheet, text: "Стеклянное меню вложений", enabled: s.liquidGlassEnabled))
     entries.append(.notice(id: id.count, section: sec, text: "Пузыри сообщений становятся стеклянными, преломляя фон чата (только на iOS 26)."))
 
     // КАМЕРА · КАЧЕСТВО
@@ -1103,6 +1105,9 @@ private func namelessFeaturesControllerImpl(context: AccountContext, initialCate
             case .namelessLiquidGlassFadeAnimation:
                 s.namelessLiquidGlassFadeAnimation = value
                 simplePromise.set(true)
+            case .namelessCompactAttachmentSheet:
+                s.namelessCompactAttachmentSheet = value
+                simplePromise.set(true)
             case .enableTelescope: s.enableTelescope = value
             case .emojiDownloaderEnabled: s.emojiDownloaderEnabled = value
             case .hideNewChatSticker: s.hideNewChatSticker = value; askForRestart?()
@@ -1331,6 +1336,17 @@ private func namelessFeaturesControllerImpl(context: AccountContext, initialCate
                 updated.searchQuery = query
                 return updated
             }
+        },
+        longPressBool: { setting in
+            // MARK: Nameless — long-press on a toggle → tooltip with the full description
+            // (or a generic fallback when the map doesn't have an entry for this key).
+            let key = "\(setting)"
+            let description = NamelessToggleDescriptions.text(for: key) ?? "Описание пока не написано."
+            let presentationData = context.sharedContext.currentPresentationData.with { $0 }
+            presentControllerImpl?(
+                UndoOverlayController(presentationData: presentationData, content: .info(title: nil, text: description, timeout: 4.0, customUndoText: nil), elevatedLayout: false, action: { _ in true }),
+                nil
+            )
         }
     )
 
