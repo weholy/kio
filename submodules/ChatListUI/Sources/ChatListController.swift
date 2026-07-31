@@ -296,9 +296,11 @@ public class ChatListControllerImpl: TelegramBaseController, ChatListController 
         switch self.location {
         case let .chatList(groupId):
             if groupId == .root {
-                // MARK: Nameless — "Надпись «Чаты» в списке": when the toggle is off, hide
-                // the "Chats" title above the list to give the chat rows more vertical space.
-                title = SGSimpleSettings.shared.chatListTitle ? self.presentationData.strings.DialogList_Title : ""
+                // MARK: Nameless / Megram — "Надпись «Чаты» в списке" hides the title when
+                // off; the Megram Nextgram-parity switch `nxHideChatsTitle` overrides it and
+                // hides the title regardless. Either flag being off/on hides the title.
+                let showChatsTitle = SGSimpleSettings.shared.chatListTitle && !SGSimpleSettings.shared.nxHideChatsTitle
+                title = showChatsTitle ? self.presentationData.strings.DialogList_Title : ""
             } else {
                 title = self.presentationData.strings.ChatList_ArchivedChatsTitle
             }
