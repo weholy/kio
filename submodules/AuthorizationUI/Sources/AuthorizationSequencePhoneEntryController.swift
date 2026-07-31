@@ -14,6 +14,20 @@ import DebugSettingsUI
 import MessageUI
 import AuthenticationServices
 
+// MARK: Nameless — compare two version strings like "12.8" / "12.10.1". Returns true when
+// `left` is strictly older than `right`. Missing/malformed segments count as 0.
+private func namelessIsVersionOlder(_ left: String, than right: String) -> Bool {
+    let lhs = left.split(separator: ".").map { Int($0) ?? 0 }
+    let rhs = right.split(separator: ".").map { Int($0) ?? 0 }
+    let count = max(lhs.count, rhs.count)
+    for i in 0 ..< count {
+        let l = i < lhs.count ? lhs[i] : 0
+        let r = i < rhs.count ? rhs[i] : 0
+        if l != r { return l < r }
+    }
+    return false
+}
+
 public final class AuthorizationSequencePhoneEntryController: ViewController, MFMailComposeViewControllerDelegate, ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding {
     private var controllerNode: AuthorizationSequencePhoneEntryControllerNode {
         return self.displayNode as! AuthorizationSequencePhoneEntryControllerNode
@@ -343,11 +357,37 @@ public final class AuthorizationSequencePhoneEntryController: ViewController, MF
     
     override public func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        
+
         if !self.animatingIn {
             self.controllerNode.activateInput()
         }
+
+        // MARK: Nameless — show the outdated-version banner on the login screen so users on
+        // stale builds are routed to the MEGRAM channel. `namelessShownOutdatedBanner` gate
+        // keeps it to once per launch. The check is a plain string compare against the
+        // pinned minimum version literal — no network dependency.
+        if !AuthorizationSequencePhoneEntryController.namelessShownOutdatedBanner {
+            AuthorizationSequencePhoneEntryController.namelessShownOutdatedBanner = true
+            let minimumRequiredMegramVersion = "12.9"
+            let currentVersion = (Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String) ?? ""
+            if namelessIsVersionOlder(currentVersion, than: minimumRequiredMegramVersion) {
+                let title = "Обновите MEGRAM"
+                let text = "Данная версия устарела. Скачайте новейшую версию в нашем канале, чтобы пользоваться клиентом."
+                let alert = UIAlertController(title: title, message: text, preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "Открыть канал", style: .default, handler: { _ in
+                    if let url = URL(string: "https://t.me/megramios") {
+                        UIApplication.shared.open(url)
+                    }
+                }))
+                alert.addAction(UIAlertAction(title: "Позже", style: .cancel, handler: nil))
+                self.present(alert, animated: true)
+            }
+        }
     }
+
+    // MARK: Nameless — one-shot flag so the outdated-version banner does not re-appear on
+    // every view-appearance during the login flow.
+    private static var namelessShownOutdatedBanner = false
     
     override public func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)

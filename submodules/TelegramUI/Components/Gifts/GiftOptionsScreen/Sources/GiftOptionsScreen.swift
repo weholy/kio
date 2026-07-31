@@ -1267,9 +1267,10 @@ final class GiftOptionsScreenComponent: Component {
                 containerSize: availableSize
             )
             
-            // MARK: Nameless — yellow rounded pill instead of the stacked "Баланс: N ⭐" label.
-            // We keep the three subviews wired (rest of the code updates them) but hide them
-            // and place a single tappable pill above.
+            // MARK: Nameless — soft-yellow rounded pill with the real StarSmall icon (the
+            // same asset the rest of the app uses for balance chips), instead of the ⭐
+            // emoji. The three original balance subviews are hidden so their state
+            // subscription still fires but nothing collides visually.
             if let balanceTitleView = self.balanceTitle.view, let balanceValueView = self.balanceValue.view, let balanceIconView = self.balanceIcon.view {
                 if balanceTitleView.superview == nil {
                     self.addSubview(balanceTitleView)
@@ -1281,12 +1282,15 @@ final class GiftOptionsScreenComponent: Component {
                 balanceIconView.isHidden = true
 
                 let navigationHeight = environment.navigationHeight - environment.statusBarHeight
-                let balanceText = self.starsState.map { formatStarsAmountText($0.balance, dateTimeFormat: environment.dateTimeFormat) } ?? "0"
-                let displayText = "⭐ \(balanceText)"
+                let balanceString = self.starsState.map { formatStarsAmountText($0.balance, dateTimeFormat: environment.dateTimeFormat) } ?? "0"
                 let font = Font.semibold(15.0)
-                let textSize = (displayText as NSString).size(withAttributes: [.font: font])
-                let pillHeight: CGFloat = 32.0
-                let pillWidth = min(availableSize.width * 0.4, textSize.width + 26.0)
+                let textSize = (balanceString as NSString).size(withAttributes: [.font: font])
+                let starIconSize: CGFloat = 16.0
+                let iconTextGap: CGFloat = 4.0
+                let horizontalPadding: CGFloat = 12.0
+                let pillHeight: CGFloat = 30.0
+                let contentWidth = starIconSize + iconTextGap + textSize.width
+                let pillWidth = min(availableSize.width * 0.45, contentWidth + horizontalPadding * 2.0)
                 let originY = environment.statusBarHeight + (navigationHeight - pillHeight) / 2.0
                 let pillFrame = CGRect(
                     x: availableSize.width - balanceInset - environment.safeInsets.right - pillWidth,
@@ -1297,15 +1301,24 @@ final class GiftOptionsScreenComponent: Component {
                 if self.namelessBalancePillButton.superview == nil {
                     self.namelessBalancePillPresented = true
                     self.addSubview(self.namelessBalancePillButton)
-                    self.namelessBalancePillButton.backgroundColor = UIColor(red: 1.0, green: 0.78, blue: 0.28, alpha: 1.0)
+                    // Softer, more legible yellow (matches iOS system yellow at low sat)
+                    self.namelessBalancePillButton.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.45, alpha: 1.0)
                     self.namelessBalancePillButton.layer.cornerRadius = pillHeight / 2.0
-                    self.namelessBalancePillButton.setTitleColor(UIColor(white: 0.2, alpha: 1.0), for: .normal)
+                    self.namelessBalancePillButton.setTitleColor(UIColor(white: 0.15, alpha: 1.0), for: .normal)
                     self.namelessBalancePillButton.titleLabel?.font = font
                     self.namelessBalancePillButton.addTarget(self, action: #selector(self.namelessBalancePillPressed), for: .touchUpInside)
-                    self.namelessBalancePillButton.contentEdgeInsets = UIEdgeInsets(top: 0, left: 12, bottom: 0, right: 12)
+                    self.namelessBalancePillButton.contentEdgeInsets = UIEdgeInsets(top: 0, left: horizontalPadding + starIconSize + iconTextGap, bottom: 0, right: horizontalPadding)
+
+                    let iconView = UIImageView(image: UIImage(bundleImageName: "Premium/Stars/StarSmall"))
+                    iconView.contentMode = .scaleAspectFit
+                    iconView.tag = 9111
+                    self.namelessBalancePillButton.addSubview(iconView)
                 }
-                self.namelessBalancePillButton.setTitle(displayText, for: .normal)
+                self.namelessBalancePillButton.setTitle(balanceString, for: .normal)
                 self.namelessBalancePillButton.frame = pillFrame
+                if let iconView = self.namelessBalancePillButton.viewWithTag(9111) {
+                    iconView.frame = CGRect(x: horizontalPadding, y: (pillHeight - starIconSize) / 2.0, width: starIconSize, height: starIconSize)
+                }
             }
             
             let premiumTitleString: String

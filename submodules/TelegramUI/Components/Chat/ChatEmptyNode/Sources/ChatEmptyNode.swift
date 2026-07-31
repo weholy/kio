@@ -130,12 +130,14 @@ public final class ChatEmptyNodeGreetingChatContent: ASDisplayNode, ChatEmptyNod
         self.addSubnode(self.titleNode)
         self.addSubnode(self.textNode)
         self.addSubnode(self.stickerNode)
-        // MARK: Nameless — "Скрыть приветственный стикер". The node stays in the tree so
-        // the layout math doesn't have to know about the toggle; it just becomes invisible
-        // and non-tappable.
+        // MARK: Nameless — "Скрыть приветственный стикер" hides the whole empty-chat card
+        // (title + sub-text + sticker) so nothing can be accidentally tapped when checking
+        // a profile of a fresh contact.
         if SGSimpleSettings.shared.hideNewChatSticker {
             self.stickerNode.isHidden = true
             self.stickerNode.isUserInteractionEnabled = false
+            self.titleNode.isHidden = true
+            self.textNode.isHidden = true
         }
     }
     
