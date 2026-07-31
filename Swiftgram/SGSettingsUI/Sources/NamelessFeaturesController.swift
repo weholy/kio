@@ -315,7 +315,7 @@ private enum NLHubCategory: String, CaseIterable {
         case .hubGhost: return .ghost
         case .hubOther: return .other
         case .hubSearch: return .search
-        case .none, .onlineHistory, .ghostDetailsToggle, .fakeLocationPicker, .localStarsAmount, .deviceModelSpoof: return nil
+        case .none, .onlineHistory, .ghostDetailsToggle, .fakeLocationPicker, .localStarsAmount, .deviceModelSpoof, .visualUsernameEditor: return nil
         }
     }
 }
@@ -1277,6 +1277,9 @@ private func namelessFeaturesControllerImpl(context: AccountContext, initialCate
                     simplePromise.set(true)
                     askForRestart?()
                 }))
+                return
+            }
+            if link == .visualUsernameEditor {
                 return
             }
             guard let category = NLHubCategory.from(link: link) else { return }
