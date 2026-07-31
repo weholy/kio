@@ -3,6 +3,8 @@ name: nameless iOS Build
 on:
   push:
     branches: [ main ]
+  # Build feature branches too, so compile errors surface before they reach main.
+  pull_request:
   workflow_dispatch:
 
 concurrency:
