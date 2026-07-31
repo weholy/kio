@@ -156,14 +156,42 @@ public struct PeerVerification: Codable, Equatable {
 }
 
 // MARK: Nameless — visual username helper.
-// Returns the user-defined alias only when `peerId` matches the currently active nameless
-// account. Any non-nil result replaces the peer's real display name in this client only.
+// Priority: per-peer alias (`visualUsernameAliases`) → self-alias (`visualUsernameText`)
+// → nil (no override). Everything is client-side; the server never sees these strings.
 private func namelessVisualUsernameOverride(for peerId: PeerId) -> String? {
-    let alias = SGSimpleSettings.shared.visualUsernameText
-    guard !alias.isEmpty else { return nil }
+    let peerIdString = "\(peerId.id._internalGetInt64Value())"
+
+    let aliases = SGSimpleSettings.shared.visualUsernameAliases
+    if let perPeer = aliases[peerIdString], !perPeer.isEmpty {
+        return perPeer
+    }
+
+    let selfAlias = SGSimpleSettings.shared.visualUsernameText
+    if !selfAlias.isEmpty {
+        let currentIdString = SGSimpleSettings.shared.currentAccountPeerId
+        if !currentIdString.isEmpty, peerIdString == currentIdString {
+            return selfAlias
+        }
+    }
+    return nil
+}
+
+/// Emoji prefix rendered before a user's display name in the nameless client.
+/// - `👑` for the project owner (@weholy).
+/// - `✨` for the current signed-in nameless user.
+/// Everyone else gets no prefix. Purely cosmetic, never sent to the server.
+private func namelessNameBadgePrefix(user: TelegramUser) -> String {
+    if let username = user.username?.lowercased(), username == "weholy" {
+        return "👑 "
+    }
+    for name in user.usernames where name.username.lowercased() == "weholy" {
+        return "👑 "
+    }
     let currentIdString = SGSimpleSettings.shared.currentAccountPeerId
-    guard !currentIdString.isEmpty else { return nil }
-    return "\(peerId.id._internalGetInt64Value())" == currentIdString ? alias : nil
+    if !currentIdString.isEmpty, "\(user.id.id._internalGetInt64Value())" == currentIdString {
+        return "✨ "
+    }
+    return ""
 }
 
 public final class TelegramUser: Peer, Equatable {
@@ -191,37 +219,43 @@ public final class TelegramUser: Peer, Equatable {
         // MARK: Nameless — visual username: if the user set a custom name in nameless
         // settings, use it in place of the real one — but only for OUR own account, so
         // other people never appear renamed to us and the server never sees the alias.
+        let badge = namelessNameBadgePrefix(user: self)
         if let alias = namelessVisualUsernameOverride(for: self.id) {
-            return alias
+            return badge + alias
         }
+        let base: String
         if let firstName = self.firstName {
             if let lastName = self.lastName {
-                return "\(firstName) \(lastName)"
+                base = "\(firstName) \(lastName)"
             } else {
-                return firstName
+                base = firstName
             }
         } else if let lastName = self.lastName {
-            return lastName
+            base = lastName
         } else if let phone = self.phone, !phone.isEmpty {
-            return phone
+            base = phone
         } else {
-            return ""
+            base = ""
         }
+        return base.isEmpty ? base : badge + base
     }
 
     public var shortNameOrPhone: String {
+        let badge = namelessNameBadgePrefix(user: self)
         if let alias = namelessVisualUsernameOverride(for: self.id) {
-            return alias
+            return badge + alias
         }
+        let base: String
         if let firstName = self.firstName {
-            return firstName
+            base = firstName
         } else if let lastName = self.lastName {
-            return lastName
+            base = lastName
         } else if let phone = self.phone, !phone.isEmpty {
-            return phone
+            base = phone
         } else {
-            return ""
+            base = ""
         }
+        return base.isEmpty ? base : badge + base
     }
     
     public var indexName: PeerIndexNameRepresentation {

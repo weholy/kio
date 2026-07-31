@@ -164,6 +164,7 @@ private enum NLBoolSetting: String {
     case namelessLiquidGlassFadeAnimation
     case enableTelescope
     case emojiDownloaderEnabled
+    case hideNewChatSticker
     case enableVideoToCircleOrVoice
     case namelessVideoBackgroundEnabled
     // Appearance
@@ -254,6 +255,7 @@ private enum NLDisclosureLink: String {
     case fakeLocationPicker
     case localStarsAmount
     case deviceModelSpoof
+    case visualUsernameEditor
 }
 
 private enum NLAction: Int, CaseIterable {
@@ -522,7 +524,7 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
     // MARK: Nameless — dropped the "12.8 · Liquid Glass edition" tagline; it drifted out of
     // sync with the actual version and cluttered the header.
     if !searching, state.hubCategory == nil {
-        entries.append(.notice(id: id.count, section: .hero, text: "**nameless**"))
+        entries.append(.notice(id: id.count, section: .hero, text: "**MEGRAM**"))
         entries.append(.searchInput(id: id.count, section: .search, title: NSAttributedString(string: "🔍"), text: state.searchQuery ?? "", placeholder: "Поиск настроек"))
         for cat in NLHubCategory.allCases {
             entries.append(.disclosureDetail(
@@ -607,6 +609,8 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
     entries.append(.toggle(id: id.count, section: sec, settingName: .disableSnapDeletionEffect, value: !s.disableSnapDeletionEffect, text: "Эффект удаления", enabled: true))
     entries.append(.toggle(id: id.count, section: sec, settingName: .forceEmojiTab, value: s.forceEmojiTab, text: "Вкладка эмодзи первой", enabled: true))
     entries.append(.toggle(id: id.count, section: sec, settingName: .defaultEmojisFirst, value: s.defaultEmojisFirst, text: "Стандартные эмодзи первыми", enabled: true))
+    entries.append(.toggle(id: id.count, section: sec, settingName: .hideNewChatSticker, value: s.hideNewChatSticker, text: "Скрыть приветственный стикер", enabled: true))
+    entries.append(.notice(id: id.count, section: sec, text: "В пустом чате не показывается большой стикер-приветствие, чтобы случайно не отправить его тапом."))
 
     // MARK: Nameless — dropped the duplicate "СООБЩЕНИЯ" header; the "ПОВЕДЕНИЕ" subheader
     // alone is enough (the section already reads as a whole from context).
@@ -626,22 +630,13 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
     entries.append(.oneFromManySelector(id: id.count, section: sec, settingName: .autoFormatMode, text: "Стиль при отправке", value: NamelessAutoFormatMode(rawValue: s.autoFormatMode)?.titleRu ?? "Обычный", enabled: true))
     entries.append(.toggle(id: id.count, section: sec, settingName: .showOriginalEdited, value: s.showOriginalEdited, text: "Оригинал изменений", enabled: true))
 
-    // LIQUID GLASS (перенесён из отдельной вкладки)
-    entries.append(.header(id: id.count, section: sec, text: "LIQUID GLASS (iOS 26)", badge: nil))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .liquidGlassEnabled, value: s.liquidGlassEnabled, text: "Жидкое стекло — мастер", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .namelessLiquidGlassFadeAnimation, value: s.namelessLiquidGlassFadeAnimation, text: "Анимация фейда при включении", enabled: s.liquidGlassEnabled))
-    entries.append(.header(id: id.count, section: sec, text: "ЗОНЫ СТЕКЛА", badge: nil))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .namelessLiquidGlassMessages, value: s.namelessLiquidGlassMessages, text: "Входящие сообщения", enabled: s.liquidGlassEnabled))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .namelessLiquidGlassOutgoingMessages, value: s.namelessLiquidGlassOutgoingMessages, text: "Исходящие сообщения", enabled: s.liquidGlassEnabled))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .namelessLiquidGlassSettings, value: s.namelessLiquidGlassSettings, text: "Настройки", enabled: s.liquidGlassEnabled))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .namelessLiquidGlassProfile, value: s.namelessLiquidGlassProfile, text: "Профиль", enabled: s.liquidGlassEnabled))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .namelessLiquidGlassProfileGifts, value: s.namelessLiquidGlassProfileGifts, text: "Подарки в профиле", enabled: s.liquidGlassEnabled))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .namelessLiquidGlassInlineButtons, value: s.namelessLiquidGlassInlineButtons, text: "Инлайн-кнопки ботов", enabled: s.liquidGlassEnabled))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .namelessLiquidGlassPopup, value: s.namelessLiquidGlassPopup, text: "Всплывающие окна (попапы)", enabled: s.liquidGlassEnabled))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .namelessLiquidGlassContextMenu, value: s.namelessLiquidGlassContextMenu, text: "Контекстное меню", enabled: s.liquidGlassEnabled))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .namelessLiquidGlassSearch, value: s.namelessLiquidGlassSearch, text: "Панель поиска", enabled: s.liquidGlassEnabled))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .namelessLiquidGlassTinting, value: s.namelessLiquidGlassTinting, text: "Тонирование (цвет акцента)", enabled: s.liquidGlassEnabled))
-    entries.append(.percentageSlider(id: id.count, section: sec, settingName: .liquidGlassIntensity, value: Int32(s.namelessLiquidGlassIntensity * 100)))
+    // MARK: Nameless — the settings surface now exposes a single Liquid Glass toggle
+    // (messages), matching the user's ask that only one Liquid Glass switch remains
+    // visible. The other zone keys still exist in SGSimpleSettings so all the code that
+    // reads them keeps working; they just aren't rendered here.
+    entries.append(.header(id: id.count, section: sec, text: "LIQUID GLASS", badge: nil))
+    entries.append(.toggle(id: id.count, section: sec, settingName: .liquidGlassEnabled, value: s.liquidGlassEnabled, text: "Liquid Glass на сообщения", enabled: true))
+    entries.append(.notice(id: id.count, section: sec, text: "Пузыри сообщений становятся стеклянными, преломляя фон чата."))
 
     // КАМЕРА (перенесена из отдельной вкладки)
     entries.append(.header(id: id.count, section: sec, text: "КАМЕРА", badge: nil))
@@ -757,7 +752,9 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
     entries.append(.toggle(id: id.count, section: sec, settingName: .showFullViews, value: s.showFullViews, text: "Полные просмотры", enabled: true))
     entries.append(.toggle(id: id.count, section: sec, settingName: .hidePhoneNumber, value: s.hidePhoneNumber, text: "Скрыть номер телефона", enabled: true))
     entries.append(.toggle(id: id.count, section: sec, settingName: .showCreationDate, value: s.showCreationDate, text: "Дата создания чата/канала", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .visualUsername, value: s.visualUsername, text: "Визуальный юзернейм", enabled: true))
+    // Visual username is a free-form alias for our own name, not a toggle. Disclosure
+    // opens a small input screen; the current value (or "Выкл.") shows on the right.
+    entries.append(.disclosureDetail(id: id.count, section: sec, link: .visualUsernameEditor, text: "Визуальный юзернейм", detail: s.visualUsernameText.isEmpty ? "Выкл." : s.visualUsernameText))
     entries.append(.toggle(id: id.count, section: sec, settingName: .showIfMutualContacts, value: s.showIfMutualContacts, text: "Если взаимно в контактах", enabled: true))
     entries.append(.toggle(id: id.count, section: sec, settingName: .showRegistrationDate, value: s.showRegistrationDate, text: "Дата регистрации аккаунта", enabled: true))
     entries.append(.toggle(id: id.count, section: sec, settingName: .showDC, value: s.showDC, text: "Показывать DC", enabled: true))
@@ -1089,6 +1086,7 @@ private func namelessFeaturesControllerImpl(context: AccountContext, initialCate
                 simplePromise.set(true)
             case .enableTelescope: s.enableTelescope = value
             case .emojiDownloaderEnabled: s.emojiDownloaderEnabled = value
+            case .hideNewChatSticker: s.hideNewChatSticker = value; askForRestart?()
             case .enableVideoToCircleOrVoice: s.enableVideoToCircleOrVoice = value
             case .namelessVideoBackgroundEnabled: s.namelessVideoBackgroundEnabled = value
             case .squareAvatars: s.squareAvatars = value; simplePromise.set(true)
@@ -1310,7 +1308,7 @@ private func namelessFeaturesControllerImpl(context: AccountContext, initialCate
     |> map { _, state, presentationData -> (ItemListControllerState, (ItemListNodeState, NLArguments)) in
         let entries = nlBuildEntries(presentationData: presentationData, state: state, simpleUpdated: true)
         let title = state.hubCategory?.titleRu ?? ""
-        let cs = ItemListControllerState(presentationData: ItemListPresentationData(presentationData), title: .text(title.isEmpty ? "nameless" : title), leftNavigationButton: nil, rightNavigationButton: nil, backNavigationButton: ItemListBackButton(title: presentationData.strings.Common_Back))
+        let cs = ItemListControllerState(presentationData: ItemListPresentationData(presentationData), title: .text(title.isEmpty ? "MEGRAM" : title), leftNavigationButton: nil, rightNavigationButton: nil, backNavigationButton: ItemListBackButton(title: presentationData.strings.Common_Back))
         let ls = ItemListNodeState(presentationData: ItemListPresentationData(presentationData), entries: entries, style: .blocks)
         return (cs, (ls, arguments))
     }

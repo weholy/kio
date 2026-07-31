@@ -23,6 +23,7 @@ import UndoUI
 import PremiumUI
 import LottieComponent
 import BundleIconComponent
+import SGSimpleSettings
 
 private protocol ChatEmptyNodeContent {
     func updateLayout(interfaceState: ChatPresentationInterfaceState, subject: ChatEmptyNode.Subject, size: CGSize, leftInset: CGFloat, rightInset: CGFloat, transition: ContainedViewLayoutTransition) -> CGSize
@@ -123,12 +124,19 @@ public final class ChatEmptyNodeGreetingChatContent: ASDisplayNode, ChatEmptyNod
         self.textNode.displaysAsynchronously = false
         
         self.stickerNode = ChatMediaInputStickerGridItemNode()
-        
+
         super.init()
-        
+
         self.addSubnode(self.titleNode)
         self.addSubnode(self.textNode)
         self.addSubnode(self.stickerNode)
+        // MARK: Nameless — "Скрыть приветственный стикер". The node stays in the tree so
+        // the layout math doesn't have to know about the toggle; it just becomes invisible
+        // and non-tappable.
+        if SGSimpleSettings.shared.hideNewChatSticker {
+            self.stickerNode.isHidden = true
+            self.stickerNode.isUserInteractionEnabled = false
+        }
     }
     
     override public func didLoad() {

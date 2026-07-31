@@ -100,6 +100,10 @@ private enum NamelessSettingsKey {
     // link SGSimpleSettings; the key literal is duplicated in MTApiEnvironment.m.
     static let deviceModelSpoof = "nameless.deviceModelSpoof"
     static let visualUsernameText = "nameless.visualUsernameText"
+    static let hideNewChatSticker = "nameless.hideNewChatSticker"
+    static let forwardWarnAuthor = "nameless.forwardWarnAuthor"
+    static let profileMusicCard = "nameless.profileMusicCard"
+    static let visualUsernameAliases = "nameless.visualUsernameAliases"
     /// Local (fake) stars wallet: master switch and how much of the configured amount
     /// has already been "spent" locally.
     static let localStarsEnabled = "nameless.localStarsEnabled"
@@ -405,6 +409,45 @@ public extension SGSimpleSettings {
     var visualUsernameText: String {
         get { storage.namelessString(NamelessSettingsKey.visualUsernameText, default: "") }
         set { storage.set(newValue, forKey: NamelessSettingsKey.visualUsernameText) }
+    }
+
+    /// Hide the greeting sticker on empty chats.
+    var hideNewChatSticker: Bool {
+        get { storage.namelessBool(NamelessSettingsKey.hideNewChatSticker) }
+        set { storage.set(newValue, forKey: NamelessSettingsKey.hideNewChatSticker) }
+    }
+
+    /// Confirm-with-cooldown alert when forwarding a message back to its author.
+    var forwardWarnAuthor: Bool {
+        get { storage.namelessBool(NamelessSettingsKey.forwardWarnAuthor, default: true) }
+        set { storage.set(newValue, forKey: NamelessSettingsKey.forwardWarnAuthor) }
+    }
+
+    /// Render the "now playing" card in a peer's profile header.
+    var profileMusicCard: Bool {
+        get { storage.namelessBool(NamelessSettingsKey.profileMusicCard, default: true) }
+        set { storage.set(newValue, forKey: NamelessSettingsKey.profileMusicCard) }
+    }
+
+    /// Per-peer visual aliases: `"peerId": "Display name"`. Only rendered client-side.
+    var visualUsernameAliases: [String: String] {
+        get {
+            (UserDefaults.standard.dictionary(forKey: NamelessSettingsKey.visualUsernameAliases) as? [String: String]) ?? [:]
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: NamelessSettingsKey.visualUsernameAliases)
+        }
+    }
+
+    func setVisualUsernameAlias(_ alias: String, forPeerId peerIdString: String) {
+        var dict = visualUsernameAliases
+        let trimmed = alias.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.isEmpty {
+            dict.removeValue(forKey: peerIdString)
+        } else {
+            dict[peerIdString] = trimmed
+        }
+        visualUsernameAliases = dict
     }
 
     // MARK: - Local (fake) stars wallet

@@ -39,7 +39,7 @@ private class ButtonIcon: Equatable {
         case .delete:
             return generateTintedImage(image: UIImage(bundleImageName: "Chat/Context Menu/Delete"), color: .white)
         case .attach:
-            return generateTintedImage(image: UIImage(bundleImageName: "Chat/Input/Text/IconAttachment"), color: .white)
+            return generateNamelessPlusIcon(color: .white)
         case .forward:
             return generateTintedImage(image: UIImage(bundleImageName: "Chat/Input/Text/IconForwardSend"), color: .white)
         case .like:
