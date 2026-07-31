@@ -17,7 +17,7 @@ private enum NamelessLocalNftSection: Int32 {
 private enum NamelessLocalNftEntry: ItemListNodeEntry {
     case header(id: Int, section: NamelessLocalNftSection, text: String)
     case input(id: Int, section: NamelessLocalNftSection, icon: String, text: String, placeholder: String, kind: InputKind)
-    case action(id: Int, section: NamelessLocalNftSection, text: String, kind: ItemListActionItemKind, action: Action)
+    case action(id: Int, section: NamelessLocalNftSection, text: String, kind: ItemListActionKind, action: Action)
     case info(id: Int, section: NamelessLocalNftSection, text: String)
 
     enum InputKind {
