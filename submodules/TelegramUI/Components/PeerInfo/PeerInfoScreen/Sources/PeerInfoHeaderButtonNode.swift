@@ -302,11 +302,14 @@ final class PeerInfoHeaderButtonNode: HighlightableButtonNode {
             self.backgroundView.isHidden = true
             self.namelessGlassBackgroundView.isHidden = false
             self.namelessGlassBackgroundView.frame = CGRect(origin: .zero, size: size)
+            // MARK: Megram — round circles use UIGlassEffect(.clear), matching the
+            // reference iOS 26 chrome look (see-through wallpaper behind, only the
+            // rim refraction remains). Older API path still gets its own blur.
             self.namelessGlassBackgroundView.update(
                 size: size,
                 cornerRadius: size.height * 0.5,
                 isDark: true,
-                tintColor: .init(kind: .panel),
+                tintColor: .init(kind: .clear),
                 isInteractive: false,
                 isVisible: true,
                 transition: .immediate

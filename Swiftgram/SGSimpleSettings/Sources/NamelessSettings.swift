@@ -104,6 +104,7 @@ private enum NamelessSettingsKey {
     static let localNftUsernamesJson = "nameless.localNftUsernamesJson"
     static let hideNewChatSticker = "nameless.hideNewChatSticker"
     static let hideBusinessChats = "nameless.hideBusinessChats"
+    static let megramGlobalClearGlass = "megram.globalClearGlass"
     static let settingsBigAvatar = "nameless.settingsBigAvatar"
     static let forwardWarnAuthor = "nameless.forwardWarnAuthor"
     static let profileMusicCard = "nameless.profileMusicCard"
@@ -512,6 +513,14 @@ public extension SGSimpleSettings {
     var hideBusinessChats: Bool {
         get { storage.namelessBool(NamelessSettingsKey.hideBusinessChats) }
         set { storage.set(newValue, forKey: NamelessSettingsKey.hideBusinessChats) }
+    }
+
+    /// Megram — force UIGlassEffect(.clear) everywhere GlassBackgroundView renders `.panel`
+    /// glass. Global switch, on by default so the user sees the see-through look right away
+    /// (navigation, input panel, buttons, sheets, settings pills).
+    var megramGlobalClearGlass: Bool {
+        get { storage.namelessBool(NamelessSettingsKey.megramGlobalClearGlass, default: true) }
+        set { storage.set(newValue, forKey: NamelessSettingsKey.megramGlobalClearGlass) }
     }
 
     /// Open Settings with the avatar already expanded (fills the top of the screen).

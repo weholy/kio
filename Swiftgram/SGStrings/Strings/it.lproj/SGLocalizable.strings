@@ -11,7 +11,7 @@
 /* Do not translate */
 "Settings.Folders.BottomTabStyle.ios" = "iOS";
 /* Do not translate */
-"Settings.Folders.BottomTabStyle.telegram" = "nameless";
+"Settings.Folders.BottomTabStyle.telegram" = "Megram";
 /* Example: Hide "All Chats" */
 "Settings.Folders.AllChatsHidden" = "Nascondi \"%@\"";
 "Settings.Folders.RememberLast" = "Apri l'ultima cartella";

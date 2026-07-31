@@ -1281,16 +1281,19 @@ final class GiftOptionsScreenComponent: Component {
                 balanceValueView.isHidden = true
                 balanceIconView.isHidden = true
 
+                // MARK: Megram — bigger yellow star pill with a white border, matching the
+                // reference gift screen (Send a Gift with 15,000 balance). Font upped to 17pt,
+                // pill height to 38pt, star icon to 22pt, added 2pt white rim.
                 let navigationHeight = environment.navigationHeight - environment.statusBarHeight
                 let balanceString = self.starsState.map { formatStarsAmountText($0.balance, dateTimeFormat: environment.dateTimeFormat) } ?? "0"
-                let font = Font.semibold(15.0)
+                let font = Font.bold(17.0)
                 let textSize = (balanceString as NSString).size(withAttributes: [.font: font])
-                let starIconSize: CGFloat = 16.0
-                let iconTextGap: CGFloat = 4.0
-                let horizontalPadding: CGFloat = 12.0
-                let pillHeight: CGFloat = 30.0
+                let starIconSize: CGFloat = 22.0
+                let iconTextGap: CGFloat = 6.0
+                let horizontalPadding: CGFloat = 14.0
+                let pillHeight: CGFloat = 38.0
                 let contentWidth = starIconSize + iconTextGap + textSize.width
-                let pillWidth = min(availableSize.width * 0.45, contentWidth + horizontalPadding * 2.0)
+                let pillWidth = min(availableSize.width * 0.5, contentWidth + horizontalPadding * 2.0)
                 let originY = environment.statusBarHeight + (navigationHeight - pillHeight) / 2.0
                 let pillFrame = CGRect(
                     x: availableSize.width - balanceInset - environment.safeInsets.right - pillWidth,
@@ -1301,10 +1304,11 @@ final class GiftOptionsScreenComponent: Component {
                 if self.namelessBalancePillButton.superview == nil {
                     self.namelessBalancePillPresented = true
                     self.addSubview(self.namelessBalancePillButton)
-                    // Softer, more legible yellow (matches iOS system yellow at low sat)
-                    self.namelessBalancePillButton.backgroundColor = UIColor(red: 1.0, green: 0.87, blue: 0.45, alpha: 1.0)
+                    self.namelessBalancePillButton.backgroundColor = UIColor(red: 1.0, green: 0.78, blue: 0.20, alpha: 1.0)
                     self.namelessBalancePillButton.layer.cornerRadius = pillHeight / 2.0
-                    self.namelessBalancePillButton.setTitleColor(UIColor(white: 0.15, alpha: 1.0), for: .normal)
+                    self.namelessBalancePillButton.layer.borderWidth = 2.0
+                    self.namelessBalancePillButton.layer.borderColor = UIColor.white.cgColor
+                    self.namelessBalancePillButton.setTitleColor(.white, for: .normal)
                     self.namelessBalancePillButton.titleLabel?.font = font
                     self.namelessBalancePillButton.addTarget(self, action: #selector(self.namelessBalancePillPressed), for: .touchUpInside)
                     self.namelessBalancePillButton.contentEdgeInsets = UIEdgeInsets(top: 0, left: horizontalPadding + starIconSize + iconTextGap, bottom: 0, right: horizontalPadding)
