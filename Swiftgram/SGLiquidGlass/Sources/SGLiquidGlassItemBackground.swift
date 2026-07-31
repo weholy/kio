@@ -93,13 +93,13 @@ public final class SGLiquidGlassItemBackground {
 
         GlassBackgroundView.useCustomGlassImpl = false
 
-        // Official Apple liquid glass: `.panel` → UIGlassEffect(style: .regular)
-        let tint: GlassBackgroundView.TintColor
-        if SGLiquidGlassZone.settings.isTinted, self._tint != .clear {
-            tint = .init(kind: .custom(style: .default, color: self._tint.withAlphaComponent(0.35)))
-        } else {
-            tint = .init(kind: .panel)
-        }
+        // Official Apple liquid glass, with the intensity slider selecting how thin the
+        // material is (see SGOfficialGlassTint.tint).
+        let tint = SGOfficialGlassTint.tint(
+            intensity: CGFloat(SGSimpleSettings.shared.namelessLiquidGlassIntensity),
+            isDark: self.currentIsDark,
+            accent: self._tint == .clear ? nil : self._tint
+        )
 
         self.glassView.update(
             size: self.currentSize,

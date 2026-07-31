@@ -280,7 +280,14 @@ public final class AccountContextImpl: AccountContext {
         self.sharedContextImpl = sharedContext
         self.account = account
         self.engine = TelegramEngine(account: account)
-        
+
+        // MARK: Nameless — record who "we" are so account-scoped local features (local
+        // premium badge, local stars wallet) can tell our own peer from everyone else's.
+        // Temp contexts are throwaway and must not clobber the real account id.
+        if !temp {
+            SGSimpleSettings.shared.currentAccountPeerId = "\(account.peerId.id._internalGetInt64Value())"
+        }
+
         self.imageCache = DirectMediaImageCache(account: account)
         
         self.userLimits = EngineConfiguration.UserLimits(UserLimitsConfiguration.defaultValue)

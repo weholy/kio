@@ -7,6 +7,7 @@ import Display
 import TelegramPresentationData
 import ComponentFlow
 import LottieComponent
+import SGSimpleSettings
 
 enum PeerInfoHeaderButtonKey: Hashable {
     case message
@@ -258,32 +259,49 @@ final class PeerInfoHeaderButtonNode: HighlightableButtonNode {
             alphaTransition.updateAlpha(node: self.textNode, alpha: isActive ? 1.0 : 0.3)
         }
         
-        self.textNode.attributedText = NSAttributedString(string: text.lowercased(), font: Font.regular(11.0), textColor: .white)
+        // MARK: Nameless — "Круглые вкладки": icon-only circular buttons in profile header
+        let iconOnlyRoundButton = SGSimpleSettings.shared.roundTabs
+
         self.accessibilityLabel = text
-        let titleSize = self.textNode.updateLayout(CGSize(width: 120.0, height: .greatestFiniteMagnitude))
-        
+        let titleSize: CGSize
+        if iconOnlyRoundButton {
+            self.textNode.attributedText = nil
+            titleSize = .zero
+        } else {
+            self.textNode.attributedText = NSAttributedString(string: text.lowercased(), font: Font.regular(11.0), textColor: .white)
+            titleSize = self.textNode.updateLayout(CGSize(width: 120.0, height: .greatestFiniteMagnitude))
+        }
+
         transition.updateFrame(node: self.containerNode, frame: CGRect(origin: CGPoint(), size: size))
         transition.updateFrame(node: self.contentNode, frame: CGRect(origin: CGPoint(x: 0.0, y: size.height * 0.5 * (1.0 - fraction)), size: size))
         transition.updateAlpha(node: self.contentNode, alpha: fraction)
-        
+
         let backgroundY = size.height * (1.0 - fraction)
         let backgroundFrame = CGRect(origin: CGPoint(x: 0.0, y: backgroundY), size: CGSize(width: size.width, height: max(0.0, size.height - backgroundY)))
         //transition.updateFrame(node: self.backgroundNode, frame: backgroundFrame)
         transition.updateFrame(view: self.backgroundView, frame: backgroundFrame)
-        
+
         transition.updateSublayerTransformScale(node: self.contentNode, scale: 1.0 * fraction + 0.001 * (1.0 - fraction))
-        
-        transition.updateCornerRadius(layer: self.backgroundView.layer, cornerRadius: min(16.0, backgroundFrame.height * 0.5))
+
+        if iconOnlyRoundButton {
+            transition.updateCornerRadius(layer: self.backgroundView.layer, cornerRadius: backgroundFrame.height * 0.5)
+        } else {
+            transition.updateCornerRadius(layer: self.backgroundView.layer, cornerRadius: min(16.0, backgroundFrame.height * 0.5))
+        }
         //self.backgroundNode.update(size: backgroundFrame.size, cornerRadius: min(11.0, backgroundFrame.height * 0.5), transition: transition)
         //self.backgroundNode.updateColor(color: backgroundColor, transition: transition)
-        let iconY: CGFloat = 1.0
+        let iconY: CGFloat = iconOnlyRoundButton ? floor((size.height - iconSize.height) / 2.0) : 1.0
         transition.updateFrame(node: self.iconNode, frame: CGRect(origin: CGPoint(x: floor((size.width - iconSize.width) / 2.0), y: iconY), size: iconSize))
         if let animatedIconView = self.animatedIcon?.view {
             transition.updateFrame(view: animatedIconView, frame: CGRect(origin: CGPoint(x: floor((size.width - iconSize.width) / 2.0), y: iconY), size: iconSize))
         }
-        transition.updateAlpha(node: self.textNode, alpha: 1.0)
-        transition.updateFrameAdditiveToCenter(node: self.textNode, frame: CGRect(origin: CGPoint(x: floor((size.width - titleSize.width) / 2.0), y: size.height - titleSize.height - 9.0), size: titleSize))
-        
+        if iconOnlyRoundButton {
+            transition.updateAlpha(node: self.textNode, alpha: 0.0)
+        } else {
+            transition.updateAlpha(node: self.textNode, alpha: 1.0)
+            transition.updateFrameAdditiveToCenter(node: self.textNode, frame: CGRect(origin: CGPoint(x: floor((size.width - titleSize.width) / 2.0), y: size.height - titleSize.height - 9.0), size: titleSize))
+        }
+
         self.referenceNode.frame = self.containerNode.bounds
     }
 }

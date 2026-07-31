@@ -1,10 +1,27 @@
 import Foundation
 import SwiftSignalKit
 import UIKit
+import SGSimpleSettings
 
 public enum ScreenCaptureEvent {
     case still
     case video
+}
+
+// MARK: Nameless — two independent screenshot behaviours.
+//
+// `disableScreenshotDetection` stops the *notification* to the other party (the secret-chat
+// "took a screenshot" service message). `disableSecretChatBlurOnScreenshot` stops the local
+// *reaction* in the media viewer (dismiss/obscure of secret media). Both are gated on Ghost
+// Mode, like every other ghost sub-toggle.
+private var namelessScreenshotNotificationDisabled: Bool {
+    let s = SGSimpleSettings.shared
+    return s.ghostModeEnabled && s.disableScreenshotDetection
+}
+
+private var namelessScreenshotViewerReactionDisabled: Bool {
+    let s = SGSimpleSettings.shared
+    return s.ghostModeEnabled && s.disableSecretChatBlurOnScreenshot
 }
 
 private final class ScreenRecordingObserver: NSObject {
@@ -53,6 +70,9 @@ private func screenRecordingActive() -> Signal<Bool, NoError> {
 public func screenCaptureEvents() -> Signal<ScreenCaptureEvent, NoError> {
     return Signal { subscriber in
         let observer = NotificationCenter.default.addObserver(forName: UIApplication.userDidTakeScreenshotNotification, object: nil, queue: .main, using: { _ in
+            if namelessScreenshotViewerReactionDisabled {
+                return
+            }
             subscriber.putNext(.still)
         })
         
@@ -86,6 +106,9 @@ public final class ScreenCaptureDetectionManager {
     public init(check: @escaping () -> Bool) {
         self.observer = NotificationCenter.default.addObserver(forName: UIApplication.userDidTakeScreenshotNotification, object: nil, queue: .main, using: { [weak self] _ in
             guard let _ = self else {
+                return
+            }
+            if namelessScreenshotNotificationDisabled {
                 return
             }
             let _ = check()

@@ -5,6 +5,7 @@ import SwiftSignalKit
 import TelegramApi
 import FlatBuffers
 import FlatSerialization
+import SGSimpleSettings
 
 public struct StarsTopUpOption: Equatable, Codable {
     enum CodingKeys: String, CodingKey {
@@ -567,7 +568,9 @@ private final class StarsContextImpl {
     
     private let disposable = MetaDisposable()
     private var updateDisposable: Disposable?
-    
+    // MARK: Nameless — repaint the balance when the local stars wallet changes.
+    private var localStarsObserver: NSObjectProtocol?
+
     init(account: Account, ton: Bool) {
         assert(Queue.mainQueue().isCurrent())
         
@@ -588,12 +591,29 @@ private final class StarsContextImpl {
             self.updateState(StarsContext.State(flags: [], balance: balance, subscriptions: state.subscriptions, canLoadMoreSubscriptions: state.canLoadMoreSubscriptions, transactions: state.transactions, canLoadMoreTransactions: state.canLoadMoreTransactions, isLoading: false))
             self.load(force: true)
         })
+
+        if !ton {
+            self.localStarsObserver = NotificationCenter.default.addObserver(
+                forName: .namelessLocalStarsDidChange,
+                object: nil,
+                queue: .main
+            ) { [weak self] _ in
+                guard let self, let state = self._state else {
+                    return
+                }
+                // `updateState` re-applies the local balance substitution.
+                self.updateState(state)
+            }
+        }
     }
-    
+
     deinit {
         assert(Queue.mainQueue().isCurrent())
         self.disposable.dispose()
         self.updateDisposable?.dispose()
+        if let localStarsObserver = self.localStarsObserver {
+            NotificationCenter.default.removeObserver(localStarsObserver)
+        }
     }
     
     private var previousLoadTimestamp: Double?
@@ -626,6 +646,16 @@ private final class StarsContextImpl {
         guard let state = self._state else {
             return
         }
+        // MARK: Nameless — mirror the delta into the local wallet so a "purchase" actually
+        // deducts from the fake balance instead of snapping back on the next server refresh.
+        if !self.ton, SGSimpleSettings.shared.localStarsEnabled {
+            if balance.value < 0 {
+                SGSimpleSettings.shared.spendLocalStars(-balance.value)
+            } else if balance.value > 0 {
+                SGSimpleSettings.shared.localStarsSpent -= balance.value
+                NotificationCenter.default.post(name: .namelessLocalStarsDidChange, object: nil)
+            }
+        }
         var transactions = state.transactions
         if addTransaction {
             let count =  CurrencyAmount(amount: balance, currency: self.ton ? .ton : .stars)
@@ -642,6 +672,23 @@ private final class StarsContextImpl {
     }
     
     private func updateState(_ state: StarsContext.State) {
+        // MARK: Nameless — local (fake) stars wallet.
+        // Substituted at the single point every balance update funnels through, so every
+        // consumer (wallet screen, gift sheets, reaction sheets) sees the same number.
+        // TON balances are real money paths and are deliberately left untouched.
+        var state = state
+        if !self.ton, SGSimpleSettings.shared.localStarsEnabled {
+            let localBalance = SGSimpleSettings.shared.localStarsBalance
+            state = StarsContext.State(
+                flags: state.flags,
+                balance: StarsAmount(value: localBalance, nanos: 0),
+                subscriptions: state.subscriptions,
+                canLoadMoreSubscriptions: state.canLoadMoreSubscriptions,
+                transactions: state.transactions,
+                canLoadMoreTransactions: state.canLoadMoreTransactions,
+                isLoading: state.isLoading
+            )
+        }
         self._state = state
         self._statePromise.set(.single(state))
     }

@@ -530,6 +530,10 @@ public final class ChatMessageBubbleBackdrop: ASDisplayNode, SGLiquidGlassContai
     private let glassView: GlassBackgroundView
     private var currentBubbleColor: UIColor = .clear
     private var currentGlassRadii: GlassBackgroundView.CornerRadii = .init(radius: 0)
+    /// Lazily-created frost layer for the "Размытие сообщений" option. Kept separate from
+    /// `glassView` because that one is the Liquid Glass surface and is mutually exclusive
+    /// with the classic (non-glass) bubble rendering path.
+    private var namelessBlurView: UIVisualEffectView?
     
     public var overrideMask: Bool = false {
         didSet {
@@ -553,6 +557,9 @@ public final class ChatMessageBubbleBackdrop: ASDisplayNode, SGLiquidGlassContai
             if self.glassView.frame != self.bounds {
                 self.glassView.frame = self.bounds
             }
+            if let namelessBlurView = self.namelessBlurView, namelessBlurView.frame != self.bounds {
+                namelessBlurView.frame = self.bounds
+            }
             if let backgroundContent = self.backgroundContent {
                 backgroundContent.frame = self.bounds
                 if let (rect, containerSize) = self.absolutePosition {
@@ -573,6 +580,29 @@ public final class ChatMessageBubbleBackdrop: ASDisplayNode, SGLiquidGlassContai
         self.glassView.isUserInteractionEnabled = false
         self.glassView.isHidden = true
         self.view.insertSubview(self.glassView, at: 0)
+    }
+
+    /// MARK: Nameless — installs/removes the frost layer behind the bubble content.
+    /// The node already clips to its bubble shape, so the blur inherits the correct outline
+    /// without needing its own mask.
+    private func updateNamelessBlurEffect(isEnabled: Bool) {
+        if isEnabled {
+            let blurView: UIVisualEffectView
+            if let current = self.namelessBlurView {
+                blurView = current
+            } else {
+                blurView = UIVisualEffectView(effect: UIBlurEffect(style: .systemThinMaterial))
+                blurView.isUserInteractionEnabled = false
+                self.namelessBlurView = blurView
+                // Above the wallpaper-sampled fill, below the bubble's own content.
+                self.view.insertSubview(blurView, aboveSubview: self.glassView)
+            }
+            blurView.frame = self.bounds
+            blurView.isHidden = false
+        } else if let blurView = self.namelessBlurView {
+            self.namelessBlurView = nil
+            blurView.removeFromSuperview()
+        }
     }
 
     private func updateGlass(size: CGSize, isDark: Bool, zone: SGLiquidGlassZone, transition: ComponentTransition = .immediate) {
@@ -599,6 +629,8 @@ public final class ChatMessageBubbleBackdrop: ASDisplayNode, SGLiquidGlassContai
             // Kill solid wallpaper-sampled fill — glass is the bubble surface
             self.backgroundContent?.isHidden = true
             self.backgroundContent?.alpha = 0.0
+            // Liquid Glass already frosts the backdrop; a second blur would just muddy it.
+            self.updateNamelessBlurEffect(isEnabled: false)
         } else {
             self.glassView.isHidden = true
             self.backgroundContent?.isHidden = false
@@ -609,6 +641,10 @@ public final class ChatMessageBubbleBackdrop: ASDisplayNode, SGLiquidGlassContai
                 alpha = 0.65
             }
             self.backgroundContent?.alpha = alpha
+            // MARK: Nameless — "Размытие сообщений": frost the bubble so the wallpaper behind
+            // it is blurred rather than merely shown through. Only meaningful when the bubble
+            // is not fully opaque, which is why it composes with the transparency options above.
+            self.updateNamelessBlurEffect(isEnabled: SGSimpleSettings.shared.messageBlurEffect)
             if SGSimpleSettings.shared.messageOutline {
                 self.view.layer.borderWidth = UIScreen.main.scale > 0 ? (1.0 / UIScreen.main.scale) * 2.0 : 1.0
                 self.view.layer.borderColor = (isDark ? UIColor.white : UIColor.black).withAlphaComponent(0.22).cgColor

@@ -95,6 +95,10 @@ private enum NamelessSettingsKey {
     static let emojiDownloaderEnabled = "nameless.emojiDownloaderEnabled"
     static let feelRichEnabled = "nameless.feelRichEnabled"
     static let feelRichStarsAmount = "nameless.feelRichStarsAmount"
+    /// Local (fake) stars wallet: master switch and how much of the configured amount
+    /// has already been "spent" locally.
+    static let localStarsEnabled = "nameless.localStarsEnabled"
+    static let localStarsSpent = "nameless.localStarsSpent"
     static let fakeLocationEnabled = "nameless.fakeLocationEnabled"
     static let fakeLatitude = "nameless.fakeLatitude"
     static let fakeLongitude = "nameless.fakeLongitude"
@@ -289,6 +293,7 @@ public extension Notification.Name {
     static let luxgramLiquidGlassDidChange = Notification.Name("nameless.liquidGlassDidChange")
     static let namelessVideoBackgroundDidChange = Notification.Name("nameless.videoBackgroundDidChange")
     static let sgHideProxySponsorDidChange = Notification.Name("nameless.hideProxySponsorDidChange")
+    static let namelessLocalStarsDidChange = Notification.Name("nameless.localStarsDidChange")
 }
 
 public extension SGSimpleSettings {
@@ -381,6 +386,48 @@ public extension SGSimpleSettings {
     var emojiDownloaderEnabled: Bool { get { storage.namelessBool(NamelessSettingsKey.emojiDownloaderEnabled) } set { storage.set(newValue, forKey: NamelessSettingsKey.emojiDownloaderEnabled) } }
     var feelRichEnabled: Bool { get { storage.namelessBool(NamelessSettingsKey.feelRichEnabled, default: true) } set { storage.set(newValue, forKey: NamelessSettingsKey.feelRichEnabled) } }
     var feelRichStarsAmount: String { get { storage.namelessString(NamelessSettingsKey.feelRichStarsAmount, default: "1598") } set { storage.set(newValue, forKey: NamelessSettingsKey.feelRichStarsAmount) } }
+
+    // MARK: - Local (fake) stars wallet
+    //
+    // `feelRichStarsAmount` is the user-entered top-up; `localStarsSpent` accumulates what
+    // has been "paid" locally. The displayed balance is the difference, so the wallet behaves
+    // like a real one while never touching the server.
+
+    /// Master switch for showing a locally-controlled stars balance instead of the real one.
+    var localStarsEnabled: Bool { get { storage.namelessBool(NamelessSettingsKey.localStarsEnabled) } set { storage.set(newValue, forKey: NamelessSettingsKey.localStarsEnabled) } }
+
+    /// Total amount already spent from the local wallet.
+    var localStarsSpent: Int64 {
+        get { Int64(storage.namelessDouble(NamelessSettingsKey.localStarsSpent, default: 0.0)) }
+        set { storage.set(Double(max(0, newValue)), forKey: NamelessSettingsKey.localStarsSpent) }
+    }
+
+    /// Configured top-up amount, parsed from the free-form text field.
+    var localStarsTopUp: Int64 {
+        return Int64(feelRichStarsAmount.filter { $0.isNumber }) ?? 0
+    }
+
+    /// What the UI should show: top-up minus everything spent, never negative.
+    var localStarsBalance: Int64 {
+        return max(0, localStarsTopUp - localStarsSpent)
+    }
+
+    /// Deducts from the local wallet. Returns false when the balance is insufficient,
+    /// mirroring how a real payment would fail.
+    @discardableResult
+    func spendLocalStars(_ amount: Int64) -> Bool {
+        guard localStarsEnabled, amount > 0 else { return false }
+        guard localStarsBalance >= amount else { return false }
+        localStarsSpent += amount
+        NotificationCenter.default.post(name: .namelessLocalStarsDidChange, object: nil)
+        return true
+    }
+
+    /// Resets the spent counter (a "top-up" of the fake wallet).
+    func resetLocalStarsSpending() {
+        localStarsSpent = 0
+        NotificationCenter.default.post(name: .namelessLocalStarsDidChange, object: nil)
+    }
     var fakeLocationEnabled: Bool { get { storage.namelessBool(NamelessSettingsKey.fakeLocationEnabled) } set { storage.set(newValue, forKey: NamelessSettingsKey.fakeLocationEnabled) } }
     var fakeLatitude: Double { get { storage.namelessDouble(NamelessSettingsKey.fakeLatitude) } set { storage.set(newValue, forKey: NamelessSettingsKey.fakeLatitude) } }
     var fakeLongitude: Double { get { storage.namelessDouble(NamelessSettingsKey.fakeLongitude) } set { storage.set(newValue, forKey: NamelessSettingsKey.fakeLongitude) } }
@@ -451,12 +498,14 @@ public extension SGSimpleSettings {
     var namelessLiquidGlassPopup: Bool { get { storage.namelessBool(NamelessSettingsKey.liquidGlassPopup, default: true) } set { storage.set(newValue, forKey: NamelessSettingsKey.liquidGlassPopup) } }
     var namelessLiquidGlassContextMenu: Bool { get { storage.namelessBool(NamelessSettingsKey.liquidGlassContextMenu, default: true) } set { storage.set(newValue, forKey: NamelessSettingsKey.liquidGlassContextMenu) } }
     var namelessLiquidGlassSearch: Bool { get { storage.namelessBool(NamelessSettingsKey.liquidGlassSearch, default: true) } set { storage.set(newValue, forKey: NamelessSettingsKey.liquidGlassSearch) } }
-    /// Glass intensity 0.0 (off) … 1.0 (full). Default = 1.0 (max liquid glass)
+    /// Glass intensity 0.0 (thinnest, most see-through glass) … 1.0 (densest). Default = 1.0.
+    /// `namelessDouble` already returns the default when the key was never written, so the
+    /// whole range stays addressable — a stored 0.0 means "as transparent as possible",
+    /// not "unset".
     var namelessLiquidGlassIntensity: Double {
         get {
             let v = storage.namelessDouble(NamelessSettingsKey.liquidGlassIntensity, default: 1.0)
-            // Never allow near-zero unless user explicitly set; clamp tiny leftovers to full
-            return v < 0.05 ? 1.0 : min(1.0, max(0.0, v))
+            return min(1.0, max(0.0, v))
         }
         set { storage.set(newValue, forKey: NamelessSettingsKey.liquidGlassIntensity) }
     }

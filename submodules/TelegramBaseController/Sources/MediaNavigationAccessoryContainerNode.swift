@@ -13,19 +13,20 @@ public final class MediaNavigationAccessoryContainerNode: ASDisplayNode, ASGestu
     public let separatorNode: ASDisplayNode
     public let headerNode: MediaNavigationAccessoryHeaderNode
     
-    private let currentHeaderHeight: CGFloat = MediaNavigationAccessoryHeaderNode.minimizedHeight
-    
+    private let currentHeaderHeight: CGFloat
+
     private var presentationData: PresentationData
-    
-    init(context: AccountContext, presentationData: PresentationData, displayBackground: Bool, customTintColor: UIColor? = nil) {
-        self.displayBackground = displayBackground
+
+    init(context: AccountContext, presentationData: PresentationData, displayBackground: Bool, customTintColor: UIColor? = nil, compactCard: Bool = false) {
+        self.displayBackground = displayBackground && !compactCard
+        self.currentHeaderHeight = compactCard ? MediaNavigationAccessoryHeaderNode.compactCardHeight : MediaNavigationAccessoryHeaderNode.minimizedHeight
 
         self.presentationData = presentationData
-        
+
         self.backgroundNode = ASDisplayNode()
         self.separatorNode = ASDisplayNode()
-        self.headerNode = MediaNavigationAccessoryHeaderNode(context: context, presentationData: presentationData, customTintColor: customTintColor)
-        
+        self.headerNode = MediaNavigationAccessoryHeaderNode(context: context, presentationData: presentationData, customTintColor: customTintColor, compactCard: compactCard)
+
         super.init()
 
         if self.displayBackground {

@@ -3,6 +3,7 @@ import TelegramApi
 import Postbox
 import SwiftSignalKit
 import MtProtoKit
+import SGSimpleSettings
 
 
 public final class PromoChatListItem: AdditionalChatListItem {
@@ -224,7 +225,16 @@ func _internal_fetchPromoInfo(accountPeerId: EnginePeer.Id, postbox: Postbox, ne
                 
                 var additionalChatListItems: [AdditionalChatListItem] = []
                 if let kind, let peer, let parsedPeer = transaction.getPeer(peer.peerId) {
-                    additionalChatListItems.append(PromoChatListItem(peerId: parsedPeer.id, kind: kind))
+                    // MARK: Nameless — "Скрыть спонсора прокси": drop the sponsored proxy
+                    // channel that a proxy server pins to the top of the chat list. PSA items
+                    // are public-service announcements, not ads, so they are left alone.
+                    var isHiddenProxySponsor = false
+                    if case .proxy = kind, SGSimpleSettings.shared.hideProxySponsor {
+                        isHiddenProxySponsor = true
+                    }
+                    if !isHiddenProxySponsor {
+                        additionalChatListItems.append(PromoChatListItem(peerId: parsedPeer.id, kind: kind))
+                    }
                 }
                 transaction.replaceAdditionalChatListItems(additionalChatListItems)
                 

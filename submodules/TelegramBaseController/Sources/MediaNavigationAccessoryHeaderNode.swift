@@ -14,9 +14,15 @@ import ContextUI
 import TelegramNotices
 import TooltipUI
 import SliderContextItem
+import PhotoResources
 
 private let titleFont = Font.regular(12.0)
 private let subtitleFont = Font.regular(10.0)
+// MARK: Nameless — compact card mode (profile "now playing" card)
+private let cardTitleFont = Font.semibold(14.0)
+private let cardSubtitleFont = Font.regular(12.0)
+private let cardCaptionFont = Font.italic(11.0)
+//
 
 private func normalizeValue(_ value: CGFloat) -> CGFloat {
     return round(value * 10.0) / 10.0
@@ -25,7 +31,12 @@ private func normalizeValue(_ value: CGFloat) -> CGFloat {
 private class MediaHeaderItemNode: ASDisplayNode {
     private let titleNode: TextNode
     private let subtitleNode: TextNode
-    
+    private let captionNode: TextNode
+    // MARK: Nameless — album art shown only in compact card mode
+    let albumArtNode: TransformImageNode
+    private var currentAlbumArtKey: String?
+    //
+
     override init() {
         self.titleNode = TextNode()
         self.titleNode.isUserInteractionEnabled = false
@@ -33,28 +44,45 @@ private class MediaHeaderItemNode: ASDisplayNode {
         self.subtitleNode = TextNode()
         self.subtitleNode.isUserInteractionEnabled = false
         self.subtitleNode.displaysAsynchronously = false
-        
+        self.captionNode = TextNode()
+        self.captionNode.isUserInteractionEnabled = false
+        self.captionNode.displaysAsynchronously = false
+        self.albumArtNode = TransformImageNode()
+        self.albumArtNode.isHidden = true
+
         super.init()
-        
+
         self.isUserInteractionEnabled = false
-        
+
+        self.addSubnode(self.albumArtNode)
         self.addSubnode(self.titleNode)
         self.addSubnode(self.subtitleNode)
+        self.addSubnode(self.captionNode)
     }
-    
-    func updateLayout(size: CGSize, leftInset: CGFloat, rightInset: CGFloat, theme: PresentationTheme, strings: PresentationStrings, dateTimeFormat: PresentationDateTimeFormat, nameDisplayOrder: PresentationPersonNameOrder, playbackItem: SharedMediaPlaylistItem?, transition: ContainedViewLayoutTransition) -> (NSAttributedString?, NSAttributedString?, Bool) {
+
+    func updateLayout(size: CGSize, leftInset: CGFloat, rightInset: CGFloat, theme: PresentationTheme, strings: PresentationStrings, dateTimeFormat: PresentationDateTimeFormat, nameDisplayOrder: PresentationPersonNameOrder, playbackItem: SharedMediaPlaylistItem?, context: AccountContext, compactCard: Bool, transition: ContainedViewLayoutTransition) -> (NSAttributedString?, NSAttributedString?, Bool) {
         var rateButtonHidden = false
         var titleString: NSAttributedString?
         var subtitleString: NSAttributedString?
+        var captionString: NSAttributedString?
+        var albumArt: SharedMediaPlaybackAlbumArt?
+        var fileReference: FileMediaReference?
         if let playbackItem = playbackItem, let displayData = playbackItem.displayData {
             switch displayData {
-                case let .music(title, performer, _, _, _):
+                case let .music(title, performer, albumArtValue, _, caption):
                     rateButtonHidden = false
                     let titleText: String = title ?? strings.MediaPlayer_UnknownTrack
                     let subtitleText: String = performer ?? strings.MediaPlayer_UnknownArtist
-                    
-                    titleString = NSAttributedString(string: titleText, font: titleFont, textColor: theme.rootController.navigationBar.primaryTextColor)
-                    subtitleString = NSAttributedString(string: subtitleText, font: subtitleFont, textColor: theme.rootController.navigationBar.secondaryTextColor)
+                    albumArt = albumArtValue
+                    if let caption, compactCard {
+                        captionString = NSAttributedString(string: caption.string, font: cardCaptionFont, textColor: theme.rootController.navigationBar.secondaryTextColor)
+                    }
+                    if compactCard, let source = playbackItem.playbackData?.source, case let .telegramFile(ref, _, _) = source {
+                        fileReference = ref
+                    }
+
+                    titleString = NSAttributedString(string: titleText, font: compactCard ? cardTitleFont : titleFont, textColor: theme.rootController.navigationBar.primaryTextColor)
+                    subtitleString = NSAttributedString(string: subtitleText, font: compactCard ? cardSubtitleFont : subtitleFont, textColor: theme.rootController.navigationBar.secondaryTextColor)
                 case let .voice(author, peer):
                     rateButtonHidden = false
                     let titleText: String = author?.displayTitle(strings: strings, displayOrder: nameDisplayOrder) ?? ""
@@ -101,26 +129,82 @@ private class MediaHeaderItemNode: ASDisplayNode {
         }
         let makeTitleLayout = TextNode.asyncLayout(self.titleNode)
         let makeSubtitleLayout = TextNode.asyncLayout(self.subtitleNode)
-        
+        let makeCaptionLayout = TextNode.asyncLayout(self.captionNode)
+
+        // MARK: Nameless — compact card: album art + left-aligned stacked text
+        if compactCard {
+            let artSize: CGSize = CGSize(width: size.height - 12.0, height: size.height - 12.0)
+            let artFrame = CGRect(origin: CGPoint(x: 0.0, y: floor((size.height - artSize.height) / 2.0)), size: artSize)
+            self.albumArtNode.isHidden = false
+            let artKey = "\(fileReference?.media.fileId.id ?? 0)_\(albumArt != nil)"
+            if self.currentAlbumArtKey != artKey {
+                self.currentAlbumArtKey = artKey
+                self.albumArtNode.setSignal(playerAlbumArt(engine: context.engine, fileReference: fileReference, albumArt: albumArt, thumbnail: true))
+            }
+            let makeArtLayout = self.albumArtNode.asyncLayout()
+            let artApply = makeArtLayout(TransformImageArguments(corners: ImageCorners(radius: 8.0), imageSize: artSize, boundingSize: artSize, intrinsicInsets: UIEdgeInsets()))
+            let _ = artApply()
+            transition.updateFrame(node: self.albumArtNode, frame: artFrame)
+
+            let textLeftInset: CGFloat = artFrame.maxX + 10.0
+            let textConstrainedWidth = max(1.0, size.width - textLeftInset - 4.0)
+
+            let (titleLayout, titleApply) = makeTitleLayout(TextNodeLayoutArguments(attributedString: titleString, backgroundColor: nil, maximumNumberOfLines: 1, truncationType: .end, constrainedSize: CGSize(width: textConstrainedWidth, height: 100.0), alignment: .natural, cutout: nil, insets: UIEdgeInsets()))
+            let (subtitleLayout, subtitleApply) = makeSubtitleLayout(TextNodeLayoutArguments(attributedString: subtitleString, backgroundColor: nil, maximumNumberOfLines: 1, truncationType: .end, constrainedSize: CGSize(width: textConstrainedWidth, height: 100.0), alignment: .natural, cutout: nil, insets: UIEdgeInsets()))
+            let (captionLayout, captionApply) = makeCaptionLayout(TextNodeLayoutArguments(attributedString: captionString, backgroundColor: nil, maximumNumberOfLines: 1, truncationType: .end, constrainedSize: CGSize(width: textConstrainedWidth, height: 100.0), alignment: .natural, cutout: nil, insets: UIEdgeInsets()))
+
+            let _ = titleApply()
+            let _ = subtitleApply()
+            let _ = captionApply()
+
+            let lineSpacing: CGFloat = 2.0
+            var linesHeight = titleLayout.size.height + lineSpacing + subtitleLayout.size.height
+            if captionString != nil {
+                linesHeight += lineSpacing + captionLayout.size.height
+            }
+            var lineY = floor((size.height - linesHeight) / 2.0)
+
+            let titleFrame = CGRect(origin: CGPoint(x: textLeftInset, y: lineY), size: titleLayout.size)
+            transition.updateFrame(node: self.titleNode, frame: titleFrame)
+            lineY += titleLayout.size.height + lineSpacing
+
+            let subtitleFrame = CGRect(origin: CGPoint(x: textLeftInset, y: lineY), size: subtitleLayout.size)
+            transition.updateFrame(node: self.subtitleNode, frame: subtitleFrame)
+            lineY += subtitleLayout.size.height + lineSpacing
+
+            if captionString != nil {
+                let captionFrame = CGRect(origin: CGPoint(x: textLeftInset, y: lineY), size: captionLayout.size)
+                transition.updateFrame(node: self.captionNode, frame: captionFrame)
+                self.captionNode.isHidden = false
+            } else {
+                self.captionNode.isHidden = true
+            }
+
+            return (titleString, subtitleString, rateButtonHidden)
+        }
+        self.albumArtNode.isHidden = true
+        self.captionNode.isHidden = true
+        //
+
         var titleSideInset: CGFloat = 12.0
         if !rateButtonHidden {
             titleSideInset += 52.0
         }
-        
+
         let (titleLayout, titleApply) = makeTitleLayout(TextNodeLayoutArguments(attributedString: titleString, backgroundColor: nil, maximumNumberOfLines: 1, truncationType: .middle, constrainedSize: CGSize(width: size.width - titleSideInset, height: 100.0), alignment: .natural, cutout: nil, insets: UIEdgeInsets()))
         let (subtitleLayout, subtitleApply) = makeSubtitleLayout(TextNodeLayoutArguments(attributedString: subtitleString, backgroundColor: nil, maximumNumberOfLines: 1, truncationType: .middle, constrainedSize: CGSize(width: size.width - titleSideInset, height: 100.0), alignment: .natural, cutout: nil, insets: UIEdgeInsets()))
-        
+
         let _ = titleApply()
         let _ = subtitleApply()
-        
+
         let minimizedTitleOffset: CGFloat = subtitleString == nil ? 6.0 : 0.0
-        
+
         let minimizedTitleFrame = CGRect(origin: CGPoint(x: floor((size.width - titleLayout.size.width) / 2.0), y: 4.0 + minimizedTitleOffset), size: titleLayout.size)
         let minimizedSubtitleFrame = CGRect(origin: CGPoint(x: floor((size.width - subtitleLayout.size.width) / 2.0), y: 20.0), size: subtitleLayout.size)
-        
+
         transition.updateFrame(node: self.titleNode, frame: minimizedTitleFrame)
         transition.updateFrame(node: self.subtitleNode, frame: minimizedSubtitleFrame)
-        
+
         return (titleString, subtitleString, rateButtonHidden)
     }
 }
@@ -142,17 +226,22 @@ private func generateMaskImage(color: UIColor) -> UIImage? {
 
 public final class MediaNavigationAccessoryHeaderNode: ASDisplayNode, ASScrollViewDelegate {
     public static let minimizedHeight: CGFloat = 37.0
-    
+    // MARK: Nameless — taller "now playing" card used only in the profile media pane
+    public static let compactCardHeight: CGFloat = 64.0
+    private let compactCard: Bool
+    private let cardBackgroundNode: ASDisplayNode
+    //
+
     private let context: AccountContext
     private var theme: PresentationTheme
     private var strings: PresentationStrings
     private var dateTimeFormat: PresentationDateTimeFormat
     private var nameDisplayOrder: PresentationPersonNameOrder
     private var customTintColor: UIColor?
-    
+
     private let scrollNode: ASScrollNode
     private var initialContentOffset: CGFloat?
-    
+
     private let leftMaskNode: ASImageNode
     private let rightMaskNode: ASImageNode
     
@@ -220,15 +309,23 @@ public final class MediaNavigationAccessoryHeaderNode: ASDisplayNode, ASScrollVi
     private weak var tooltipController: TooltipScreen?
     private let dismissedPromise = ValuePromise<Bool>(false)
     
-    public init(context: AccountContext, presentationData: PresentationData, customTintColor: UIColor? = nil) {
+    public init(context: AccountContext, presentationData: PresentationData, customTintColor: UIColor? = nil, compactCard: Bool = false) {
         self.context = context
-        
+        self.compactCard = compactCard
+        self.cardBackgroundNode = ASDisplayNode()
+        self.cardBackgroundNode.isLayerBacked = true
+        self.cardBackgroundNode.isHidden = !compactCard
+        self.cardBackgroundNode.cornerRadius = 14.0
+        if #available(iOS 13.0, *) {
+            self.cardBackgroundNode.layer.cornerCurve = .continuous
+        }
+
         self.theme = presentationData.theme
         self.strings = presentationData.strings
         self.dateTimeFormat = presentationData.dateTimeFormat
         self.nameDisplayOrder = presentationData.nameDisplayOrder
         self.customTintColor = customTintColor
-        
+
         self.scrollNode = ASScrollNode()
         
         self.currentItemNode = MediaHeaderItemNode()
@@ -273,7 +370,10 @@ public final class MediaNavigationAccessoryHeaderNode: ASDisplayNode, ASScrollVi
         super.init()
         
         self.clipsToBounds = true
-        
+
+        self.cardBackgroundNode.backgroundColor = self.theme.list.itemBlocksBackgroundColor
+        self.addSubnode(self.cardBackgroundNode)
+
         self.addSubnode(self.scrollNode)
         self.scrollNode.addSubnode(self.currentItemNode)
         self.scrollNode.addSubnode(self.previousItemNode)
@@ -372,6 +472,7 @@ public final class MediaNavigationAccessoryHeaderNode: ASDisplayNode, ASScrollVi
         self.closeButton.setImage(PresentationResourcesRootController.navigationPlayerCloseButton(self.theme), for: [])
         self.playPauseIconNode.customColor = self.customTintColor ?? self.theme.rootController.navigationBar.accentTextColor
         self.separatorNode.backgroundColor = self.theme.rootController.navigationBar.separatorColor
+        self.cardBackgroundNode.backgroundColor = self.theme.list.itemBlocksBackgroundColor
         self.scrubbingNode.updateContent(.standard(lineHeight: 2.0, lineCap: .square, scrubberHandle: .none, backgroundColor: .clear, foregroundColor: self.customTintColor ?? self.theme.rootController.navigationBar.accentTextColor, bufferingColor: (self.customTintColor ?? self.theme.rootController.navigationBar.accentTextColor).withAlphaComponent(0.5), chapters: []))
         
         if let playbackBaseRate = self.playbackBaseRate {
@@ -440,21 +541,31 @@ public final class MediaNavigationAccessoryHeaderNode: ASDisplayNode, ASScrollVi
     
     public func updateLayout(size: CGSize, leftInset: CGFloat, rightInset: CGFloat, transition: ContainedViewLayoutTransition) {
         self.validLayout = (size, leftInset, rightInset)
-        
-        let minHeight = MediaNavigationAccessoryHeaderNode.minimizedHeight
-        
-        let inset: CGFloat = 45.0 + leftInset
+
+        // MARK: Nameless — use the actual assigned row height so the compact card mode
+        // (taller container, see `compactCardHeight`) lays out correctly; this equals the
+        // previous hardcoded `minimizedHeight` constant for every existing (non-card) caller.
+        let minHeight = size.height
+
+        if self.compactCard {
+            let sideInset = max(16.0, leftInset)
+            let cardFrame = CGRect(x: sideInset, y: 4.0, width: max(0.0, size.width - sideInset - max(16.0, rightInset)), height: max(0.0, size.height - 8.0))
+            transition.updateFrame(node: self.cardBackgroundNode, frame: cardFrame)
+        }
+
+        let cardSideInset = max(16.0, leftInset)
+        let inset: CGFloat = self.compactCard ? (cardSideInset + 45.0) : (45.0 + leftInset)
         let constrainedSize = CGSize(width: size.width - inset * 2.0, height: size.height)
-        let (titleString, subtitleString, rateButtonHidden) = self.currentItemNode.updateLayout(size: constrainedSize, leftInset: 0.0, rightInset: 0.0, theme: self.theme, strings: self.strings, dateTimeFormat: self.dateTimeFormat, nameDisplayOrder: self.nameDisplayOrder, playbackItem: self.playbackItems?.0, transition: transition)
+        let (titleString, subtitleString, rateButtonHidden) = self.currentItemNode.updateLayout(size: constrainedSize, leftInset: 0.0, rightInset: 0.0, theme: self.theme, strings: self.strings, dateTimeFormat: self.dateTimeFormat, nameDisplayOrder: self.nameDisplayOrder, playbackItem: self.playbackItems?.0, context: self.context, compactCard: self.compactCard, transition: transition)
         self.accessibilityAreaNode.accessibilityLabel = "\(titleString?.string ?? ""). \(subtitleString?.string ?? "")"
         self.rateButton.isHidden = rateButtonHidden
-        
-        let _ = self.previousItemNode.updateLayout(size: constrainedSize, leftInset: 0.0, rightInset: 0.0, theme: self.theme, strings: self.strings, dateTimeFormat: self.dateTimeFormat, nameDisplayOrder: self.nameDisplayOrder, playbackItem: self.playbackItems?.1, transition: transition)
-        let _ = self.nextItemNode.updateLayout(size: constrainedSize, leftInset: 0.0, rightInset: 0.0, theme: self.theme, strings: self.strings, dateTimeFormat: self.dateTimeFormat, nameDisplayOrder: self.nameDisplayOrder, playbackItem: self.playbackItems?.2, transition: transition)
-        
+
+        let _ = self.previousItemNode.updateLayout(size: constrainedSize, leftInset: 0.0, rightInset: 0.0, theme: self.theme, strings: self.strings, dateTimeFormat: self.dateTimeFormat, nameDisplayOrder: self.nameDisplayOrder, playbackItem: self.playbackItems?.1, context: self.context, compactCard: self.compactCard, transition: transition)
+        let _ = self.nextItemNode.updateLayout(size: constrainedSize, leftInset: 0.0, rightInset: 0.0, theme: self.theme, strings: self.strings, dateTimeFormat: self.dateTimeFormat, nameDisplayOrder: self.nameDisplayOrder, playbackItem: self.playbackItems?.2, context: self.context, compactCard: self.compactCard, transition: transition)
+
         let constrainedBounds = CGRect(origin: CGPoint(), size: constrainedSize)
         transition.updateFrame(node: self.scrollNode, frame: constrainedBounds.offsetBy(dx: inset, dy: 0.0))
-        
+
         var contentSize = constrainedSize
         var contentOffset: CGFloat = 0.0
         if self.playbackItems?.1 != nil {
@@ -464,34 +575,41 @@ public final class MediaNavigationAccessoryHeaderNode: ASDisplayNode, ASScrollVi
         if self.playbackItems?.2 != nil {
             contentSize.width += constrainedSize.width
         }
-        
+
         self.previousItemNode.frame = constrainedBounds.offsetBy(dx: contentOffset - constrainedSize.width, dy: 0.0)
         self.currentItemNode.frame = constrainedBounds.offsetBy(dx: contentOffset, dy: 0.0)
         self.nextItemNode.frame = constrainedBounds.offsetBy(dx: contentOffset + constrainedSize.width, dy: 0.0)
-        
+
+        self.leftMaskNode.isHidden = self.compactCard
+        self.rightMaskNode.isHidden = self.compactCard
         self.leftMaskNode.frame = CGRect(x: inset, y: 0.0, width: 12.0, height: minHeight)
         self.rightMaskNode.transform = CATransform3DMakeScale(-1.0, 1.0, 1.0)
         self.rightMaskNode.frame = CGRect(x: size.width - inset - 12.0, y: 0.0, width: 12.0, height: minHeight)
-        
+
         if !self.scrollNode.view.isTracking && !self.scrollNode.view.isTracking {
             self.scrollNode.view.contentSize = contentSize
             self.scrollNode.view.contentOffset = CGPoint(x: contentOffset, y: 0.0)
             self.initialContentOffset = contentOffset
         }
-        
+
         let bounds = CGRect(origin: CGPoint(), size: size)
+        let cardRightInset: CGFloat = self.compactCard ? max(16.0, rightInset) : 0.0
         let closeButtonSize = self.closeButton.measure(CGSize(width: 100.0, height: 100.0))
-        transition.updateFrame(node: self.closeButton, frame: CGRect(origin: CGPoint(x: bounds.size.width - 44.0, y: 0.0), size: CGSize(width: 44.0, height: minHeight)))
+        transition.updateFrame(node: self.closeButton, frame: CGRect(origin: CGPoint(x: bounds.size.width - 44.0 - cardRightInset, y: 0.0), size: CGSize(width: 44.0, height: minHeight)))
         let rateButtonSize = CGSize(width: 30.0, height: minHeight)
-        transition.updateFrame(node: self.rateButton, frame: CGRect(origin: CGPoint(x: bounds.size.width - 27.0 - closeButtonSize.width - rateButtonSize.width - rightInset, y: -4.0), size: rateButtonSize))
-        
-        transition.updateFrame(node: self.playPauseIconNode, frame: CGRect(origin: CGPoint(x: 6.0 + 4.0, y: 4.0 + UIScreenPixel), size: CGSize(width: 28.0, height: 28.0)))
-        transition.updateFrame(node: self.actionButton, frame: CGRect(origin: CGPoint(x: 4.0, y: 0.0), size: CGSize(width: 40.0, height: 37.0)))
-        transition.updateFrame(node: self.scrubbingNode, frame: CGRect(origin: CGPoint(x: leftInset, y: 37.0 - 2.0), size: CGSize(width: size.width - leftInset - rightInset, height: 2.0)))
-        
+        let rateButtonY: CGFloat = self.compactCard ? 0.0 : -4.0
+        transition.updateFrame(node: self.rateButton, frame: CGRect(origin: CGPoint(x: bounds.size.width - 27.0 - closeButtonSize.width - rateButtonSize.width - rightInset - cardRightInset, y: rateButtonY), size: rateButtonSize))
+
+        let actionButtonX: CGFloat = self.compactCard ? cardSideInset + 4.0 : 4.0
+        transition.updateFrame(node: self.playPauseIconNode, frame: CGRect(origin: CGPoint(x: 6.0 + 4.0, y: floor((minHeight - 28.0) / 2.0)), size: CGSize(width: 28.0, height: 28.0)))
+        transition.updateFrame(node: self.actionButton, frame: CGRect(origin: CGPoint(x: actionButtonX, y: 0.0), size: CGSize(width: 40.0, height: minHeight)))
+        transition.updateFrame(node: self.scrubbingNode, frame: CGRect(origin: CGPoint(x: leftInset, y: minHeight - 2.0), size: CGSize(width: size.width - leftInset - rightInset, height: 2.0)))
+        self.scrubbingNode.isHidden = self.displayScrubber ? self.compactCard : true
+
         let originY: CGFloat = self.customTintColor != nil ? minHeight - UIScreenPixel : 0.0
+        self.separatorNode.isHidden = self.compactCard
         transition.updateFrame(node: self.separatorNode, frame: CGRect(origin: CGPoint(x: 0.0, y: originY), size: CGSize(width: size.width, height: UIScreenPixel)))
-        
+
         self.accessibilityAreaNode.frame = CGRect(origin: CGPoint(x: self.actionButton.frame.maxX, y: 0.0), size: CGSize(width: self.rateButton.frame.minX - self.actionButton.frame.maxX, height: minHeight))
     }
     

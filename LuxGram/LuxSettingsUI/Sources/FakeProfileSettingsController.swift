@@ -104,17 +104,17 @@ private enum FakeProfileEntry: ItemListNodeEntry {
         case .badgesHeader(_, let text):
             return ItemListSectionHeaderItem(presentationData: presentationData, text: text, sectionId: section)
         case .premium(_, let title, let subtext, let value):
-            return ItemListSwitchItem(presentationData: presentationData, systemStyle: .glass, title: title, text: subtext, value: value, sectionId: section, style: .blocks, updated: { args.updatePremium($0) })
+            return ItemListSwitchItem(presentationData: presentationData, systemStyle: .glass, title: title, text: subtext, value: value, isolatedCard: true, sectionId: section, style: .blocks, updated: { args.updatePremium($0) })
         case .verified(_, let title, let subtext, let value):
-            return ItemListSwitchItem(presentationData: presentationData, systemStyle: .glass, title: title, text: subtext, value: value, sectionId: section, style: .blocks, updated: { args.updateVerified($0) })
+            return ItemListSwitchItem(presentationData: presentationData, systemStyle: .glass, title: title, text: subtext, value: value, isolatedCard: true, sectionId: section, style: .blocks, updated: { args.updateVerified($0) })
         case .scam(_, let title, let subtext, let value):
-            return ItemListSwitchItem(presentationData: presentationData, systemStyle: .glass, title: title, text: subtext, value: value, sectionId: section, style: .blocks, updated: { args.updateScam($0) })
+            return ItemListSwitchItem(presentationData: presentationData, systemStyle: .glass, title: title, text: subtext, value: value, isolatedCard: true, sectionId: section, style: .blocks, updated: { args.updateScam($0) })
         case .fake(_, let title, let subtext, let value):
-            return ItemListSwitchItem(presentationData: presentationData, systemStyle: .glass, title: title, text: subtext, value: value, sectionId: section, style: .blocks, updated: { args.updateFake($0) })
+            return ItemListSwitchItem(presentationData: presentationData, systemStyle: .glass, title: title, text: subtext, value: value, isolatedCard: true, sectionId: section, style: .blocks, updated: { args.updateFake($0) })
         case .support(_, let title, let subtext, let value):
-            return ItemListSwitchItem(presentationData: presentationData, systemStyle: .glass, title: title, text: subtext, value: value, sectionId: section, style: .blocks, updated: { args.updateSupport($0) })
+            return ItemListSwitchItem(presentationData: presentationData, systemStyle: .glass, title: title, text: subtext, value: value, isolatedCard: true, sectionId: section, style: .blocks, updated: { args.updateSupport($0) })
         case .bot(_, let title, let subtext, let value):
-            return ItemListSwitchItem(presentationData: presentationData, systemStyle: .glass, title: title, text: subtext, value: value, sectionId: section, style: .blocks, updated: { args.updateBot($0) })
+            return ItemListSwitchItem(presentationData: presentationData, systemStyle: .glass, title: title, text: subtext, value: value, isolatedCard: true, sectionId: section, style: .blocks, updated: { args.updateBot($0) })
         case .badgesNotice(_, let text):
             return ItemListTextItem(presentationData: presentationData, text: .plain(text), sectionId: section)
         }

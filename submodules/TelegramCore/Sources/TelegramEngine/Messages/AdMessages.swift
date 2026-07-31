@@ -2,6 +2,7 @@ import Foundation
 import Postbox
 import SwiftSignalKit
 import TelegramApi
+import SGSimpleSettings
 
 private class AdMessagesHistoryContextImpl {
     final class CachedMessage: Equatable, Codable {
@@ -481,7 +482,16 @@ private class AdMessagesHistoryContextImpl {
             return
         }
         self.isActivated = true
-        
+
+        // MARK: Nameless — "Отключить рекламу". The UI already drops ad messages, but without
+        // this the request still leaves the device; suppressing it here means the server is
+        // never even asked for sponsored content.
+        if SGSimpleSettings.shared.disableAllAds {
+            self.stateValue = State(interPostInterval: nil, messages: [])
+            self.state.set(.single(State(interPostInterval: nil, messages: [])))
+            return
+        }
+
         let peerId = self.peerId
         let accountPeerId = self.account.peerId
         let account = self.account

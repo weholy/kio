@@ -2318,9 +2318,21 @@ final class PeerInfoHeaderNode: ASDisplayNode {
             }
         }
         
-        let buttonWidth = (width - buttonSideInset * 2.0 + buttonSpacing) / CGFloat(buttonKeys.count) - buttonSpacing
-        let buttonSize = CGSize(width: buttonWidth, height: 58.0)
-        var buttonRightOrigin = CGPoint(x: width - buttonSideInset, y: backgroundHeight - bottomInset - 16.0 - buttonSize.height)
+        // MARK: Nameless — "Круглые вкладки": profile header buttons become fixed-size circles, centered as a group
+        let roundProfileButtons = SGSimpleSettings.shared.roundTabs
+        let buttonSize: CGSize
+        var buttonRightOrigin: CGPoint
+        if roundProfileButtons {
+            let circleDiameter: CGFloat = 56.0
+            buttonSize = CGSize(width: circleDiameter, height: circleDiameter)
+            let totalContentWidth = CGFloat(buttonKeys.count) * circleDiameter + CGFloat(max(0, buttonKeys.count - 1)) * buttonSpacing
+            let startX = (width + totalContentWidth) / 2.0
+            buttonRightOrigin = CGPoint(x: startX, y: backgroundHeight - bottomInset - 16.0 - buttonSize.height)
+        } else {
+            let buttonWidth = (width - buttonSideInset * 2.0 + buttonSpacing) / CGFloat(buttonKeys.count) - buttonSpacing
+            buttonSize = CGSize(width: buttonWidth, height: 58.0)
+            buttonRightOrigin = CGPoint(x: width - buttonSideInset, y: backgroundHeight - bottomInset - 16.0 - buttonSize.height)
+        }
         if !actionButtonKeys.isEmpty {
             buttonRightOrigin.y += actionButtonSize.height + 24.0
         }

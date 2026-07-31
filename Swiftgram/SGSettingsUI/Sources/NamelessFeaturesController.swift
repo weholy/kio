@@ -90,6 +90,7 @@ private enum NLBoolSetting: String {
     case disableZalgoText
     case quickTranslateButton
     case enableLocalPremium
+    case localStarsEnabled
     case uploadSpeedBoost
     case unlimitedFavoriteStickers
     case storyStealthMode
@@ -251,6 +252,7 @@ private enum NLDisclosureLink: String {
     case onlineHistory
     case ghostDetailsToggle
     case fakeLocationPicker
+    case localStarsAmount
 }
 
 private enum NLAction: Int, CaseIterable {
@@ -258,6 +260,7 @@ private enum NLAction: Int, CaseIterable {
     case importSettings
     case saveKeychain
     case resetAll
+    case resetLocalStars
 }
 
 /// 4 категории для нового layout (вместо 9)
@@ -309,7 +312,7 @@ private enum NLHubCategory: String, CaseIterable {
         case .hubGhost: return .ghost
         case .hubOther: return .other
         case .hubSearch: return .search
-        case .none, .onlineHistory, .ghostDetailsToggle, .fakeLocationPicker: return nil
+        case .none, .onlineHistory, .ghostDetailsToggle, .fakeLocationPicker, .localStarsAmount: return nil
         }
     }
 }
@@ -435,6 +438,60 @@ private let nlSearchIndex: [NLSearchableItem] = [
     NLSearchableItem(title: "Полные просмотры", category: .other),
     NLSearchableItem(title: "Визуальный юзернейм", category: .other),
     NLSearchableItem(title: "Компактные числа", category: .other),
+    // MARK: Nameless — additional entries so every toggle is searchable
+    // Appearance
+    NLSearchableItem(title: "Надпись «Чаты» в списке", category: .appearance),
+    NLSearchableItem(title: "Кнопка поиска в списке чатов", category: .appearance),
+    NLSearchableItem(title: "Премиум-статус в шапке", category: .appearance),
+    NLSearchableItem(title: "ОЗУ под часами", category: .appearance),
+    NLSearchableItem(title: "Скрыть номер в настройках", category: .appearance),
+    NLSearchableItem(title: "Скрыть «Все чаты»", category: .appearance),
+    NLSearchableItem(title: "Скрыть истории", category: .appearance),
+    NLSearchableItem(title: "Блюр вместо Liquid Glass", category: .appearance),
+    NLSearchableItem(title: "Полупрозрачные сообщения", category: .appearance),
+    NLSearchableItem(title: "Компактный превью сообщений", category: .appearance),
+    NLSearchableItem(title: "Подписи вкладок таббара", category: .appearance),
+    NLSearchableItem(title: "Круглые вкладки", category: .appearance),
+    NLSearchableItem(title: "Свайп-опции чатов", category: .appearance),
+    NLSearchableItem(title: "Эффект удаления сообщений", category: .appearance),
+    NLSearchableItem(title: "Стандартные эмодзи первыми", category: .appearance),
+    NLSearchableItem(title: "Сохранять историю чатов", category: .appearance),
+    NLSearchableItem(title: "Локальное редактирование сообщений", category: .appearance),
+    NLSearchableItem(title: "История чатов (сохранение)", category: .appearance),
+    NLSearchableItem(title: "Одноразовые медиа в галерею", category: .appearance),
+    NLSearchableItem(title: "Не слушать следующее голосовое", category: .appearance),
+    NLSearchableItem(title: "Полупрозрачно когда отмечают", category: .appearance),
+    NLSearchableItem(title: "Кнопка «Наверх»", category: .appearance),
+    NLSearchableItem(title: "Скролл к следующему каналу", category: .appearance),
+    NLSearchableItem(title: "Стиль автоформатирования", category: .appearance),
+    NLSearchableItem(title: "Анимация фейда Liquid Glass", category: .appearance),
+    NLSearchableItem(title: "Стекло: входящие сообщения", category: .appearance),
+    NLSearchableItem(title: "Стекло: исходящие сообщения", category: .appearance),
+    NLSearchableItem(title: "Стекло: настройки", category: .appearance),
+    NLSearchableItem(title: "Стекло: профиль", category: .appearance),
+    NLSearchableItem(title: "Стекло: подарки в профиле", category: .appearance),
+    NLSearchableItem(title: "Стекло: инлайн-кнопки ботов", category: .appearance),
+    NLSearchableItem(title: "Стекло: всплывающие окна", category: .appearance),
+    NLSearchableItem(title: "Стекло: контекстное меню", category: .appearance),
+    NLSearchableItem(title: "Стекло: панель поиска", category: .appearance),
+    NLSearchableItem(title: "Стекло: тонирование", category: .appearance),
+    NLSearchableItem(title: "Интенсивность Liquid Glass", category: .appearance),
+    NLSearchableItem(title: "Задняя камера по умолчанию", category: .appearance),
+    NLSearchableItem(title: "Микрофон устройства (камера)", category: .appearance),
+    NLSearchableItem(title: "Качество JPEG камеры", category: .appearance),
+    NLSearchableItem(title: "Видео → кружок или голосовое", category: .appearance),
+    NLSearchableItem(title: "Минимальный блюр аватара", category: .appearance),
+    NLSearchableItem(title: "Тонирование блюра аватара", category: .appearance),
+    NLSearchableItem(title: "Иконки приложения Telegram", category: .appearance),
+    // Ghost
+    NLSearchableItem(title: "Скрыть отправку голосового", category: .ghost),
+    NLSearchableItem(title: "Скрыть запись видео", category: .ghost),
+    NLSearchableItem(title: "Если взаимно в контактах", category: .ghost),
+    NLSearchableItem(title: "Показывать DC", category: .ghost),
+    // Other
+    NLSearchableItem(title: "Временные метки на стикерах", category: .other),
+    NLSearchableItem(title: "Предупреждение при открытии сторис", category: .other),
+    NLSearchableItem(title: "Системный шэринг", category: .other),
 ]
 
 // MARK: - State
@@ -652,8 +709,10 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
     entries.append(.toggle(id: id.count, section: sec, settingName: .disableUploadingPhotoStatus, value: s.disableUploadingPhotoStatus, text: "Скрыть отправку фото", enabled: true))
     entries.append(.toggle(id: id.count, section: sec, settingName: .disableUploadingVideoStatus, value: s.disableUploadingVideoStatus, text: "Скрыть отправку видео", enabled: true))
     entries.append(.toggle(id: id.count, section: sec, settingName: .disableRecordingVideoStatus, value: s.disableRecordingVideoStatus, text: "Скрыть запись видео", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .disableChoosingLocationStatus, value: s.disableChoosingLocationStatus, text: "Скрыть выбор локации", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .disableChoosingContactStatus, value: s.disableChoosingContactStatus, text: "Скрыть выбор контакта", enabled: true))
+    // "Выбирает локацию" / "выбирает контакт" are not real Telegram activities — there is no
+    // such `SendMessageAction`, so no toggle can suppress them. Rows removed rather than left
+    // as switches that silently do nothing.
+    id.increment(2)
     entries.append(.toggle(id: id.count, section: sec, settingName: .disablePlayingGameStatus, value: s.disablePlayingGameStatus, text: "Скрыть статус игры", enabled: true))
     entries.append(.toggle(id: id.count, section: sec, settingName: .disableRecordingRoundVideoStatus, value: s.disableRecordingRoundVideoStatus, text: "Скрыть запись кружка", enabled: true))
     entries.append(.toggle(id: id.count, section: sec, settingName: .disableUploadingRoundVideoStatus, value: s.disableUploadingRoundVideoStatus, text: "Скрыть отправку кружка", enabled: true))
@@ -723,10 +782,17 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
     entries.append(.toggle(id: id.count, section: sec, settingName: .contextShowMessageReplies, value: s.contextShowMessageReplies, text: "Ответы на сообщение", enabled: true))
     entries.append(.toggle(id: id.count, section: sec, settingName: .contextShowJson, value: s.contextShowJson, text: "JSON", enabled: true))
 
-    // ЛОКАЛЬНЫЕ ЗВЁЗДЫ
-    entries.append(.header(id: id.count, section: sec, text: "ЛОКАЛЬНЫЕ ЗВЁЗДЫ", badge: nil))
+    // ЛОКАЛЬНЫЙ ПРЕМИУМ И ЗВЁЗДЫ
+    entries.append(.header(id: id.count, section: sec, text: "ЛОКАЛЬНЫЙ ПРЕМИУМ И ЗВЁЗДЫ", badge: nil))
     entries.append(.toggle(id: id.count, section: sec, settingName: .enableLocalPremium, value: s.enableLocalPremium, text: "Локальный премиум", enabled: true))
-    entries.append(.notice(id: id.count, section: sec, text: "Локальный баланс: \(s.feelRichStarsAmount) ⭐ (настройка feel rich)"))
+    entries.append(.toggle(id: id.count, section: sec, settingName: .localStarsEnabled, value: s.localStarsEnabled, text: "Локальные звёзды", enabled: true))
+    entries.append(.disclosureDetail(id: id.count, section: sec, link: .localStarsAmount, text: "Баланс звёзд", detail: "\(s.localStarsBalance) ⭐ из \(s.localStarsTopUp)"))
+    if s.localStarsSpent > 0 {
+        entries.append(.action(id: id.count, section: sec, actionType: .resetLocalStars, text: "Пополнить (сбросить траты: \(s.localStarsSpent) ⭐)", kind: .generic))
+    } else {
+        id.increment(1)
+    }
+    entries.append(.notice(id: id.count, section: sec, text: "Баланс виден только вам и не связан с сервером. При отправке подарков и платных реакций сумма списывается локально."))
 
     // ДОПОЛНИТЕЛЬНО
     entries.append(.header(id: id.count, section: sec, text: "ДОПОЛНИТЕЛЬНО", badge: nil))
@@ -852,7 +918,11 @@ private func namelessFeaturesControllerImpl(context: AccountContext, initialCate
             case .disableScrollToNextTopic2: s.disableScrollToNextChannel = !value
             case .disableZalgoText: s.disableZalgoText = value
             case .quickTranslateButton: s.quickTranslateButton = value
-            case .enableLocalPremium: s.enableLocalPremium = value
+            case .enableLocalPremium: s.enableLocalPremium = value; askForRestart?()
+            case .localStarsEnabled:
+                s.localStarsEnabled = value
+                NotificationCenter.default.post(name: .namelessLocalStarsDidChange, object: nil)
+                simplePromise.set(true)
             case .uploadSpeedBoost: s.uploadSpeedBoost = value
             case .unlimitedFavoriteStickers: s.unlimitedFavoriteStickers = value
             case .storyStealthMode: s.storyStealthMode = value
@@ -959,38 +1029,81 @@ private func namelessFeaturesControllerImpl(context: AccountContext, initialCate
                 if value { s.disableOnlineStatus = false }
                 NotificationCenter.default.post(name: NSNotification.Name("nameless.ghostModeDidChange"), object: nil)
                 simplePromise.set(true)
-            case .liquidGlassEnabled: s.liquidGlassEnabled = value; NotificationCenter.default.post(name: .luxgramLiquidGlassDidChange, object: nil)
-            case .namelessLiquidGlassMessages: s.namelessLiquidGlassMessages = value; NotificationCenter.default.post(name: .luxgramLiquidGlassDidChange, object: nil)
-            case .namelessLiquidGlassOutgoingMessages: s.namelessLiquidGlassOutgoingMessages = value; NotificationCenter.default.post(name: .luxgramLiquidGlassDidChange, object: nil)
-            case .namelessLiquidGlassSettings: s.namelessLiquidGlassSettings = value; NotificationCenter.default.post(name: .luxgramLiquidGlassDidChange, object: nil)
-            case .namelessLiquidGlassProfile: s.namelessLiquidGlassProfile = value; NotificationCenter.default.post(name: .luxgramLiquidGlassDidChange, object: nil)
-            case .namelessLiquidGlassProfileGifts: s.namelessLiquidGlassProfileGifts = value; NotificationCenter.default.post(name: .luxgramLiquidGlassDidChange, object: nil)
-            case .namelessLiquidGlassInlineButtons: s.namelessLiquidGlassInlineButtons = value; NotificationCenter.default.post(name: .luxgramLiquidGlassDidChange, object: nil)
-            case .namelessLiquidGlassTinting: s.namelessLiquidGlassTinting = value; NotificationCenter.default.post(name: .luxgramLiquidGlassDidChange, object: nil)
-            case .namelessLiquidGlassPopup: s.namelessLiquidGlassPopup = value; NotificationCenter.default.post(name: .luxgramLiquidGlassDidChange, object: nil)
-            case .namelessLiquidGlassContextMenu: s.namelessLiquidGlassContextMenu = value; NotificationCenter.default.post(name: .luxgramLiquidGlassDidChange, object: nil)
-            case .namelessLiquidGlassSearch: s.namelessLiquidGlassSearch = value; NotificationCenter.default.post(name: .luxgramLiquidGlassDidChange, object: nil)
-            case .namelessLiquidGlassFadeAnimation: s.namelessLiquidGlassFadeAnimation = value
+            // MARK: Nameless — every glass toggle must both repaint live surfaces
+            // (`.luxgramLiquidGlassDidChange`) *and* rebuild this list (`simplePromise`),
+            // otherwise the dependent rows keep their stale `enabled:` state until the
+            // screen is re-entered.
+            case .liquidGlassEnabled:
+                s.liquidGlassEnabled = value
+                NotificationCenter.default.post(name: .luxgramLiquidGlassDidChange, object: nil)
+                simplePromise.set(true)
+            case .namelessLiquidGlassMessages:
+                s.namelessLiquidGlassMessages = value
+                NotificationCenter.default.post(name: .luxgramLiquidGlassDidChange, object: nil)
+                simplePromise.set(true)
+            case .namelessLiquidGlassOutgoingMessages:
+                s.namelessLiquidGlassOutgoingMessages = value
+                NotificationCenter.default.post(name: .luxgramLiquidGlassDidChange, object: nil)
+                simplePromise.set(true)
+            case .namelessLiquidGlassSettings:
+                s.namelessLiquidGlassSettings = value
+                NotificationCenter.default.post(name: .luxgramLiquidGlassDidChange, object: nil)
+                simplePromise.set(true)
+            case .namelessLiquidGlassProfile:
+                s.namelessLiquidGlassProfile = value
+                NotificationCenter.default.post(name: .luxgramLiquidGlassDidChange, object: nil)
+                simplePromise.set(true)
+            case .namelessLiquidGlassProfileGifts:
+                s.namelessLiquidGlassProfileGifts = value
+                NotificationCenter.default.post(name: .luxgramLiquidGlassDidChange, object: nil)
+                simplePromise.set(true)
+            case .namelessLiquidGlassInlineButtons:
+                s.namelessLiquidGlassInlineButtons = value
+                NotificationCenter.default.post(name: .luxgramLiquidGlassDidChange, object: nil)
+                simplePromise.set(true)
+            case .namelessLiquidGlassTinting:
+                s.namelessLiquidGlassTinting = value
+                NotificationCenter.default.post(name: .luxgramLiquidGlassDidChange, object: nil)
+                simplePromise.set(true)
+            case .namelessLiquidGlassPopup:
+                s.namelessLiquidGlassPopup = value
+                NotificationCenter.default.post(name: .luxgramLiquidGlassDidChange, object: nil)
+                simplePromise.set(true)
+            case .namelessLiquidGlassContextMenu:
+                s.namelessLiquidGlassContextMenu = value
+                NotificationCenter.default.post(name: .luxgramLiquidGlassDidChange, object: nil)
+                simplePromise.set(true)
+            case .namelessLiquidGlassSearch:
+                s.namelessLiquidGlassSearch = value
+                NotificationCenter.default.post(name: .luxgramLiquidGlassDidChange, object: nil)
+                simplePromise.set(true)
+            case .namelessLiquidGlassFadeAnimation:
+                s.namelessLiquidGlassFadeAnimation = value
+                simplePromise.set(true)
             case .enableTelescope: s.enableTelescope = value
             case .emojiDownloaderEnabled: s.emojiDownloaderEnabled = value
             case .enableVideoToCircleOrVoice: s.enableVideoToCircleOrVoice = value
             case .namelessVideoBackgroundEnabled: s.namelessVideoBackgroundEnabled = value
-            case .squareAvatars: s.squareAvatars = value
-            case .newChatList: s.newChatList = value
-            case .newChatHeader: s.newChatHeader = value
-            case .blurInsteadGlass: s.blurInsteadGlass = value
-            case .oledMode: s.oledMode = value
-            case .customSettingsIcons: s.customSettingsIcons = value
-            case .telegramAppIcons: s.telegramAppIcons = value
+            case .squareAvatars: s.squareAvatars = value; simplePromise.set(true)
+            case .newChatList: s.newChatList = value; askForRestart?()
+            case .newChatHeader: s.newChatHeader = value; askForRestart?()
+            case .blurInsteadGlass:
+                // Kills glass in favour of plain blur — every registered surface has to repaint.
+                s.blurInsteadGlass = value
+                NotificationCenter.default.post(name: .luxgramLiquidGlassDidChange, object: nil)
+                simplePromise.set(true)
+            case .oledMode: s.oledMode = value; askForRestart?()
+            case .customSettingsIcons: s.customSettingsIcons = value; simplePromise.set(true)
+            case .telegramAppIcons: s.telegramAppIcons = value; simplePromise.set(true)
             case .swipeChatOptions: s.swipeChatOptions = value
             case .hideVoiceRecordButton: s.hideVoiceRecordButton = value
-            case .foldersAtBottom: s.foldersAtBottom = value
-            case .ramUsageUnderClock: s.ramUsageUnderClock = value
-            case .chatListTitle: s.chatListTitle = value
-            case .premiumStatusInHeader: s.premiumStatusInHeader = value
-            case .searchButtonInChatList: s.searchButtonInChatList = value
+            case .foldersAtBottom: s.foldersAtBottom = value; askForRestart?()
+            case .ramUsageUnderClock: s.ramUsageUnderClock = value; askForRestart?()
+            case .chatListTitle: s.chatListTitle = value; askForRestart?()
+            case .premiumStatusInHeader: s.premiumStatusInHeader = value; askForRestart?()
+            case .searchButtonInChatList: s.searchButtonInChatList = value; askForRestart?()
             case .unlimitedPinnedChats: s.unlimitedPinnedChats = value
-            case .newAccountSwitcher: s.newAccountSwitcher = value
+            case .newAccountSwitcher: s.newAccountSwitcher = value; askForRestart?()
             case .profileColorBackground: s.profileColorBackground = value
             case .profileAvatarBlur: s.profileAvatarBlur = value
             case .profileAvatarBlurMinimal: s.profileAvatarBlurMinimal = value
@@ -1139,6 +1252,12 @@ private func namelessFeaturesControllerImpl(context: AccountContext, initialCate
                 }))
                 return
             }
+            if link == .localStarsAmount {
+                pushControllerImpl?(namelessLocalStarsController(context: context, onSave: {
+                    simplePromise.set(true)
+                }))
+                return
+            }
             guard let category = NLHubCategory.from(link: link) else { return }
             pushControllerImpl?(namelessFeaturesCategoryController(context: context, category: category))
         },
@@ -1158,6 +1277,9 @@ private func namelessFeaturesControllerImpl(context: AccountContext, initialCate
             case .resetAll:
                 SGSimpleSettings.shared.restoreNamelessRollbackSnapshot()
                 for key in UserDefaults.standard.dictionaryRepresentation().keys where key.hasPrefix("nameless.") { UserDefaults.standard.removeObject(forKey: key) }
+                simplePromise.set(true)
+            case .resetLocalStars:
+                SGSimpleSettings.shared.resetLocalStarsSpending()
                 simplePromise.set(true)
             }
         },

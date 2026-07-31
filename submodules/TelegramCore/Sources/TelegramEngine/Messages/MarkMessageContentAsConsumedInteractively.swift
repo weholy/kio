@@ -2,6 +2,7 @@ import Foundation
 import Postbox
 import TelegramApi
 import SwiftSignalKit
+import SGSimpleSettings
 
 func _internal_markMessageContentAsConsumedInteractively(postbox: Postbox, messageId: MessageId) -> Signal<Void, NoError> {
     return postbox.transaction { transaction -> Void in
@@ -38,7 +39,14 @@ func _internal_markMessageContentAsConsumedInteractively(postbox: Postbox, messa
                                 }
                             }
                         } else {
-                            addSynchronizeConsumeMessageContentsOperation(transaction: transaction, messageIds: [message.id])
+                            // MARK: Nameless — "Скрыть просмотр видео/кружка". The message is
+                            // still marked consumed locally (the play button stops pulsing for
+                            // us), but the server is never told, so the sender does not see the
+                            // "watched" state on voice/round-video messages.
+                            let ghostHidesWatch = SGSimpleSettings.shared.ghostModeEnabled && SGSimpleSettings.shared.ghostModeHideVideoWatch
+                            if !ghostHidesWatch {
+                                addSynchronizeConsumeMessageContentsOperation(transaction: transaction, messageIds: [message.id])
+                            }
                         }
                     }
                 } else if let attribute = updatedAttributes[i] as? ConsumablePersonalMentionMessageAttribute, !attribute.consumed {

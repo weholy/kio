@@ -44,9 +44,9 @@ private enum ProtectedChatsEntry: ItemListNodeEntry {
         let lang = presentationData.strings.baseLanguageCode
         switch self {
         case let .enabled(title, value):
-            return ItemListSwitchItem(presentationData: presentationData, title: title, value: value, sectionId: section, style: .blocks, updated: { args.toggleEnabled($0) })
+            return ItemListSwitchItem(presentationData: presentationData, title: title, value: value, isolatedCard: true, sectionId: section, style: .blocks, updated: { args.toggleEnabled($0) })
         case let .useDevicePasscode(title, value):
-            return ItemListSwitchItem(presentationData: presentationData, title: title, value: value, sectionId: section, style: .blocks, updated: { args.toggleUseDevicePasscode($0) })
+            return ItemListSwitchItem(presentationData: presentationData, title: title, value: value, isolatedCard: true, sectionId: section, style: .blocks, updated: { args.toggleUseDevicePasscode($0) })
         case let .setCustomPasscode(title):
             return ItemListDisclosureItem(presentationData: presentationData, title: title, label: "", sectionId: section, style: .blocks, action: { args.setCustomPasscode() })
         case let .addChat(title):
