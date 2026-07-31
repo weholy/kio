@@ -34,6 +34,14 @@ private enum NLSectionId: Int32, SGItemListSection {
     case hubPill8 = 18
     case hubPill9 = 19
     case hubPill10 = 20
+    case hubPill11 = 21
+    case hubPill12 = 22
+    case hubPill13 = 23
+    case hubPill14 = 24
+    case hubPill15 = 25
+    case hubPill16 = 26
+    case hubPill17 = 27
+    case hubPill18 = 28
     case hubActions = 30
 }
 
@@ -253,6 +261,22 @@ private enum NLDisclosureLink: String {
     case hubGhost
     case hubOther
     case hubSearch
+    case hubLiquidGlass
+    case hubProfiles
+    case hubTabs
+    case hubFolders
+    case hubChatList
+    case hubStories
+    case hubMediaCamera
+    case hubInputEmoji
+    case hubVoice
+    case hubVoiceMorph
+    case hubCalls
+    case hubMusic
+    case hubNetwork
+    case hubSettingsSections
+    case hubBackup
+    case hubMisc
     case onlineHistory
     case ghostDetailsToggle
     case fakeLocationPicker
@@ -271,55 +295,150 @@ private enum NLAction: Int, CaseIterable {
     case resetLocalStars
 }
 
-/// 4 категории для нового layout (вместо 9)
 private enum NLHubCategory: String, CaseIterable {
-    case appearance   // Внешний вид — всё что связано с интерфейсом + сообщения
-    case ghost        // Режим призрака — привacidad + геолокация + статусы
-    case other        // Прочие функции — контекст, сторис, медиа, экспорт
-    case search       // Поиск — поиск по настройкам с навигацией
+    case search
+    case appearance
+    case liquidGlass
+    case profiles
+    case tabs
+    case folders
+    case chatList
+    case stories
+    case mediaCamera
+    case inputEmoji
+    case voice
+    case voiceMorph
+    case calls
+    case music
+    case network
+    case settingsSections
+    case backup
+    case misc
+    case ghost
+    case other
 
     var titleRu: String {
         switch self {
+        case .search: return "Поиск"
         case .appearance: return "Внешний вид"
+        case .liquidGlass: return "Стекло и эффекты"
+        case .profiles: return "Профили"
+        case .tabs: return "Вкладки"
+        case .folders: return "Папки"
+        case .chatList: return "Список чатов"
+        case .stories: return "Истории"
+        case .mediaCamera: return "Медиа и камера"
+        case .inputEmoji: return "Ввод и эмодзи"
+        case .voice: return "Голосовые"
+        case .voiceMorph: return "Смена голоса"
+        case .calls: return "Звонки"
+        case .music: return "Музыка"
+        case .network: return "Сеть"
+        case .settingsSections: return "Разделы настроек"
+        case .backup: return "Резервная копия"
+        case .misc: return "Прочее"
         case .ghost: return "Режим призрака"
         case .other: return "Прочие функции"
-        case .search: return "Поиск"
         }
     }
 
     var subtitleRu: String {
         switch self {
+        case .search: return "Найти и перейти к настройке"
         case .appearance: return "Интерфейс, сообщения, Liquid Glass, камера"
+        case .liquidGlass: return "Liquid Glass, блюр и сообщения"
+        case .profiles: return "ID и дополнения профиля"
+        case .tabs: return "Панель вкладок"
+        case .folders: return "Папки чатов"
+        case .chatList: return "Внешний вид и свайп-действия"
+        case .stories: return "Запись и репост"
+        case .mediaCamera: return "Видео, фото и камера"
+        case .inputEmoji: return "Клавиатура, ввод и эмодзи"
+        case .voice: return "Микрофон и голосовые"
+        case .voiceMorph: return "Пресеты и свой голос"
+        case .calls: return "Подтверждение звонков"
+        case .music: return "Плеер, кроссфейд и эквалайзер"
+        case .network: return "Ускорение отправки и загрузки"
+        case .settingsSections: return "Скрытие стандартных разделов"
+        case .backup: return "JSON и Keychain"
+        case .misc: return "Разное"
         case .ghost: return "Онлайн, прочтение, приватность, геолокация"
         case .other: return "Контекст, сторис, медиа, экспорт"
-        case .search: return "Найти и перейти к настройке"
         }
     }
 
     var pillSection: NLSectionId {
         switch self {
-        case .appearance: return .hubPill0
-        case .ghost: return .hubPill1
-        case .other: return .hubPill2
-        case .search: return .hubPill3
+        case .search: return .hubPill0
+        case .appearance: return .hubPill1
+        case .liquidGlass: return .hubPill2
+        case .profiles: return .hubPill3
+        case .tabs: return .hubPill4
+        case .folders: return .hubPill5
+        case .chatList: return .hubPill6
+        case .stories: return .hubPill7
+        case .mediaCamera: return .hubPill8
+        case .inputEmoji: return .hubPill9
+        case .voice: return .hubPill10
+        case .voiceMorph: return .hubPill11
+        case .calls: return .hubPill12
+        case .music: return .hubPill13
+        case .network: return .hubPill14
+        case .settingsSections: return .hubPill15
+        case .backup: return .hubPill16
+        case .misc: return .hubPill17
+        case .ghost: return .hubPill18
+        case .other: return .hubActions
         }
     }
 
     var disclosure: NLDisclosureLink {
         switch self {
+        case .search: return .hubSearch
         case .appearance: return .hubAppearance
+        case .liquidGlass: return .hubLiquidGlass
+        case .profiles: return .hubProfiles
+        case .tabs: return .hubTabs
+        case .folders: return .hubFolders
+        case .chatList: return .hubChatList
+        case .stories: return .hubStories
+        case .mediaCamera: return .hubMediaCamera
+        case .inputEmoji: return .hubInputEmoji
+        case .voice: return .hubVoice
+        case .voiceMorph: return .hubVoiceMorph
+        case .calls: return .hubCalls
+        case .music: return .hubMusic
+        case .network: return .hubNetwork
+        case .settingsSections: return .hubSettingsSections
+        case .backup: return .hubBackup
+        case .misc: return .hubMisc
         case .ghost: return .hubGhost
         case .other: return .hubOther
-        case .search: return .hubSearch
         }
     }
 
     static func from(link: NLDisclosureLink) -> NLHubCategory? {
         switch link {
         case .hubAppearance: return .appearance
+        case .hubSearch: return .search
+        case .hubLiquidGlass: return .liquidGlass
+        case .hubProfiles: return .profiles
+        case .hubTabs: return .tabs
+        case .hubFolders: return .folders
+        case .hubChatList: return .chatList
+        case .hubStories: return .stories
+        case .hubMediaCamera: return .mediaCamera
+        case .hubInputEmoji: return .inputEmoji
+        case .hubVoice: return .voice
+        case .hubVoiceMorph: return .voiceMorph
+        case .hubCalls: return .calls
+        case .hubMusic: return .music
+        case .hubNetwork: return .network
+        case .hubSettingsSections: return .settingsSections
+        case .hubBackup: return .backup
+        case .hubMisc: return .misc
         case .hubGhost: return .ghost
         case .hubOther: return .other
-        case .hubSearch: return .search
         case .none, .onlineHistory, .ghostDetailsToggle, .fakeLocationPicker, .localStarsAmount, .deviceModelSpoof, .visualUsernameEditor, .localNftCenter, .accountSwitcher: return nil
         }
     }
@@ -622,6 +741,12 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
     entries.append(.searchInput(id: id.count, section: .search, title: NSAttributedString(string: "🔍"), text: state.searchQuery ?? "", placeholder: "Поиск настроек"))
     let sec: NLSectionId = .items
     let cat = state.hubCategory
+    let appearanceCategories: Set<NLHubCategory> = [.appearance, .liquidGlass, .profiles, .tabs, .folders, .chatList, .stories, .mediaCamera, .inputEmoji, .voice, .calls, .music]
+    let ghostCategories: Set<NLHubCategory> = [.ghost]
+    let otherCategories: Set<NLHubCategory> = [.other, .voiceMorph, .network, .settingsSections, .backup, .misc]
+    let showAppearance = cat == nil || cat.map { appearanceCategories.contains($0) } == true
+    let showGhost = cat == nil || cat.map { ghostCategories.contains($0) } == true
+    let showOther = cat == nil || cat.map { otherCategories.contains($0) } == true
 
     // ═══════════════════════════════════════════
     // ВНЕШНИЙ ВИД — интерфейс + сообщения + Liquid Glass + камера + медиа + информация
@@ -633,7 +758,7 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
     // saveEditHistory, enableLocalMessageEditing, saveChatHistory, saveOnceMedia,
     // noAutoNextVoice (wired but confusing), doubleTapToEdit, scrollToTopButtonEnabled,
     // showOriginalEdited, camera/particle/profile-blur/icons/music noise) removed.
-    if cat == nil || cat == .appearance {
+    if showAppearance {
 
     // СПИСОК ЧАТОВ
     entries.append(.header(id: id.count, section: sec, text: "СПИСОК ЧАТОВ", badge: nil))
@@ -716,7 +841,7 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
     // ═══════════════════════════════════════════
     // РЕЖИМ ПРИЗРАКА — статусы + приватность + конфиденциальность + геолокация + информация
     // ═══════════════════════════════════════════
-    if cat == nil || cat == .ghost {
+    if showGhost {
     entries.append(.header(id: id.count, section: sec, text: "👻 РЕЖИМ ПРИЗРАКА", badge: nil))
     entries.append(.toggle(id: id.count, section: sec, settingName: .ghostModeEnabled, value: s.ghostModeEnabled, text: "Режим призрака", enabled: true))
     entries.append(.disclosureDetail(id: id.count, section: sec, link: .ghostDetailsToggle, text: "Дополнительные настройки", detail: state.ghostModeExpanded ? "Скрыть настройки режима призрака" : "Показать настройки режима призрака"))
@@ -792,7 +917,7 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
     // ═══════════════════════════════════════════
     // ПРОЧИЕ ФУНКЦИИ — контекст, сторис, фото, доп.
     // ═══════════════════════════════════════════
-    if cat == nil || cat == .other {
+    if showOther {
     // КОНТЕКСТНОЕ МЕНЮ
     entries.append(.header(id: id.count, section: sec, text: "✦ ПРОЧИЕ ФУНКЦИИ", badge: nil))
     entries.append(.header(id: id.count, section: sec, text: "КОНТЕКСТНОЕ МЕНЮ", badge: nil))
