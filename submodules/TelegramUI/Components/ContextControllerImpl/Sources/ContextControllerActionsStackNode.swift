@@ -8,6 +8,7 @@ import TelegramCore
 import SwiftSignalKit
 import AccountContext
 import ReactionSelectionNode
+import SGSimpleSettings
 import Markdown
 import EntityKeyboard
 import AnimationCache
@@ -1760,19 +1761,27 @@ public final class ContextControllerActionsStackNodeImpl: ASDisplayNode, Context
         func update(presentationData: PresentationData, presentation: Presentation, size: CGSize, transition: ContainedViewLayoutTransition) {
             let transition = ComponentTransition(transition)
             
+            // MARK: Megram — when the global clear-glass switch is on, force the message
+            // context menu to render as a light material (isDark=false) regardless of the
+            // system theme, matching the reference screenshot with the white translucent
+            // action list on the blurred wallpaper.
+            let overallDark = presentationData.theme.overallDarkAppearance
+            let forceLight = SGSimpleSettings.shared.megramGlobalClearGlass
+            let effectiveIsDark = forceLight ? false : overallDark
+
             transition.setFrame(view: self.backgroundContainer, frame: CGRect(origin: CGPoint(), size: size))
-            self.backgroundContainer.update(size: size, isDark: presentationData.theme.overallDarkAppearance, transition: transition)
-            
+            self.backgroundContainer.update(size: size, isDark: effectiveIsDark, transition: transition)
+
             if let effectView = self.contentContainer.effectView as? LensTransitionContainerEffectViewImpl {
                 effectView.update(theme: presentationData.theme)
             }
             transition.setPosition(view: self.contentContainer, position: CGRect(origin: CGPoint(), size: size).center)
             transition.setBounds(view: self.contentContainer, bounds: CGRect(origin: CGPoint(), size: size))
             let cornerRadius = min(34.0, size.height * 0.5)
-            self.contentContainer.update(size: size, cornerRadius: cornerRadius, isDark: presentationData.theme.overallDarkAppearance, transition: transition)
+            self.contentContainer.update(size: size, cornerRadius: cornerRadius, isDark: effectiveIsDark, transition: transition)
             transition.setFrame(view: self.borderView, frame: CGRect(origin: .zero, size: size))
             transition.setCornerRadius(layer: self.borderView.layer, cornerRadius: cornerRadius)
-            self.borderView.layer.borderColor = (presentationData.theme.overallDarkAppearance ? UIColor(rgb: 0x8D5CFF) : UIColor.white).withAlphaComponent(presentationData.theme.overallDarkAppearance ? 0.34 : 0.5).cgColor
+            self.borderView.layer.borderColor = (effectiveIsDark ? UIColor(rgb: 0x8D5CFF) : UIColor.white).withAlphaComponent(effectiveIsDark ? 0.34 : 0.5).cgColor
             
             //let backgroundContainerFrame = CGRect(origin: CGPoint(), size: size).insetBy(dx: -self.backgroundContainerInset, dy: -self.backgroundContainerInset)
             

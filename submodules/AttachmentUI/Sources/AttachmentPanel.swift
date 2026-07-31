@@ -2586,13 +2586,15 @@ final class AttachmentPanel: ASDisplayNode, ASScrollViewDelegate, ASGestureRecog
                 panelSize.height = topAccessoryHeight
             }
 
+            // Megram: chunkier corners for the attach panel (matches the reference iOS 26
+            // sheet with visibly rounded rectangle instead of an oval pill).
             let cornerRadius: CGFloat
             if isSelecting {
-                cornerRadius = min(20.0, basePanelHeight * 0.5)
+                cornerRadius = min(22.0, basePanelHeight * 0.5)
             } else if self.hasMediaAccessoryPanel {
-                cornerRadius = 18.5
+                cornerRadius = 22.0
             } else {
-                cornerRadius = glassPanelHeight * 0.5
+                cornerRadius = min(28.0, glassPanelHeight * 0.5)
             }
             let backgroundOriginX: CGFloat = isSelecting ? panelSideInset : floorToScreenPixels((layout.size.width - panelSize.width) / 2.0)
 
