@@ -166,6 +166,7 @@ private enum NLBoolSetting: String {
     case emojiDownloaderEnabled
     case hideNewChatSticker
     case hideBusinessChats
+    case settingsBigAvatar
     case enableVideoToCircleOrVoice
     case namelessVideoBackgroundEnabled
     // Appearance
@@ -664,6 +665,8 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
     entries.append(.notice(id: id.count, section: sec, text: "В пустом чате не показывается большой стикер-приветствие, чтобы случайно не отправить его тапом."))
     entries.append(.toggle(id: id.count, section: sec, settingName: .hideBusinessChats, value: s.hideBusinessChats, text: "Скрыть панель бизнес-бота", enabled: true))
     entries.append(.notice(id: id.count, section: sec, text: "Убирает баннер «бот управляет этим чатом» с кнопкой СТОП сверху чатов, делегированных Telegram Business ассистенту."))
+    entries.append(.toggle(id: id.count, section: sec, settingName: .settingsBigAvatar, value: s.settingsBigAvatar, text: "Большой аватар в шапке настроек", enabled: true))
+    entries.append(.notice(id: id.count, section: sec, text: "Настройки открываются с уже развёрнутой фотографией во всю ширину, имя и юзернейм — поверх снизу."))
 
     // СООБЩЕНИЯ · ПОВЕДЕНИЕ
     entries.append(.header(id: id.count, section: sec, text: "СООБЩЕНИЯ", badge: nil))
@@ -1100,6 +1103,7 @@ private func namelessFeaturesControllerImpl(context: AccountContext, initialCate
             case .emojiDownloaderEnabled: s.emojiDownloaderEnabled = value
             case .hideNewChatSticker: s.hideNewChatSticker = value; askForRestart?()
             case .hideBusinessChats: s.hideBusinessChats = value; simplePromise.set(true)
+            case .settingsBigAvatar: s.settingsBigAvatar = value; askForRestart?()
             case .enableVideoToCircleOrVoice: s.enableVideoToCircleOrVoice = value
             case .namelessVideoBackgroundEnabled: s.namelessVideoBackgroundEnabled = value
             case .squareAvatars: s.squareAvatars = value; simplePromise.set(true)

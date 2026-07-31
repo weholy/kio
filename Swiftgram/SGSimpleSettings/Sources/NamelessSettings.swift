@@ -102,6 +102,7 @@ private enum NamelessSettingsKey {
     static let visualUsernameText = "nameless.visualUsernameText"
     static let hideNewChatSticker = "nameless.hideNewChatSticker"
     static let hideBusinessChats = "nameless.hideBusinessChats"
+    static let settingsBigAvatar = "nameless.settingsBigAvatar"
     static let forwardWarnAuthor = "nameless.forwardWarnAuthor"
     static let profileMusicCard = "nameless.profileMusicCard"
     static let visualUsernameAliases = "nameless.visualUsernameAliases"
@@ -423,6 +424,12 @@ public extension SGSimpleSettings {
     var hideBusinessChats: Bool {
         get { storage.namelessBool(NamelessSettingsKey.hideBusinessChats) }
         set { storage.set(newValue, forKey: NamelessSettingsKey.hideBusinessChats) }
+    }
+
+    /// Open Settings with the avatar already expanded (fills the top of the screen).
+    var settingsBigAvatar: Bool {
+        get { storage.namelessBool(NamelessSettingsKey.settingsBigAvatar) }
+        set { storage.set(newValue, forKey: NamelessSettingsKey.settingsBigAvatar) }
     }
 
     /// Confirm-with-cooldown alert when forwarding a message back to its author.
