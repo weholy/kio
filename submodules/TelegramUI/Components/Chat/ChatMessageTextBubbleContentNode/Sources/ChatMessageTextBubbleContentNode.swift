@@ -27,6 +27,7 @@ import ChatControllerInteraction
 import InteractiveTextComponent
 import ShimmeringMask
 import StreamingTextReveal
+import SGSimpleSettings
 
 private final class CachedChatMessageText {
     let text: String
@@ -655,6 +656,23 @@ public class ChatMessageTextBubbleContentNode: ChatMessageBubbleContentNode {
                         maximumNumberOfLines = 12
                     }
                     
+                    let truncationTokenText = item.presentationData.strings.Conversation_ReadMore
+                    customTruncationToken = { baseFont, isQuote in
+                        let truncationToken = NSMutableAttributedString()
+                        if isQuote {
+                            truncationToken.append(NSAttributedString(string: "\u{2026}", font: Font.regular(baseFont.pointSize), textColor: messageTheme.primaryTextColor))
+                        } else {
+                            truncationToken.append(NSAttributedString(string: "\u{2026} ", font: Font.regular(baseFont.pointSize), textColor: messageTheme.primaryTextColor))
+                            truncationToken.append(NSAttributedString(string: truncationTokenText, font: Font.regular(baseFont.pointSize), textColor: messageTheme.accentTextColor))
+                        }
+                        return truncationToken
+                    }
+                } else if SGSimpleSettings.shared.truncateLongMessages {
+                    // MARK: Nameless — "Сокращать сообщения": collapse long walls of text in the
+                    // chat itself, reusing the same "Read more" token the preview mode uses.
+                    // Tapping the bubble opens the message, which is where the full text lives.
+                    maximumNumberOfLines = 12
+
                     let truncationTokenText = item.presentationData.strings.Conversation_ReadMore
                     customTruncationToken = { baseFont, isQuote in
                         let truncationToken = NSMutableAttributedString()
