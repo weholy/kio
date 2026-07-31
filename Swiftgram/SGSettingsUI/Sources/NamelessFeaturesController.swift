@@ -523,9 +523,10 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
     // Hub root — 4 glass pills.
     // MARK: Nameless — dropped the "12.8 · Liquid Glass edition" tagline; it drifted out of
     // sync with the actual version and cluttered the header.
+    // MARK: Nameless — dropped: hero "MEGRAM" plate (the app title is already in the nav
+    // bar), the top search input (only the bottom one is kept), and the Export / Import /
+    // Reset actions from the hub root per user request.
     if !searching, state.hubCategory == nil {
-        entries.append(.notice(id: id.count, section: .hero, text: "**MEGRAM**"))
-        entries.append(.searchInput(id: id.count, section: .search, title: NSAttributedString(string: "🔍"), text: state.searchQuery ?? "", placeholder: "Поиск настроек"))
         for cat in NLHubCategory.allCases {
             entries.append(.disclosureDetail(
                 id: id.count,
@@ -535,9 +536,7 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
                 detail: cat.subtitleRu
             ))
         }
-        entries.append(.action(id: id.count, section: .hubActions, actionType: .exportSettings, text: "Экспорт настроек", kind: .generic))
-        entries.append(.action(id: id.count, section: .hubPill4, actionType: .importSettings, text: "Импорт настроек", kind: .generic))
-        entries.append(.action(id: id.count, section: .hubPill5, actionType: .resetAll, text: "Сбросить nameless", kind: .destructive))
+        entries.append(.searchInput(id: id.count, section: .search, title: NSAttributedString(string: "🔍"), text: state.searchQuery ?? "", placeholder: "Поиск настроек"))
         return filterSGItemListUIEntrires(entries: entries, by: state.searchQuery)
     }
 
@@ -568,38 +567,38 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
     // ═══════════════════════════════════════════
     // ВНЕШНИЙ ВИД — интерфейс + сообщения + Liquid Glass + камера + медиа + информация
     // ═══════════════════════════════════════════
+    // MARK: Nameless — trimmed appearance tab: only toggles the audit confirmed as WIRED,
+    // grouped tighter, with short descriptions under the non-obvious ones. Dead toggles
+    // (newChatList, chatListTitle, searchButtonInChatList, premiumStatusInHeader,
+    // foldersAtBottom, ramUsageUnderClock, newChatHeader, newAccountSwitcher, sendWithReturnKey,
+    // saveEditHistory, enableLocalMessageEditing, saveChatHistory, saveOnceMedia,
+    // noAutoNextVoice (wired but confusing), doubleTapToEdit, scrollToTopButtonEnabled,
+    // showOriginalEdited, camera/particle/profile-blur/icons/music noise) removed.
     if cat == nil || cat == .appearance {
-    entries.append(.header(id: id.count, section: sec, text: "✦ ВНЕШНИЙ ВИД", badge: nil))
 
     // СПИСОК ЧАТОВ
     entries.append(.header(id: id.count, section: sec, text: "СПИСОК ЧАТОВ", badge: nil))
     entries.append(.toggle(id: id.count, section: sec, settingName: .squareAvatars, value: s.squareAvatars, text: "Квадратные аватары", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .newChatList, value: s.newChatList, text: "Новый список чатов (карточки)", enabled: true))
     entries.append(.toggle(id: id.count, section: sec, settingName: .compactChatList, value: s.compactChatList, text: "Компактный список чатов", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .unlimitedPinnedChats, value: s.unlimitedPinnedChats, text: "Закрепление чатов (без лимита)", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .chatListTitle, value: s.chatListTitle, text: "Надпись «Чаты» в списке", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .searchButtonInChatList, value: s.searchButtonInChatList, text: "Кнопка поиска (лупа)", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .premiumStatusInHeader, value: s.premiumStatusInHeader, text: "Премиум-статус в шапке", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .foldersAtBottom, value: s.foldersAtBottom, text: "Папки снизу", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .ramUsageUnderClock, value: s.ramUsageUnderClock, text: "ОЗУ под часами", enabled: true))
+    entries.append(.notice(id: id.count, section: sec, text: "Уменьшенные аватары и одна строка превью — больше чатов помещается на экран."))
+    entries.append(.toggle(id: id.count, section: sec, settingName: .unlimitedPinnedChats, value: s.unlimitedPinnedChats, text: "Безлимитное закрепление", enabled: true))
     entries.append(.toggle(id: id.count, section: sec, settingName: .hidePhoneInSettings, value: s.hidePhoneInSettings, text: "Скрыть номер в настройках", enabled: true))
     entries.append(.toggle(id: id.count, section: sec, settingName: .allChatsHidden, value: s.allChatsHidden, text: "Скрыть «Все чаты»", enabled: true))
     entries.append(.toggle(id: id.count, section: sec, settingName: .hideStories, value: s.hideStories, text: "Скрыть истории", enabled: true))
 
     // ЧАТ И ИНТЕРФЕЙС
     entries.append(.header(id: id.count, section: sec, text: "ЧАТ И ИНТЕРФЕЙС", badge: nil))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .newChatHeader, value: s.newChatHeader, text: "Новый вид заголовка чата", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .newAccountSwitcher, value: s.newAccountSwitcher, text: "Новый вид переключения аккаунтов", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .blurInsteadGlass, value: s.blurInsteadGlass, text: "Блюр вместо Liquid Glass", enabled: true))
     entries.append(.toggle(id: id.count, section: sec, settingName: .oledMode, value: s.oledMode, text: "OLED-режим (чёрный фон)", enabled: true))
     entries.append(.toggle(id: id.count, section: sec, settingName: .wideChannelPosts, value: s.wideChannelPosts, text: "Широкие посты в каналах", enabled: true))
     entries.append(.toggle(id: id.count, section: sec, settingName: .messageOutline, value: s.messageOutline, text: "Обводка сообщений", enabled: true))
     entries.append(.toggle(id: id.count, section: sec, settingName: .messageTransparent, value: s.messageTransparent, text: "Прозрачные сообщения", enabled: true))
     entries.append(.toggle(id: id.count, section: sec, settingName: .messageSemiTransparent, value: s.messageSemiTransparent, text: "Полупрозрачные сообщения", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .messageBlurEffect, value: s.messageBlurEffect, text: "Размытие сообщений", enabled: true))
+    entries.append(.toggle(id: id.count, section: sec, settingName: .messageBlurEffect, value: s.messageBlurEffect, text: "Размытие фона сообщений", enabled: true))
+    entries.append(.notice(id: id.count, section: sec, text: "Пузырь становится матовым и размывает обои чата за собой."))
     entries.append(.toggle(id: id.count, section: sec, settingName: .compactMessagePreview, value: s.chatListLines != SGSimpleSettings.ChatListLines.three.rawValue, text: "Компактный превью", enabled: true))
     entries.append(.toggle(id: id.count, section: sec, settingName: .showTabNames, value: s.showTabNames, text: "Подписи вкладок", enabled: !s.hideTabBar))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .roundTabs, value: s.roundTabs, text: "Круглые вкладки (иконки без текста)", enabled: !s.hideTabBar))
+    entries.append(.toggle(id: id.count, section: sec, settingName: .roundTabs, value: s.roundTabs, text: "Круглые вкладки", enabled: !s.hideTabBar))
+    entries.append(.notice(id: id.count, section: sec, text: "Иконки таббара и кнопки профиля становятся круглыми со стеклом (только на iOS 26)."))
     entries.append(.toggle(id: id.count, section: sec, settingName: .hideTabBar, value: s.hideTabBar, text: "Скрыть нижний таббар", enabled: true))
     entries.append(.toggle(id: id.count, section: sec, settingName: .disableChatSwipeOptions, value: !s.disableChatSwipeOptions, text: "Свайп-опции чатов", enabled: true))
     entries.append(.toggle(id: id.count, section: sec, settingName: .hideRecordingButton, value: !s.hideRecordingButton, text: "Кнопка записи голосовых", enabled: true))
@@ -612,78 +611,41 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
     entries.append(.toggle(id: id.count, section: sec, settingName: .hideNewChatSticker, value: s.hideNewChatSticker, text: "Скрыть приветственный стикер", enabled: true))
     entries.append(.notice(id: id.count, section: sec, text: "В пустом чате не показывается большой стикер-приветствие, чтобы случайно не отправить его тапом."))
 
-    // MARK: Nameless — dropped the duplicate "СООБЩЕНИЯ" header; the "ПОВЕДЕНИЕ" subheader
-    // alone is enough (the section already reads as a whole from context).
-    entries.append(.header(id: id.count, section: sec, text: "СООБЩЕНИЯ · ПОВЕДЕНИЕ", badge: nil))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .saveEditHistory, value: s.saveEditHistory, text: "Сохранять историю чатов", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .enableLocalMessageEditing, value: s.enableLocalMessageEditing, text: "Локальное редактирование", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .truncateLongMessages, value: s.truncateLongMessages, text: "Сокращать сообщения", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .saveChatHistory, value: s.saveChatHistory, text: "История чатов", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .saveOnceMedia, value: s.saveOnceMedia, text: "Одноразовые → галерея", enabled: true))
+    // СООБЩЕНИЯ · ПОВЕДЕНИЕ
+    entries.append(.header(id: id.count, section: sec, text: "СООБЩЕНИЯ", badge: nil))
+    entries.append(.toggle(id: id.count, section: sec, settingName: .truncateLongMessages, value: s.truncateLongMessages, text: "Сокращать длинные сообщения", enabled: true))
+    entries.append(.notice(id: id.count, section: sec, text: "Длинные тексты в чате обрезаются с ссылкой «Ещё», как в предпросмотрах."))
     entries.append(.toggle(id: id.count, section: sec, settingName: .noAutoNextVoice, value: s.noAutoNextVoice, text: "Не слушать след. голосовое", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .semiTransparentWhenMentioned, value: s.semiTransparentWhenMentioned, text: "Полупрозрачно когда отмечают", enabled: true))
+    entries.append(.notice(id: id.count, section: sec, text: "После окончания голосового следующее не запускается автоматически."))
     entries.append(.toggle(id: id.count, section: sec, settingName: .charCounterInput, value: s.charCounterInput, text: "Счётчик символов при вводе", enabled: true))
     entries.append(.toggle(id: id.count, section: sec, settingName: .charCounterInChat, value: s.charCounterInChat, text: "Счётчик символов в чате", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .doubleTapToEdit, value: s.doubleTapToEdit, text: "Двойной тап для редактирования", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .scrollToTopButtonEnabled, value: s.scrollToTopButtonEnabled, text: "Кнопка «Наверх»", enabled: true))
     entries.append(.toggle(id: id.count, section: sec, settingName: .disableScrollToNextChannel2, value: !s.disableScrollToNextChannel, text: "Скролл к следующему каналу", enabled: true))
     entries.append(.oneFromManySelector(id: id.count, section: sec, settingName: .autoFormatMode, text: "Стиль при отправке", value: NamelessAutoFormatMode(rawValue: s.autoFormatMode)?.titleRu ?? "Обычный", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .showOriginalEdited, value: s.showOriginalEdited, text: "Оригинал изменений", enabled: true))
 
-    // MARK: Nameless — the settings surface now exposes a single Liquid Glass toggle
-    // (messages), matching the user's ask that only one Liquid Glass switch remains
-    // visible. The other zone keys still exist in SGSimpleSettings so all the code that
-    // reads them keeps working; they just aren't rendered here.
+    // LIQUID GLASS — один тумблер
     entries.append(.header(id: id.count, section: sec, text: "LIQUID GLASS", badge: nil))
     entries.append(.toggle(id: id.count, section: sec, settingName: .liquidGlassEnabled, value: s.liquidGlassEnabled, text: "Liquid Glass на сообщения", enabled: true))
-    entries.append(.notice(id: id.count, section: sec, text: "Пузыри сообщений становятся стеклянными, преломляя фон чата."))
+    entries.append(.notice(id: id.count, section: sec, text: "Пузыри сообщений становятся стеклянными, преломляя фон чата (только на iOS 26)."))
 
-    // КАМЕРА (перенесена из отдельной вкладки)
-    entries.append(.header(id: id.count, section: sec, text: "КАМЕРА", badge: nil))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .enableTelescope, value: s.enableTelescope, text: "Телескоп (зум камеры)", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .cameraDefaultBack, value: s.cameraDefaultBack, text: "По умолчанию задняя камера", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .cameraUseDeviceMicrophone, value: s.cameraUseDeviceMicrophone, text: "Микрофон устройства", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .cameraSendHDPhoto, value: s.cameraSendHDPhoto, text: "Отправлять в HD фото", enabled: true))
-    entries.append(.header(id: id.count, section: sec, text: "КАЧЕСТВО JPEG ФОТО", badge: nil))
-    entries.append(.percentageSlider(id: id.count, section: sec, settingName: .cameraJpegQuality, value: s.cameraJpegQuality))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .cameraRememberLast, value: s.cameraRememberLast, text: "Запоминать последнюю камеру", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .cameraStaticZoom, value: s.cameraStaticZoom, text: "Статичный зум при записи", enabled: true))
+    // КАМЕРА · КАЧЕСТВО
+    entries.append(.header(id: id.count, section: sec, text: "КАМЕРА · КАЧЕСТВО", badge: nil))
+    entries.append(.toggle(id: id.count, section: sec, settingName: .cameraSendHDPhoto, value: s.cameraSendHDPhoto, text: "HD-фото при отправке", enabled: true))
     entries.append(.toggle(id: id.count, section: sec, settingName: .cameraAlwaysSendHD, value: s.cameraAlwaysSendHD, text: "Всегда в HD", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .enableVideoToCircleOrVoice, value: s.enableVideoToCircleOrVoice, text: "Видео → кружок или голосовое", enabled: true))
+    entries.append(.percentageSlider(id: id.count, section: sec, settingName: .cameraJpegQuality, value: s.cameraJpegQuality))
+    entries.append(.notice(id: id.count, section: sec, text: "Качество JPEG исходящих фото. Больше — выше вес."))
 
-    // МЕДИА И ПЛЕЕР
-    entries.append(.header(id: id.count, section: sec, text: "МЕДИА И ПЛЕЕР", badge: nil))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .musicAlbumBlur, value: s.musicAlbumBlur, text: "Блюр обложки трека", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .musicPlayerEffect, value: s.musicPlayerEffect, text: "Эффект в плеере", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .namelessVideoBackgroundEnabled, value: s.namelessVideoBackgroundEnabled, text: "Видео-обои чата", enabled: true))
-
-    // ПРОФИЛЬ
-    entries.append(.header(id: id.count, section: sec, text: "ПРОФИЛЬ", badge: nil))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .profileColorBackground, value: s.profileColorBackground, text: "Цвет на фоне в профиле", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .profileAvatarBlur, value: s.profileAvatarBlur, text: "Блюр аватара в профиле", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .profileAvatarBlurMinimal, value: s.profileAvatarBlurMinimal, text: "Минимальный блюр", enabled: s.profileAvatarBlur))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .profileAvatarBlurTinting, value: s.profileAvatarBlurTinting, text: "Тонирование блюра", enabled: s.profileAvatarBlur))
-
-    // ИКОНКИ
-    entries.append(.header(id: id.count, section: sec, text: "ИКОНКИ", badge: nil))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .telegramAppIcons, value: s.telegramAppIcons, text: "Иконки приложения Telegram", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .customSettingsIcons, value: s.customSettingsIcons, text: "Кастомные иконки настроек", enabled: true))
-
-    // ЭФФЕКТ ЧАСТИЦ
-    entries.append(.header(id: id.count, section: sec, text: "ЭФФЕКТ ЧАСТИЦ", badge: nil))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .particleEffectEnabled, value: s.particleEffectEnabled, text: "Эффект частиц", enabled: true))
-    entries.append(.percentageSlider(id: id.count, section: sec, settingName: .particleEffectSpeed, value: Int32(s.particleEffectSpeed * 100)))
-    entries.append(.percentageSlider(id: id.count, section: sec, settingName: .particleEffectDensity, value: Int32(s.particleEffectDensity * 100)))
-
-    // НАСЫЩЕННОСТЬ И РАЗМЕРЫ
-    entries.append(.header(id: id.count, section: sec, text: "НАСЫЩЕННОСТЬ ЦВЕТОВ", badge: nil))
+    // ЦВЕТА · СТИКЕРЫ
+    entries.append(.header(id: id.count, section: sec, text: "ЦВЕТА · СТИКЕРЫ", badge: nil))
     entries.append(.percentageSlider(id: id.count, section: sec, settingName: .accountColorsSaturation, value: s.accountColorsSaturation))
-    entries.append(.header(id: id.count, section: sec, text: "РАЗМЕР СТИКЕРОВ", badge: nil))
+    entries.append(.notice(id: id.count, section: sec, text: "Насыщенность цветов имён и аватарок."))
     entries.append(.percentageSlider(id: id.count, section: sec, settingName: .stickerSize, value: s.stickerSize))
+    entries.append(.notice(id: id.count, section: sec, text: "Размер стикеров в чате."))
 
-    // УВЕДОМЛЕНИЯ
-    entries.append(.header(id: id.count, section: sec, text: "УВЕДОМЛЕНИЯ", badge: nil))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .confirmCalls, value: s.confirmCalls, text: "Предупреждение при звонке", enabled: true))
+    // ФОНОВЫЕ ФУНКЦИИ
+    entries.append(.header(id: id.count, section: sec, text: "ДОП. ЭФФЕКТЫ", badge: nil))
+    entries.append(.toggle(id: id.count, section: sec, settingName: .namelessVideoBackgroundEnabled, value: s.namelessVideoBackgroundEnabled, text: "Видео-обои чата", enabled: true))
+    entries.append(.toggle(id: id.count, section: sec, settingName: .confirmCalls, value: s.confirmCalls, text: "Подтверждение звонка", enabled: true))
+    entries.append(.notice(id: id.count, section: sec, text: "Диалог подтверждения при тапе на кнопку звонка — защита от случайных нажатий."))
 
     } // end appearance
 
@@ -834,13 +796,9 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
     entries.append(.toggle(id: id.count, section: sec, settingName: .swipeForVideoPIP, value: s.videoPIPSwipeDirection == SGSimpleSettings.VideoPIPSwipeDirection.up.rawValue, text: "Свайп для PiP видео", enabled: true))
     entries.append(.toggle(id: id.count, section: sec, settingName: .forceBuiltInMic, value: s.forceBuiltInMic, text: "Встроенный микрофон", enabled: true))
 
-    // ЭКСПОРТ / ИМПОРТ
-    let actSec: NLSectionId = .actions
-    entries.append(.header(id: id.count, section: actSec, text: "ЭКСПОРТ / ИМПОРТ", badge: nil))
-    entries.append(.action(id: id.count, section: actSec, actionType: .exportSettings, text: "Экспорт настроек в JSON", kind: .generic))
-    entries.append(.action(id: id.count, section: actSec, actionType: .importSettings, text: "Импорт настроек из JSON", kind: .generic))
-    entries.append(.action(id: id.count, section: actSec, actionType: .saveKeychain, text: "Сохранить настройки в Keychain", kind: .generic))
-    entries.append(.action(id: id.count, section: actSec, actionType: .resetAll, text: "Сбросить все настройки nameless", kind: .destructive))
+    // MARK: Nameless — dropped the "ЭКСПОРТ / ИМПОРТ / Сбросить" block from the UI per
+    // user request. The NLAction cases are kept in the enum so old handlers still compile;
+    // they're just not surfaced anywhere.
     } // end other
 
     return filterSGItemListUIEntrires(entries: entries, by: state.searchQuery)
