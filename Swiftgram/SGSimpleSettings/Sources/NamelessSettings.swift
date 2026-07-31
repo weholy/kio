@@ -101,6 +101,7 @@ private enum NamelessSettingsKey {
     static let deviceModelSpoof = "nameless.deviceModelSpoof"
     static let visualUsernameText = "nameless.visualUsernameText"
     static let hideNewChatSticker = "nameless.hideNewChatSticker"
+    static let hideBusinessChats = "nameless.hideBusinessChats"
     static let forwardWarnAuthor = "nameless.forwardWarnAuthor"
     static let profileMusicCard = "nameless.profileMusicCard"
     static let visualUsernameAliases = "nameless.visualUsernameAliases"
@@ -415,6 +416,13 @@ public extension SGSimpleSettings {
     var hideNewChatSticker: Bool {
         get { storage.namelessBool(NamelessSettingsKey.hideNewChatSticker) }
         set { storage.set(newValue, forKey: NamelessSettingsKey.hideNewChatSticker) }
+    }
+
+    /// Hide the "bot manages this chat" panel that appears at the top of chats delegated
+    /// to a Telegram Business assistant bot.
+    var hideBusinessChats: Bool {
+        get { storage.namelessBool(NamelessSettingsKey.hideBusinessChats) }
+        set { storage.set(newValue, forKey: NamelessSettingsKey.hideBusinessChats) }
     }
 
     /// Confirm-with-cooldown alert when forwarding a message back to its author.
