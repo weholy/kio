@@ -259,6 +259,7 @@ private enum NLDisclosureLink: String {
     case localStarsAmount
     case deviceModelSpoof
     case visualUsernameEditor
+    case localNftCenter
     case accountSwitcher
 }
 
@@ -319,7 +320,7 @@ private enum NLHubCategory: String, CaseIterable {
         case .hubGhost: return .ghost
         case .hubOther: return .other
         case .hubSearch: return .search
-        case .none, .onlineHistory, .ghostDetailsToggle, .fakeLocationPicker, .localStarsAmount, .deviceModelSpoof, .visualUsernameEditor, .accountSwitcher: return nil
+        case .none, .onlineHistory, .ghostDetailsToggle, .fakeLocationPicker, .localStarsAmount, .deviceModelSpoof, .visualUsernameEditor, .localNftCenter, .accountSwitcher: return nil
         }
     }
 }
@@ -811,6 +812,7 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
     entries.append(.toggle(id: id.count, section: sec, settingName: .enableLocalPremium, value: s.enableLocalPremium, text: "Локальный премиум", enabled: true))
     entries.append(.toggle(id: id.count, section: sec, settingName: .localStarsEnabled, value: s.localStarsEnabled, text: "Локальные звёзды", enabled: true))
     entries.append(.disclosureDetail(id: id.count, section: sec, link: .localStarsAmount, text: "Баланс звёзд", detail: "\(s.localStarsBalance) ⭐ из \(s.localStarsTopUp)"))
+    entries.append(.disclosureDetail(id: id.count, section: sec, link: .localNftCenter, text: "NFT-подарки и usernames", detail: "\(s.localNftGifts.count) подарков · \(s.localNftUsernames.count) usernames"))
     if s.localStarsSpent > 0 {
         entries.append(.action(id: id.count, section: sec, actionType: .resetLocalStars, text: "Пополнить (сбросить траты: \(s.localStarsSpent) ⭐)", kind: .generic))
     } else {
@@ -1285,6 +1287,12 @@ private func namelessFeaturesControllerImpl(context: AccountContext, initialCate
             }
             if link == .localStarsAmount {
                 pushControllerImpl?(namelessLocalStarsController(context: context, onSave: {
+                    simplePromise.set(true)
+                }))
+                return
+            }
+            if link == .localNftCenter {
+                pushControllerImpl?(namelessLocalNftController(context: context, onSave: {
                     simplePromise.set(true)
                 }))
                 return

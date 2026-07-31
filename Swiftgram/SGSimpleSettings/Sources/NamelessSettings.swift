@@ -100,6 +100,8 @@ private enum NamelessSettingsKey {
     // link SGSimpleSettings; the key literal is duplicated in MTApiEnvironment.m.
     static let deviceModelSpoof = "nameless.deviceModelSpoof"
     static let visualUsernameText = "nameless.visualUsernameText"
+    static let localNftGiftsJson = "nameless.localNftGiftsJson"
+    static let localNftUsernamesJson = "nameless.localNftUsernamesJson"
     static let hideNewChatSticker = "nameless.hideNewChatSticker"
     static let hideBusinessChats = "nameless.hideBusinessChats"
     static let settingsBigAvatar = "nameless.settingsBigAvatar"
@@ -255,6 +257,46 @@ private enum NamelessSettingsKey {
     static let antiScamEnabled = "nameless.antiScam"
     static let warnBeforeCall = "nameless.warnBeforeCall"
     static let outgoingPhotoQuality = "nameless.outgoingPhotoQuality"
+    // MARK: - Attachment UI
+    // When enabled, the '+' attachment picker replaces the classic horizontal tab bar with
+    // a compact rounded glass sheet stacking the same buttons as a vertical list.
+    static let namelessCompactAttachmentSheet = "nameless.compactAttachmentSheet"
+}
+
+public struct NamelessLocalNftGift: Codable, Equatable {
+    public var id: String
+    public var peerId: String
+    public var title: String
+    public var subtitle: String
+    public var emoji: String
+    public var rarity: String
+    public var serial: String
+
+    public init(id: String = UUID().uuidString, peerId: String, title: String, subtitle: String, emoji: String, rarity: String, serial: String) {
+        self.id = id
+        self.peerId = peerId
+        self.title = title
+        self.subtitle = subtitle
+        self.emoji = emoji
+        self.rarity = rarity
+        self.serial = serial
+    }
+}
+
+public struct NamelessLocalNftUsername: Codable, Equatable {
+    public var id: String
+    public var peerId: String
+    public var username: String
+    public var number: String
+    public var colorHex: String
+
+    public init(id: String = UUID().uuidString, peerId: String, username: String, number: String, colorHex: String) {
+        self.id = id
+        self.peerId = peerId
+        self.username = username
+        self.number = number
+        self.colorHex = colorHex
+    }
 }
 
 private enum NamelessRollbackStorage {
@@ -411,6 +453,52 @@ public extension SGSimpleSettings {
     var visualUsernameText: String {
         get { storage.namelessString(NamelessSettingsKey.visualUsernameText, default: "") }
         set { storage.set(newValue, forKey: NamelessSettingsKey.visualUsernameText) }
+    }
+
+    var localNftGifts: [NamelessLocalNftGift] {
+        get {
+            guard let data = storage.namelessString(NamelessSettingsKey.localNftGiftsJson, default: "[]").data(using: .utf8) else {
+                return []
+            }
+            return (try? JSONDecoder().decode([NamelessLocalNftGift].self, from: data)) ?? []
+        }
+        set {
+            let data = (try? JSONEncoder().encode(newValue)) ?? Data()
+            storage.set(String(data: data, encoding: .utf8) ?? "[]", forKey: NamelessSettingsKey.localNftGiftsJson)
+        }
+    }
+
+    var localNftUsernames: [NamelessLocalNftUsername] {
+        get {
+            guard let data = storage.namelessString(NamelessSettingsKey.localNftUsernamesJson, default: "[]").data(using: .utf8) else {
+                return []
+            }
+            return (try? JSONDecoder().decode([NamelessLocalNftUsername].self, from: data)) ?? []
+        }
+        set {
+            let data = (try? JSONEncoder().encode(newValue)) ?? Data()
+            storage.set(String(data: data, encoding: .utf8) ?? "[]", forKey: NamelessSettingsKey.localNftUsernamesJson)
+        }
+    }
+
+    func addLocalNftGift(_ gift: NamelessLocalNftGift) {
+        var gifts = localNftGifts
+        gifts.insert(gift, at: 0)
+        localNftGifts = gifts
+    }
+
+    func removeLocalNftGift(id: String) {
+        localNftGifts = localNftGifts.filter { $0.id != id }
+    }
+
+    func addLocalNftUsername(_ username: NamelessLocalNftUsername) {
+        var usernames = localNftUsernames
+        usernames.insert(username, at: 0)
+        localNftUsernames = usernames
+    }
+
+    func removeLocalNftUsername(id: String) {
+        localNftUsernames = localNftUsernames.filter { $0.id != id }
     }
 
     /// Hide the greeting sticker on empty chats.
@@ -717,5 +805,14 @@ public extension SGSimpleSettings {
             ids.remove(String(recordId))
         }
         storage.set(Array(ids).sorted(), forKey: NamelessSettingsKey.mutedAccountIds)
+    }
+
+    /// Replace the horizontal '+' attachment tab bar with a compact vertical rounded
+    /// glass sheet floating above the input. Off by default so the classic behaviour
+    /// stays the safety net; toggling this hides the tab bar and shows a stacked
+    /// list of the same buttons.
+    var namelessCompactAttachmentSheet: Bool {
+        get { storage.namelessBool(NamelessSettingsKey.namelessCompactAttachmentSheet) }
+        set { storage.set(newValue, forKey: NamelessSettingsKey.namelessCompactAttachmentSheet) }
     }
 }
