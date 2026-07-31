@@ -1227,7 +1227,7 @@ final class GiftOptionsScreenComponent: Component {
                 }
             }
             
-            let balanceTitleSize = self.balanceTitle.update(
+            _ = self.balanceTitle.update(
                 transition: .immediate,
                 component: AnyComponent(MultilineTextComponent(
                     text: .plain(NSAttributedString(
@@ -1251,7 +1251,7 @@ final class GiftOptionsScreenComponent: Component {
                 balanceInset += 6.0
             }
             
-            let balanceValueSize = self.balanceValue.update(
+            _ = self.balanceValue.update(
                 transition: .immediate,
                 component: AnyComponent(MultilineTextComponent(
                     text: .plain(balanceText),
@@ -1260,7 +1260,7 @@ final class GiftOptionsScreenComponent: Component {
                 environment: {},
                 containerSize: availableSize
             )
-            let balanceIconSize = self.balanceIcon.update(
+            _ = self.balanceIcon.update(
                 transition: .immediate,
                 component: AnyComponent(BundleIconComponent(name: "Premium/Stars/StarSmall", tintColor: nil)),
                 environment: {},
