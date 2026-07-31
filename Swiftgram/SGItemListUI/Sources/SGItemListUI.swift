@@ -56,8 +56,12 @@ public final class SGItemListArguments<BoolSetting: Hashable, SliderSetting: Has
     let openDisclosureLink: (DisclosureLink) -> Void
     let action: (ActionType) -> Void
     let searchInput: (String) -> Void
+    // MARK: Nameless — long-press on a toggle row shows a full-description tooltip.
+    // Consumers wire this to pop an UndoOverlayController / alert from the description map.
+    let longPressBool: (BoolSetting) -> Void
+    let boolDescription: (BoolSetting) -> String?
 
-    
+
     public init(
         context: AccountContext,
         //
@@ -66,7 +70,9 @@ public final class SGItemListArguments<BoolSetting: Hashable, SliderSetting: Has
         setOneFromManyValue: @escaping (OneFromManySetting) -> Void = { _ in },
         openDisclosureLink: @escaping (DisclosureLink) -> Void = { _ in},
         action: @escaping (ActionType) -> Void = { _ in },
-        searchInput: @escaping (String) -> Void = { _ in }
+        searchInput: @escaping (String) -> Void = { _ in },
+        longPressBool: @escaping (BoolSetting) -> Void = { _ in },
+        boolDescription: @escaping (BoolSetting) -> String? = { _ in nil }
     ) {
         self.context = context
         //
@@ -76,6 +82,8 @@ public final class SGItemListArguments<BoolSetting: Hashable, SliderSetting: Has
         self.openDisclosureLink = openDisclosureLink
         self.action = action
         self.searchInput = searchInput
+        self.longPressBool = longPressBool
+        self.boolDescription = boolDescription
     }
 }
 
@@ -229,13 +237,13 @@ public enum SGItemListUIEntry<Section: SGItemListSection, BoolSetting: Hashable,
             return ItemListSectionHeaderItem(presentationData: presentationData, text: string, badge: badge, sectionId: self.section)
             
         case let .toggle(_, _, setting, value, text, enabled):
-            return ItemListSwitchItem(presentationData: presentationData, systemStyle: .glass, title: text, value: value, enabled: enabled, maximumNumberOfLines: 0, isolatedCard: true, sectionId: self.section, style: .blocks, updated: { value in
+            return ItemListSwitchItem(presentationData: presentationData, systemStyle: .glass, title: text, text: arguments.boolDescription(setting), value: value, enabled: enabled, maximumNumberOfLines: 0, isolatedCard: true, sectionId: self.section, style: .blocks, updated: { value in
                 arguments.setBoolValue(setting, value)
-            })
+            }, longTapAction: { arguments.longPressBool(setting) })
         case let .toggleWithIcon(_, _, setting, value, text, _, enabled):
-            return ItemListSwitchItem(presentationData: presentationData, systemStyle: .glass, title: text, value: value, enabled: enabled, maximumNumberOfLines: 0, isolatedCard: true, sectionId: self.section, style: .blocks, updated: { value in
+            return ItemListSwitchItem(presentationData: presentationData, systemStyle: .glass, title: text, text: arguments.boolDescription(setting), value: value, enabled: enabled, maximumNumberOfLines: 0, isolatedCard: true, sectionId: self.section, style: .blocks, updated: { value in
                 arguments.setBoolValue(setting, value)
-            })
+            }, longTapAction: { arguments.longPressBool(setting) })
         case let .notice(_, _, string):
             return ItemListTextItem(presentationData: presentationData, text: .markdown(string), sectionId: self.section)
         case let .disclosure(_, _, link, text):

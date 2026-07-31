@@ -608,15 +608,14 @@ public final class ChatMessageBubbleBackdrop: ASDisplayNode, SGLiquidGlassContai
     private func updateGlass(size: CGSize, isDark: Bool, zone: SGLiquidGlassZone, transition: ComponentTransition = .immediate) {
         let enabled = zone.isEnabled && size.width > 0.5 && size.height > 0.5
         // Official Apple liquid glass ONLY:
-        // GlassBackgroundView(.panel) → UIGlassEffect(style: .regular)
-        // (same as official Telegram-iOS chat chrome / input pills)
+        // message bubbles use clear-style glass, not panel glass. This keeps the iOS 26
+        // refraction/specular material while avoiding a grey/colored solid fill over chats.
         GlassBackgroundView.useCustomGlassImpl = false
         let tint: GlassBackgroundView.TintColor
         if zone.isTinted && self.currentBubbleColor != .clear {
-            // Light accent over panel glass (official custom default style)
-            tint = .init(kind: .custom(style: .default, color: self.currentBubbleColor.withAlphaComponent(0.28)))
+            tint = .init(kind: .custom(style: .clear, color: self.currentBubbleColor.withAlphaComponent(isDark ? 0.10 : 0.08)))
         } else {
-            tint = .init(kind: .panel)
+            tint = .init(kind: .clear)
         }
         if enabled {
             if self.glassView.superview !== self.view {

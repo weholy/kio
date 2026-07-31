@@ -1355,6 +1355,9 @@ private func namelessFeaturesControllerImpl(context: AccountContext, initialCate
                 UndoOverlayController(presentationData: presentationData, content: .info(title: nil, text: description, timeout: 4.0, customUndoText: nil), elevatedLayout: false, action: { _ in true }),
                 nil
             )
+        },
+        boolDescription: { setting in
+            return NamelessToggleDescriptions.text(for: "\(setting)") ?? "Локальная функция Megram. Работает только в этом клиенте и не меняет серверные данные Telegram."
         }
     )
 
