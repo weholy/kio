@@ -511,6 +511,28 @@ private struct NLControllerState: Equatable {
 private typealias NLEntry = SGItemListUIEntry<NLSectionId, NLBoolSetting, NLSliderSetting, NLOneFromManySetting, NLDisclosureLink, NLAction>
 private typealias NLArguments = SGItemListArguments<NLBoolSetting, NLSliderSetting, NLOneFromManySetting, NLDisclosureLink, NLAction>
 
+// MARK: Nameless — search helper.
+// Extracts the user-visible title from any entry kind that a settings search should surface.
+// Section headers, notice text, and search inputs are intentionally skipped.
+private func nlSearchableTitle(from entry: NLEntry) -> String {
+    switch entry {
+    case let .toggle(_, _, _, _, text, _):
+        return text
+    case let .toggleWithIcon(_, _, _, _, text, _, _):
+        return text
+    case let .disclosure(_, _, _, text):
+        return text
+    case let .disclosureDetail(_, _, _, text, _):
+        return text
+    case let .oneFromManySelector(_, _, _, text, _, _):
+        return text
+    case let .action(_, _, _, text, _):
+        return text
+    default:
+        return ""
+    }
+}
+
 // MARK: - Build Entries
 
 private func nlBuildEntries(presentationData: PresentationData, state: NLControllerState, simpleUpdated: Bool) -> [NLEntry] {
@@ -540,10 +562,39 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
         return filterSGItemListUIEntrires(entries: entries, by: state.searchQuery)
     }
 
-    // Search mode — show filtered results with category labels
+    // MARK: Nameless — search results. Instead of relying on the hand-maintained
+    // `nlSearchIndex` (which drifts out of sync every time we add a toggle), rebuild the
+    // full three-category tree with a throwaway id counter and pull the title/category
+    // out of every renderable row. Anything the user can see anywhere in the settings is
+    // then guaranteed to be searchable, and the fixed nlSearchIndex is only used as a
+    // supplement for aliases (e.g. English keywords for Russian titles).
     if searching {
         entries.append(.searchInput(id: id.count, section: .search, title: NSAttributedString(string: "🔍"), text: state.searchQuery ?? "", placeholder: "Поиск настроек..."))
-        let results = nlSearchIndex.filter { $0.title.lowercased().contains(query) }
+        var seen = Set<String>()
+        var results: [(title: String, category: NLHubCategory)] = []
+
+        for cat in [NLHubCategory.appearance, .ghost, .other] {
+            var catState = NLControllerState()
+            catState.hubCategory = cat
+            catState.ghostModeExpanded = true
+            let catEntries = nlBuildEntries(presentationData: presentationData, state: catState, simpleUpdated: false)
+            for entry in catEntries {
+                let title = nlSearchableTitle(from: entry)
+                guard !title.isEmpty else { continue }
+                guard title.lowercased().contains(query) else { continue }
+                let key = title.lowercased()
+                if seen.insert(key).inserted {
+                    results.append((title: title, category: cat))
+                }
+            }
+        }
+        for extra in nlSearchIndex where extra.title.lowercased().contains(query) {
+            let key = extra.title.lowercased()
+            if seen.insert(key).inserted {
+                results.append((title: extra.title, category: extra.category))
+            }
+        }
+
         if results.isEmpty {
             entries.append(.notice(id: id.count, section: .items, text: "Ничего не найдено"))
             return entries
