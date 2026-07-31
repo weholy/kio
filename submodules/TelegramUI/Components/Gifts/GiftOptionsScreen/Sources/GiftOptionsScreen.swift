@@ -135,6 +135,11 @@ final class GiftOptionsScreenComponent: Component {
         private let header = ComponentView<Empty>()
         
         private let balanceTitle = ComponentView<Empty>()
+        // MARK: Nameless — yellow pill button that replaces the balance stack in the top-right
+        // corner of the gift screen. Same tappable target (opens Stars intro), but with the
+        // wallet look from the reference screenshot instead of two lines of grey text.
+        private let namelessBalancePillButton = HighlightTrackingButton()
+        private var namelessBalancePillPresented = false
         private let balanceValue = ComponentView<Empty>()
         private let balanceIcon = ComponentView<Empty>()
         
@@ -284,6 +289,23 @@ final class GiftOptionsScreenComponent: Component {
 
         func scrollToTop() {
             self.scrollView.setContentOffset(CGPoint(), animated: true)
+        }
+
+        // MARK: Nameless — open StarsIntro (Мои звёзды) when the yellow balance pill is tapped.
+        @objc func namelessBalancePillPressed() {
+            guard let component = self.component, let environment = self.environment else {
+                return
+            }
+            let introController = component.context.sharedContext.makeStarsIntroScreen(context: component.context)
+            if let controller = environment.controller() as? GiftOptionsScreen {
+                let mainController: ViewController
+                if let parentController = controller.parentController() {
+                    mainController = parentController
+                } else {
+                    mainController = controller
+                }
+                mainController.push(introController)
+            }
         }
         
         var nextScrollTransition: ComponentTransition?
@@ -1245,20 +1267,45 @@ final class GiftOptionsScreenComponent: Component {
                 containerSize: availableSize
             )
             
+            // MARK: Nameless — yellow rounded pill instead of the stacked "Баланс: N ⭐" label.
+            // We keep the three subviews wired (rest of the code updates them) but hide them
+            // and place a single tappable pill above.
             if let balanceTitleView = self.balanceTitle.view, let balanceValueView = self.balanceValue.view, let balanceIconView = self.balanceIcon.view {
                 if balanceTitleView.superview == nil {
                     self.addSubview(balanceTitleView)
                     self.addSubview(balanceValueView)
                     self.addSubview(balanceIconView)
                 }
+                balanceTitleView.isHidden = true
+                balanceValueView.isHidden = true
+                balanceIconView.isHidden = true
+
                 let navigationHeight = environment.navigationHeight - environment.statusBarHeight
-                let topBalanceOriginY = environment.statusBarHeight + (navigationHeight - balanceTitleSize.height - balanceValueSize.height) / 2.0
-                balanceTitleView.center = CGPoint(x: availableSize.width - balanceInset - environment.safeInsets.right - balanceTitleSize.width / 2.0, y: topBalanceOriginY + balanceTitleSize.height / 2.0)
-                balanceTitleView.bounds = CGRect(origin: .zero, size: balanceTitleSize)
-                balanceValueView.center = CGPoint(x: availableSize.width - balanceInset - environment.safeInsets.right - balanceValueSize.width / 2.0, y: topBalanceOriginY + balanceTitleSize.height + balanceValueSize.height / 2.0)
-                balanceValueView.bounds = CGRect(origin: .zero, size: balanceValueSize)
-                balanceIconView.center = CGPoint(x: availableSize.width - balanceInset - environment.safeInsets.right - balanceValueSize.width - balanceIconSize.width / 2.0 - 2.0, y: topBalanceOriginY + balanceTitleSize.height + balanceValueSize.height / 2.0 - UIScreenPixel)
-                balanceIconView.bounds = CGRect(origin: .zero, size: balanceIconSize)
+                let balanceText = self.starsState.map { formatStarsAmountText($0.balance, dateTimeFormat: environment.dateTimeFormat) } ?? "0"
+                let displayText = "⭐ \(balanceText)"
+                let font = Font.semibold(15.0)
+                let textSize = (displayText as NSString).size(withAttributes: [.font: font])
+                let pillHeight: CGFloat = 32.0
+                let pillWidth = min(availableSize.width * 0.4, textSize.width + 26.0)
+                let originY = environment.statusBarHeight + (navigationHeight - pillHeight) / 2.0
+                let pillFrame = CGRect(
+                    x: availableSize.width - balanceInset - environment.safeInsets.right - pillWidth,
+                    y: originY,
+                    width: pillWidth,
+                    height: pillHeight
+                )
+                if self.namelessBalancePillButton.superview == nil {
+                    self.namelessBalancePillPresented = true
+                    self.addSubview(self.namelessBalancePillButton)
+                    self.namelessBalancePillButton.backgroundColor = UIColor(red: 1.0, green: 0.78, blue: 0.28, alpha: 1.0)
+                    self.namelessBalancePillButton.layer.cornerRadius = pillHeight / 2.0
+                    self.namelessBalancePillButton.setTitleColor(UIColor(white: 0.2, alpha: 1.0), for: .normal)
+                    self.namelessBalancePillButton.titleLabel?.font = font
+                    self.namelessBalancePillButton.addTarget(self, action: #selector(self.namelessBalancePillPressed), for: .touchUpInside)
+                    self.namelessBalancePillButton.contentEdgeInsets = UIEdgeInsets(top: 0, left: 12, bottom: 0, right: 12)
+                }
+                self.namelessBalancePillButton.setTitle(displayText, for: .normal)
+                self.namelessBalancePillButton.frame = pillFrame
             }
             
             let premiumTitleString: String
