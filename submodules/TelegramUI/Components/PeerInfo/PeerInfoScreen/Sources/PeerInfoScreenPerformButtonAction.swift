@@ -12,6 +12,7 @@ import NotificationExceptionsScreen
 import TranslateUI
 import TelegramNotices
 import AlertComponent
+import Postbox
 import SGMegramFire
 
 extension PeerInfoScreenNode {
