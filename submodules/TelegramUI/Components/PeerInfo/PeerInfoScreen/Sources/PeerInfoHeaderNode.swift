@@ -214,7 +214,13 @@ final class PeerInfoHeaderNode: ASDisplayNode {
         self.context = context
         self.hidePhoneInSettings = hidePhoneInSettings
         self.controller = controller
-        self.isAvatarExpanded = avatarInitiallyExpanded
+        // MARK: Megram — the settings header opens with the avatar already expanded.
+        //
+        // Stock Telegram starts it small and grows it as you pull down, then opens the gallery on
+        // a further pull. Here the large avatar *is* the settings design, so it is the entry
+        // state rather than something the user has to discover — and, being expanded from the
+        // first frame, the pull-down has nothing left to expand.
+        self.isAvatarExpanded = avatarInitiallyExpanded || isSettings
         self.isOpenedFromChat = isOpenedFromChat
         self.isSettings = isSettings
         self.isMyProfile = isMyProfile
@@ -229,7 +235,7 @@ final class PeerInfoHeaderNode: ASDisplayNode {
         self.avatarClippingNode.alpha = 0.996
         self.avatarClippingNode.clipsToBounds = true
         
-        self.avatarListNode = PeerInfoAvatarListNode(context: context, readyWhenGalleryLoads: avatarInitiallyExpanded, isSettings: isSettings)
+        self.avatarListNode = PeerInfoAvatarListNode(context: context, readyWhenGalleryLoads: avatarInitiallyExpanded || isSettings, isSettings: isSettings)
         
         self.titleNodeContainer = ASDisplayNode()
         self.titleNodeRawContainer = ASDisplayNode()
