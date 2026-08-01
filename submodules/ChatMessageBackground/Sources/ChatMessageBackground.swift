@@ -640,14 +640,18 @@ public final class ChatMessageBubbleBackdrop: ASDisplayNode, SGLiquidGlassContai
         // regardless of the global "tint glass surfaces" preference — that flag only decides
         // how far it is pushed. A plain untinted `.clear` bubble made both sides of the
         // conversation render as the same colourless lens over the wallpaper.
+        // The material was already `.clear`; what made bubbles read as solid was the tint alpha.
+        // A bubble sits over the wallpaper, so it can afford to be genuinely see-through — the
+        // colour only has to say "mine" or "theirs", not to fill the shape. Kept low enough that
+        // the wallpaper pattern stays legible straight through the bubble.
         let tint: GlassBackgroundView.TintColor
         if self.currentBubbleColor != .clear {
-            let alpha: CGFloat = zone.isTinted ? (isDark ? 0.34 : 0.28) : (isDark ? 0.22 : 0.18)
+            let alpha: CGFloat = zone.isTinted ? (isDark ? 0.18 : 0.15) : (isDark ? 0.12 : 0.10)
             tint = .init(kind: .custom(style: .clear, color: self.currentBubbleColor.withAlphaComponent(alpha)))
         } else {
-            // No bubble colour to lean on (custom wallpaper themes): lift the material off the
-            // backdrop with a neutral wash so the bubble still has an edge to read against.
-            tint = .init(kind: .custom(style: .clear, color: UIColor(white: 1.0, alpha: isDark ? 0.10 : 0.22)))
+            // No bubble colour to lean on (custom wallpaper themes): the faintest neutral wash,
+            // just enough to give the glass an edge to read against.
+            tint = .init(kind: .custom(style: .clear, color: UIColor(white: 1.0, alpha: isDark ? 0.07 : 0.12)))
         }
         if enabled {
             let state = (size: size, radii: self.currentGlassRadii, isDark: isDark, tint: tint)
