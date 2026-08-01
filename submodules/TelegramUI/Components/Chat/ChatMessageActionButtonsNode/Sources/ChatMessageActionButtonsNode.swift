@@ -1,4 +1,5 @@
 import Foundation
+import SGSimpleSettings
 import UIKit
 import AsyncDisplayKit
 import TelegramCore
@@ -494,9 +495,20 @@ private final class ChatMessageActionButtonNode: ASDisplayNode {
                             case .danger: glassColor = theme.theme.contextMenu.destructiveColor
                             case .success: glassColor = theme.theme.list.freeTextSuccessColor
                             }
-                            let tint = SGLiquidGlassZone.inlineButtons.isTinted
-                                ? GlassBackgroundView.TintColor(kind: .custom(style: .clear, color: glassColor.withAlphaComponent(0.16)))
-                                : GlassBackgroundView.TintColor(kind: .clear)
+                            // Same rule as message bubbles: with pure clear glass on, the button is
+                            // the material and nothing else, so the accent tint is dropped too.
+                            // The opaque `backgroundColorView` above it is what would otherwise
+                            // still colour the button, so it is hidden alongside.
+                            let pureClear = SGSimpleSettings.shared.megramPureClearBubbles
+                            let tint: GlassBackgroundView.TintColor
+                            if pureClear {
+                                tint = GlassBackgroundView.TintColor(kind: .clear)
+                            } else if SGLiquidGlassZone.inlineButtons.isTinted {
+                                tint = GlassBackgroundView.TintColor(kind: .custom(style: .clear, color: glassColor.withAlphaComponent(0.16)))
+                            } else {
+                                tint = GlassBackgroundView.TintColor(kind: .clear)
+                            }
+                            backgroundColorView.isHidden = pureClear
                             let glassSize = CGSize(width: max(0.0, width), height: 42.0)
                             glassView.frame = CGRect(origin: .zero, size: glassSize)
                             glassView.update(size: glassSize, cornerRadius: 12.0, isDark: theme.theme.overallDarkAppearance, tintColor: tint, isInteractive: false, isVisible: true, transition: .immediate)

@@ -640,12 +640,13 @@ public final class ChatMessageBubbleBackdrop: ASDisplayNode, SGLiquidGlassContai
         // regardless of the global "tint glass surfaces" preference — that flag only decides
         // how far it is pushed. A plain untinted `.clear` bubble made both sides of the
         // conversation render as the same colourless lens over the wallpaper.
-        // The material was already `.clear`; what made bubbles read as solid was the tint alpha.
-        // A bubble sits over the wallpaper, so it can afford to be genuinely see-through — the
-        // colour only has to say "mine" or "theirs", not to fill the shape. Kept low enough that
-        // the wallpaper pattern stays legible straight through the bubble.
+        // Pure glass: no tint at all, so the bubble is the material and nothing else. The cost is
+        // that incoming and outgoing look identical apart from which side they sit on — which is
+        // exactly what the switch is for.
         let tint: GlassBackgroundView.TintColor
-        if self.currentBubbleColor != .clear {
+        if SGSimpleSettings.shared.megramPureClearBubbles {
+            tint = .init(kind: .clear)
+        } else if self.currentBubbleColor != .clear {
             let alpha: CGFloat = zone.isTinted ? (isDark ? 0.18 : 0.15) : (isDark ? 0.12 : 0.10)
             tint = .init(kind: .custom(style: .clear, color: self.currentBubbleColor.withAlphaComponent(alpha)))
         } else {

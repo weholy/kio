@@ -103,6 +103,7 @@ private enum NamelessSettingsKey {
     static let hideBusinessChats = "nameless.hideBusinessChats"
     static let megramGlobalClearGlass = "megram.globalClearGlass"
     static let megramFullGiftCatalog = "megram.fullGiftCatalog"
+    static let megramPureClearBubbles = "megram.pureClearBubbles"
     // MARK: Megram — Nextgram parity keys (UI-only for now, no consumers)
     static let nxHideGiftsTab = "megram.nx.hideGiftsTab"
     static let nxHideContactsTab = "megram.nx.hideContactsTab"
@@ -463,6 +464,17 @@ public extension SGSimpleSettings {
     /// Megram — force UIGlassEffect(.clear) everywhere GlassBackgroundView renders `.panel`
     /// glass. Global switch, on by default so the user sees the see-through look right away
     /// (navigation, input panel, buttons, sheets, settings pills).
+    /// Draw message bubbles and inline buttons as untinted `UIGlassEffect(.clear)` — pure glass,
+    /// no colour at all.
+    ///
+    /// The trade-off is deliberate and worth knowing: without a tint there is nothing left to
+    /// distinguish an incoming bubble from an outgoing one except its side of the screen and the
+    /// delivery checks. Turning this off brings back a faint tint from the theme's bubble colour.
+    var megramPureClearBubbles: Bool {
+        get { storage.namelessBool(NamelessSettingsKey.megramPureClearBubbles, default: true) }
+        set { storage.set(newValue, forKey: NamelessSettingsKey.megramPureClearBubbles) }
+    }
+
     /// Ask the server for the complete star-gift catalog instead of "only what changed".
     ///
     /// `payments.getStarGifts` takes a hash of the catalog the client already has; when it matches,
