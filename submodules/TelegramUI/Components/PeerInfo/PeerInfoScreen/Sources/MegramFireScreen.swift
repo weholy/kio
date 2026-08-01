@@ -69,11 +69,18 @@ private final class MegramWeekChartView: UIView {
     private var bars: [UIView] = []
     private var labels: [UILabel] = []
     private var counts: [Int] = Array(repeating: 0, count: 7)
+    /// Smooth curve traced through the bar tops, as in the reference design.
+    private let curveLayer = CAShapeLayer()
 
     private static let dayTitles = ["ПН", "ВТ", "СР", "ЧТ", "ПТ", "СБ", "ВС"]
 
     init() {
         super.init(frame: CGRect())
+        self.curveLayer.fillColor = nil
+        self.curveLayer.lineWidth = 2.0
+        self.curveLayer.lineJoin = .round
+        self.curveLayer.lineCap = .round
+        self.layer.addSublayer(self.curveLayer)
         for _ in 0 ..< 7 {
             let bar = UIView()
             bar.layer.cornerRadius = 5.0
@@ -97,9 +104,12 @@ private final class MegramWeekChartView: UIView {
 
         let calendar = Calendar(identifier: .gregorian)
         let now = Date()
+        self.curveLayer.strokeColor = palette.accent.withAlphaComponent(0.75).cgColor
         for index in 0 ..< 7 {
             let isToday = index == 6
-            self.bars[index].backgroundColor = isToday ? palette.accent : UIColor.white.withAlphaComponent(0.16)
+            self.bars[index].backgroundColor = isToday ? palette.accent.withAlphaComponent(0.85) : UIColor.white.withAlphaComponent(0.22)
+            self.bars[index].layer.borderWidth = isToday ? 1.5 : 0.0
+            self.bars[index].layer.borderColor = palette.accent.cgColor
             self.labels[index].textColor = isToday ? palette.accent : UIColor.white.withAlphaComponent(0.4)
             if let date = calendar.date(byAdding: .day, value: index - 6, to: now) {
                 // Calendar weekday is 1...7 starting on Sunday.
@@ -122,13 +132,34 @@ private final class MegramWeekChartView: UIView {
         let barWidth = max(4.0, (bounds.width - spacing * 6.0) / 7.0)
         let peak = max(1, self.counts.max() ?? 1)
 
+        var tops: [CGPoint] = []
         for index in 0 ..< 7 {
             let ratio = CGFloat(self.counts[index]) / CGFloat(peak)
             let height = max(6.0, chartHeight * ratio)
             let x = CGFloat(index) * (barWidth + spacing)
             self.bars[index].frame = CGRect(x: x, y: chartHeight - height, width: barWidth, height: height)
             self.labels[index].frame = CGRect(x: x - 4.0, y: chartHeight + 4.0, width: barWidth + 8.0, height: labelHeight)
+            tops.append(CGPoint(x: x + barWidth / 2.0, y: chartHeight - height))
         }
+
+        // Catmull-Rom style smoothing: pull each segment towards the midpoint
+        // of its neighbours so the line reads as a curve, not a polyline.
+        let path = UIBezierPath()
+        if let first = tops.first {
+            path.move(to: first)
+            for index in 1 ..< tops.count {
+                let previous = tops[index - 1]
+                let current = tops[index]
+                let controlX = (previous.x + current.x) / 2.0
+                path.addCurve(
+                    to: current,
+                    controlPoint1: CGPoint(x: controlX, y: previous.y),
+                    controlPoint2: CGPoint(x: controlX, y: current.y)
+                )
+            }
+        }
+        self.curveLayer.frame = self.bounds
+        self.curveLayer.path = path.cgPath
     }
 }
 
@@ -172,8 +203,12 @@ private final class MegramFireScreenNode: ASDisplayNode {
     private var presentationData: PresentationData
 
     private let backgroundLayer = CAGradientLayer()
+    /// Large radial wash behind the flame. It lives on the screen rather than
+    /// inside the flame view so it can spill across the whole width.
+    private let glowLayer = CAGradientLayer()
     private let scrollView = UIScrollView()
     private let contentView = UIView()
+    private var validLayout: ContainerViewLayout?
 
     private let closeButton = UIButton(type: .system)
     private var avatarNodes: [AvatarNode] = []
@@ -240,6 +275,10 @@ private final class MegramFireScreenNode: ASDisplayNode {
 
         let view = self.view
         view.layer.addSublayer(self.backgroundLayer)
+        self.glowLayer.type = .radial
+        self.glowLayer.startPoint = CGPoint(x: 0.5, y: 0.5)
+        self.glowLayer.endPoint = CGPoint(x: 1.0, y: 1.0)
+        view.layer.addSublayer(self.glowLayer)
         view.addSubview(self.scrollView)
         view.addSubview(self.closeButton)
         self.scrollView.addSubview(self.contentView)
@@ -259,10 +298,10 @@ private final class MegramFireScreenNode: ASDisplayNode {
             self.contentView.addSubview(label)
         }
 
-        self.daysLabel.font = UIFont.systemFont(ofSize: 84.0, weight: .heavy)
+        self.daysLabel.font = UIFont.systemFont(ofSize: 110.0, weight: .heavy)
         self.daysLabel.textAlignment = .center
         self.daysLabel.textColor = .white
-        self.daysCaptionLabel.font = UIFont.systemFont(ofSize: 17.0, weight: .medium)
+        self.daysCaptionLabel.font = UIFont.systemFont(ofSize: 19.0, weight: .semibold)
         self.daysCaptionLabel.textAlignment = .center
         self.levelLabel.font = UIFont.systemFont(ofSize: 13.0, weight: .semibold)
         self.levelLabel.textAlignment = .center
@@ -350,6 +389,11 @@ private final class MegramFireScreenNode: ASDisplayNode {
         }
         self.rebuildAvatars()
         self.applyState()
+        // Freshly created avatar views sit at the origin until a layout pass
+        // places them, and data can arrive after the last one.
+        if let layout = self.validLayout {
+            self.containerLayoutUpdated(layout)
+        }
         if leveledUp {
             self.flameView.playIgnition()
         }
@@ -397,12 +441,21 @@ private final class MegramFireScreenNode: ASDisplayNode {
         self.backgroundLayer.startPoint = CGPoint(x: 0.5, y: 0.0)
         self.backgroundLayer.endPoint = CGPoint(x: 0.5, y: 1.0)
 
+        let glowStrength: CGFloat = isPreview ? 0.22 : 1.0
+        self.glowLayer.colors = [
+            palette.glow.withAlphaComponent(0.95 * glowStrength).cgColor,
+            palette.glow.withAlphaComponent(0.55 * glowStrength).cgColor,
+            palette.glow.withAlphaComponent(0.18 * glowStrength).cgColor,
+            palette.glow.withAlphaComponent(0.0).cgColor
+        ]
+        self.glowLayer.locations = [0.0, 0.28, 0.55, 1.0]
+
         self.flameView.update(level: level)
         self.flameView.isDimmed = isPreview || !self.state.isActive
 
         self.daysLabel.text = "\(self.state.days)"
         self.daysCaptionLabel.text = self.pluralDays(self.state.days)
-        self.daysCaptionLabel.textColor = palette.accent
+        self.daysCaptionLabel.textColor = .white
         self.levelLabel.text = "\(level.titleRu) · серия с \(self.peer.compactDisplayTitle)"
         self.levelLabel.textColor = UIColor.white.withAlphaComponent(0.4)
 
@@ -492,6 +545,7 @@ private final class MegramFireScreenNode: ASDisplayNode {
         guard self.isNodeLoaded else {
             return
         }
+        self.validLayout = layout
         let size = layout.size
         let topInset = (layout.statusBarHeight ?? 20.0) + 6.0
         let side: CGFloat = 16.0
@@ -500,6 +554,14 @@ private final class MegramFireScreenNode: ASDisplayNode {
         CATransaction.begin()
         CATransaction.setDisableActions(true)
         self.backgroundLayer.frame = CGRect(origin: CGPoint(), size: size)
+        // Centred on the flame and wide enough to wash across the whole screen.
+        let glowSide = size.width * 2.2
+        self.glowLayer.frame = CGRect(
+            x: size.midX - glowSide / 2.0,
+            y: topInset + 150.0 - glowSide / 2.0,
+            width: glowSide,
+            height: glowSide
+        )
         CATransaction.commit()
 
         self.closeButton.frame = CGRect(x: side, y: topInset, width: 34.0, height: 34.0)
@@ -519,16 +581,17 @@ private final class MegramFireScreenNode: ASDisplayNode {
 
         var y: CGFloat = 8.0
 
-        let flameSide = min(width * 0.52, 190.0)
-        self.flameView.frame = CGRect(x: (size.width - flameSide) / 2.0, y: y, width: flameSide, height: flameSide * 1.24)
-        y += flameSide * 1.24 - 12.0
+        // Small flame, oversized day count — the number is the hero here.
+        let flameSide: CGFloat = 74.0
+        self.flameView.frame = CGRect(x: (size.width - flameSide) / 2.0, y: y + 10.0, width: flameSide, height: flameSide * 1.24)
+        y += flameSide * 1.24 + 6.0
 
-        self.daysLabel.frame = CGRect(x: side, y: y, width: width, height: 92.0)
-        y += 88.0
-        self.daysCaptionLabel.frame = CGRect(x: side, y: y, width: width, height: 22.0)
-        y += 24.0
+        self.daysLabel.frame = CGRect(x: side, y: y, width: width, height: 118.0)
+        y += 112.0
+        self.daysCaptionLabel.frame = CGRect(x: side, y: y, width: width, height: 24.0)
+        y += 26.0
         self.levelLabel.frame = CGRect(x: side, y: y, width: width, height: 16.0)
-        y += 34.0
+        y += 32.0
 
         // Milestone card with the level arrows on either side.
         let arrowWidth: CGFloat = 30.0

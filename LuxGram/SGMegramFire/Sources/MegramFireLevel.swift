@@ -97,38 +97,41 @@ public enum MegramFireLevel: Int, CaseIterable {
 
     public var palette: MegramFirePalette {
         switch self {
+        // The background stays near black; the level colour arrives as a large,
+        // saturated radial glow behind the flame, with light translucent cards
+        // floating on top of it.
         case .ember:
             return MegramFirePalette(
                 flameOuter: [megramColor(0xff8a1f), megramColor(0xff5a0a), megramColor(0xdd2c05)],
                 flameCore: [megramColor(0xfff3b0), megramColor(0xffd954), megramColor(0xffab21)],
-                glow: megramColor(0xff7a18),
-                backgroundTop: megramColor(0x1d0d04),
-                backgroundBottom: megramColor(0x080403),
-                accent: megramColor(0xff9a2b),
-                cardFill: megramColor(0xff8a1f, 0.13),
-                cardStroke: megramColor(0xffb04a, 0.22)
+                glow: megramColor(0xff7a10),
+                backgroundTop: megramColor(0x0a0603),
+                backgroundBottom: megramColor(0x000000),
+                accent: megramColor(0xffa432),
+                cardFill: megramColor(0xffffff, 0.14),
+                cardStroke: megramColor(0xffffff, 0.10)
             )
         case .azure:
             return MegramFirePalette(
                 flameOuter: [megramColor(0x2f5bff), megramColor(0x5b2ef0), megramColor(0xb02bea)],
                 flameCore: [megramColor(0xd8f6ff), megramColor(0x7de6ff), megramColor(0x8f7dff)],
-                glow: megramColor(0x3f5cff),
-                backgroundTop: megramColor(0x0b0f2e),
-                backgroundBottom: megramColor(0x040510),
-                accent: megramColor(0x6f8dff),
-                cardFill: megramColor(0x4a6bff, 0.14),
-                cardStroke: megramColor(0x8fa6ff, 0.24)
+                glow: megramColor(0x3552ff),
+                backgroundTop: megramColor(0x03040f),
+                backgroundBottom: megramColor(0x000000),
+                accent: megramColor(0x8aa2ff),
+                cardFill: megramColor(0xffffff, 0.14),
+                cardStroke: megramColor(0xffffff, 0.10)
             )
         case .inferno:
             return MegramFirePalette(
                 flameOuter: [megramColor(0xff5b12), megramColor(0xb81406), megramColor(0x35090a)],
                 flameCore: [megramColor(0xfff0b8), megramColor(0xffb43c), megramColor(0xff6a12)],
-                glow: megramColor(0xc4200a),
-                backgroundTop: megramColor(0x220604),
-                backgroundBottom: megramColor(0x070202),
-                accent: megramColor(0xff6a2b),
-                cardFill: megramColor(0xd8330f, 0.15),
-                cardStroke: megramColor(0xff7a4a, 0.24)
+                glow: megramColor(0xd41d06),
+                backgroundTop: megramColor(0x0a0201),
+                backgroundBottom: megramColor(0x000000),
+                accent: megramColor(0xff7a3a),
+                cardFill: megramColor(0xffffff, 0.14),
+                cardStroke: megramColor(0xffffff, 0.10)
             )
         }
     }

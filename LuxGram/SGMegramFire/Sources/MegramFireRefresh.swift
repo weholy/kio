@@ -63,11 +63,10 @@ public enum MegramFireRefresh {
         var perDayIncoming: [String: Int] = [:]
         var perDayTotal: [String: Int] = [:]
 
-        let since = stored.activationTimestamp
+        // The whole conversation counts, not just what arrived after the fire
+        // was lit — a fresh fire showing zero messages next to a chat with
+        // thousands of them reads as broken.
         transaction.withAllMessages(peerId: peerId, namespace: Namespaces.Message.Cloud, reversed: true, { message in
-            if message.timestamp < since {
-                return false
-            }
             // Joins, pins and other service events are not conversation.
             if message.media.contains(where: { $0 is TelegramMediaAction }) {
                 return true
