@@ -124,11 +124,8 @@ private func generateAttachmentSourceIcon(type: AttachmentButtonType) -> UIImage
     let size = CGSize(width: 32.0, height: 32.0)
     let color = attachmentSourceColor(for: type)
 
-    var glyph: UIImage?
-    if #available(iOS 13.0, *) {
-        let configuration = UIImage.SymbolConfiguration(pointSize: 15.0, weight: .semibold)
-        glyph = UIImage(systemName: attachmentSourceSymbolName(for: type), withConfiguration: configuration)
-    }
+    let configuration = UIImage.SymbolConfiguration(pointSize: 15.0, weight: .semibold)
+    let glyph = UIImage(systemName: attachmentSourceSymbolName(for: type), withConfiguration: configuration)
 
     return UIGraphicsImageRenderer(size: size).image { context in
         let cgContext = context.cgContext
@@ -149,11 +146,7 @@ private func generateAttachmentSourceIcon(type: AttachmentButtonType) -> UIImage
             ),
             size: glyphSize
         )
-        if #available(iOS 13.0, *) {
-            glyph.withTintColor(.white, renderingMode: .alwaysOriginal).draw(in: glyphFrame)
-        } else {
-            glyph.draw(in: glyphFrame)
-        }
+        glyph.withTintColor(.white, renderingMode: .alwaysOriginal).draw(in: glyphFrame)
     }.withRenderingMode(.alwaysOriginal)
 }
 
