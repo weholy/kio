@@ -312,6 +312,7 @@ private enum NLDisclosureLink: String {
     case deviceModelSpoof
     case accountSwitcher
     case pluginsCenter
+    case localGiftsShop
 }
 
 private enum NLAction: Int, CaseIterable {
@@ -486,7 +487,7 @@ private enum NLHubCategory: String, CaseIterable {
         case .hubMisc: return .misc
         case .hubGhost: return .ghost
         case .hubOther: return .other
-        case .none, .onlineHistory, .ghostDetailsToggle, .fakeLocationPicker, .localStarsAmount, .deviceModelSpoof, .accountSwitcher, .pluginsCenter: return nil
+        case .none, .onlineHistory, .ghostDetailsToggle, .fakeLocationPicker, .localStarsAmount, .deviceModelSpoof, .accountSwitcher, .pluginsCenter, .localGiftsShop: return nil
         }
     }
 }
@@ -980,6 +981,7 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
     entries.append(.toggle(id: id.count, section: sec, settingName: .enableLocalPremium, value: s.enableLocalPremium, text: "Локальный премиум", enabled: true))
     entries.append(.toggle(id: id.count, section: sec, settingName: .localStarsEnabled, value: s.localStarsEnabled, text: "Локальные звёзды", enabled: true))
     entries.append(.disclosureDetail(id: id.count, section: sec, link: .localStarsAmount, text: "Баланс звёзд", detail: "\(s.localStarsBalance) ⭐ из \(s.localStarsTopUp)"))
+    entries.append(.disclosureDetail(id: id.count, section: sec, link: .localGiftsShop, text: "Локальные подарки", detail: "Каталог и покупка за локальные звёзды"))
     if s.localStarsSpent > 0 {
         entries.append(.action(id: id.count, section: sec, actionType: .resetLocalStars, text: "Пополнить (сбросить траты: \(s.localStarsSpent) ⭐)", kind: .generic))
     } else {
@@ -1571,6 +1573,10 @@ private func namelessFeaturesControllerImpl(context: AccountContext, initialCate
             }
             if link == .pluginsCenter {
                 pushControllerImpl?(mgPluginsController(context: context))
+                return
+            }
+            if link == .localGiftsShop {
+                pushControllerImpl?(mgLocalGiftsController(context: context))
                 return
             }
             if link == .accountSwitcher {
