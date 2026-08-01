@@ -1193,20 +1193,16 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
 
     } // end other
 
-    // Applied only to the category screen, never to search results or the hub root: a search for a
-    // switch that lives elsewhere must still find it.
-    if state.searchQuery?.isEmpty ?? true {
-        switch state.hubCategory {
-        case .appearance:
-            entries = nlFiltered(entries, keeping: nlAppearanceWhitelist)
-        case .profiles:
-            entries = nlFiltered(entries, keeping: nlProfileWhitelist)
-        case .tabs:
-            entries = nlFiltered(entries, keeping: nlTabsWhitelist)
-        default:
-            break
-        }
-    }
+    // MARK: Megram — whitelist filtering is off.
+    //
+    // Trimming the finished list looked cheap on paper, but a category screen is not a flat run of
+    // switches: it is headers, notices and switches emitted across two blocks, and removing rows
+    // from the middle left tabs looking empty rather than curated. Reaching the exact lists means
+    // editing the builders themselves — dropping the `entries.append` calls that should not be
+    // there — so the screen is built right instead of built wide and then cut down.
+    //
+    // Until that is done the full lists stay: a tab with more switches than intended is a
+    // cosmetic problem, a tab with none is a broken screen.
 
     return filterSGItemListUIEntrires(entries: entries, by: state.searchQuery)
 }
