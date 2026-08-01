@@ -707,6 +707,66 @@ private func nlSearchableTitle(from entry: NLEntry) -> String {
 
 // MARK: - Build Entries
 
+// MARK: - Category whitelists
+//
+// The category screens are all assembled by one long builder, so the switches a category is meant
+// to show are declared here and applied to the finished list. Filtering the result is both smaller
+// and safer than threading a condition through several hundred `entries.append` calls — and it
+// makes the intended contents of a tab readable in one place instead of scattered through the
+// builder.
+
+/// "Внешний вид" — exactly these switches, in the order the builder already emits them.
+private let nlAppearanceWhitelist: Set<NLBoolSetting> = [
+    .squareAvatars,
+    .unlimitedPinnedChats,
+    .showTabNames,
+    .roundTabs,
+    .sendWithReturnKey,
+    .disableSnapDeletionEffect,
+    .forceEmojiTab,
+    .hideNewChatSticker,
+    .hideBusinessChats,
+    .truncateLongMessages,
+    .noAutoNextVoice,
+    .charCounterInput,
+    .charCounterInChat,
+    .disableScrollToNextChannel2,
+    .namelessLiquidGlassMessages,
+    .namelessCompactAttachmentSheet,
+    .cameraSendHDPhoto,
+    .cameraAlwaysSendHD
+]
+
+/// Drops switches outside `allowed`, then drops any header left standing over nothing.
+private func nlFiltered(_ entries: [NLEntry], keeping allowed: Set<NLBoolSetting>) -> [NLEntry] {
+    var kept: [NLEntry] = []
+    for entry in entries {
+        switch entry {
+        case let .toggle(_, _, settingName, _, _, _), let .toggleWithIcon(_, _, settingName, _, _, _, _):
+            if allowed.contains(settingName) {
+                kept.append(entry)
+            }
+        default:
+            kept.append(entry)
+        }
+    }
+
+    var pruned: [NLEntry] = []
+    for (index, entry) in kept.enumerated() {
+        if case .header = entry {
+            // A header is only worth keeping when something other than the next header follows it.
+            guard let next = kept[kept.index(after: index)...].first else {
+                continue
+            }
+            if case .header = next {
+                continue
+            }
+        }
+        pruned.append(entry)
+    }
+    return pruned
+}
+
 private func nlBuildEntries(presentationData: PresentationData, state: NLControllerState, simpleUpdated: Bool) -> [NLEntry] {
     let s = SGSimpleSettings.shared
     var entries: [NLEntry] = []
@@ -1109,6 +1169,12 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
     entries.append(.notice(id: id.count, section: sec, text: "При нагреве устройства Megram упрощает себя: стеклянные сообщения становятся сплошной заливкой, снег останавливается."))
 
     } // end other
+
+    // Applied only to the category screen, never to search results or the hub root: a search for a
+    // switch that lives elsewhere must still find it.
+    if state.hubCategory == .appearance, state.searchQuery?.isEmpty ?? true {
+        entries = nlFiltered(entries, keeping: nlAppearanceWhitelist)
+    }
 
     return filterSGItemListUIEntrires(entries: entries, by: state.searchQuery)
 }
