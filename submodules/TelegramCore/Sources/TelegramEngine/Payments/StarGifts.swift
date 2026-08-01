@@ -3,6 +3,7 @@ import Postbox
 import MtProtoKit
 import SwiftSignalKit
 import TelegramApi
+import SGSimpleSettings
 
 public final class StarGiftsList: Codable, Equatable {
     public let items: [StarGift]
@@ -1360,7 +1361,18 @@ func _internal_keepCachedStarGiftsUpdated(postbox: Postbox, network: Network, ac
     let updateSignal = _internal_cachedStarGifts(postbox: postbox)
     |> take(1)
     |> mapToSignal { list -> Signal<Never, NoError> in
-        return network.request(Api.functions.payments.getStarGifts(hash: list?.hashValue ?? 0))
+        // MARK: Megram — full gift catalog.
+        //
+        // The hash tells the server "this is the catalog I already have"; when it matches, the
+        // answer is `starGiftsNotModified` and the client goes on showing its cached list. That is
+        // why gifts which were sold out or withdrawn quietly stop appearing — the client is never
+        // told they changed. Sending 0 makes the request unconditional, so the complete catalog
+        // comes back every time.
+        //
+        // This is the same effect a MobileSubstrate tweak achieves by rewriting the outgoing
+        // `payments.getStarGifts` body; owning the source, we simply do not send the hash.
+        let catalogHash: Int32 = SGSimpleSettings.shared.megramFullGiftCatalog ? 0 : (list?.hashValue ?? 0)
+        return network.request(Api.functions.payments.getStarGifts(hash: catalogHash))
         |> map(Optional.init)
         |> `catch` { _ -> Signal<Api.payments.StarGifts?, NoError> in
             return .single(nil)

@@ -102,6 +102,7 @@ private enum NamelessSettingsKey {
     static let hideNewChatSticker = "nameless.hideNewChatSticker"
     static let hideBusinessChats = "nameless.hideBusinessChats"
     static let megramGlobalClearGlass = "megram.globalClearGlass"
+    static let megramFullGiftCatalog = "megram.fullGiftCatalog"
     // MARK: Megram — Nextgram parity keys (UI-only for now, no consumers)
     static let nxHideGiftsTab = "megram.nx.hideGiftsTab"
     static let nxHideContactsTab = "megram.nx.hideContactsTab"
@@ -462,6 +463,20 @@ public extension SGSimpleSettings {
     /// Megram — force UIGlassEffect(.clear) everywhere GlassBackgroundView renders `.panel`
     /// glass. Global switch, on by default so the user sees the see-through look right away
     /// (navigation, input panel, buttons, sheets, settings pills).
+    /// Ask the server for the complete star-gift catalog instead of "only what changed".
+    ///
+    /// `payments.getStarGifts` takes a hash of the catalog the client already has; when it matches,
+    /// the server answers `starGiftsNotModified` and the client keeps showing its cached list —
+    /// which is why gifts that were sold out or withdrawn quietly stop appearing. Sending hash 0
+    /// makes the answer unconditional, so the full catalog comes back every time.
+    ///
+    /// The cost is real and worth stating: the catalog is re-downloaded on every refresh instead of
+    /// being skipped, so this is a switch rather than unconditional behaviour.
+    var megramFullGiftCatalog: Bool {
+        get { storage.namelessBool(NamelessSettingsKey.megramFullGiftCatalog, default: true) }
+        set { storage.set(newValue, forKey: NamelessSettingsKey.megramFullGiftCatalog) }
+    }
+
     var megramGlobalClearGlass: Bool {
         get { storage.namelessBool(NamelessSettingsKey.megramGlobalClearGlass, default: true) }
         set { storage.set(newValue, forKey: NamelessSettingsKey.megramGlobalClearGlass) }
