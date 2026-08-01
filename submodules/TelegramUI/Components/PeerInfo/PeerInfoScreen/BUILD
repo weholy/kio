@@ -10,6 +10,8 @@ sgdeps = [
     "//Swiftgram/SGRegDate:SGRegDate",
     "//Swiftgram/SGRegDateScheme:SGRegDateScheme",
     "//Swiftgram/SGDebugUI:SGDebugUI",
+    "//LuxGram/SGMegramFire:SGMegramFire",
+    "//submodules/LocalizedPeerData",
 ]
 
 

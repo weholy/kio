@@ -17,6 +17,7 @@ import EmojiStatusComponent
 import AvatarVideoNode
 import AvatarStoryIndicatorComponent
 import ComponentDisplayAdapters
+import SGMegramFire
 
 private let normalFont = avatarPlaceholderFont(size: 16.0)
 private let smallFont = avatarPlaceholderFont(size: 12.0)
@@ -34,6 +35,9 @@ public final class ChatAvatarNavigationNode: ASDisplayNode {
     public var statusView: ComponentView<Empty>
     private var starView: StarView?
     
+    private var megramFireBadgeView: MegramFireBadgeView?
+    private let megramFireDisposable = MetaDisposable()
+
     private var cachedDataDisposable = MetaDisposable()
     private var hierarchyTrackingLayer: HierarchyTrackingLayer?
     
@@ -80,6 +84,46 @@ public final class ChatAvatarNavigationNode: ASDisplayNode {
     
     deinit {
         self.cachedDataDisposable.dispose()
+        self.megramFireDisposable.dispose()
+    }
+
+    /// Shows the "fire N" streak pill over the bottom-left corner of the avatar.
+    /// The cached day count is applied straight away so the badge never flashes
+    /// in, then a background pass recomputes it from the real history.
+    private func updateMegramFire(context: AccountContext, peer: EnginePeer?) {
+        guard let peer, peer.id.namespace == Namespaces.Peer.CloudUser else {
+            self.applyMegramFire(days: nil)
+            self.megramFireDisposable.set(nil)
+            return
+        }
+        self.applyMegramFire(days: MegramFireStore.badgeDays(peerId: peer.id.toInt64()))
+        self.megramFireDisposable.set(MegramFireRefresh.refreshInBackground(postbox: context.account.postbox, peerId: peer.id, completion: { [weak self] state in
+            self?.applyMegramFire(days: state.days > 0 ? state.days : nil)
+        }))
+    }
+
+    private func applyMegramFire(days: Int?) {
+        guard let days else {
+            self.megramFireBadgeView?.removeFromSuperview()
+            self.megramFireBadgeView = nil
+            return
+        }
+        let badgeView: MegramFireBadgeView
+        if let current = self.megramFireBadgeView {
+            badgeView = current
+        } else {
+            badgeView = MegramFireBadgeView()
+            self.megramFireBadgeView = badgeView
+            self.containerNode.view.addSubview(badgeView)
+        }
+        badgeView.update(days: days)
+        let height: CGFloat = 18.0
+        badgeView.frame = CGRect(
+            x: -3.0,
+            y: self.containerNode.bounds.height - height,
+            width: MegramFireBadgeView.width(days: days),
+            height: height
+        )
     }
     
     override public func didLoad() {
@@ -133,7 +177,9 @@ public final class ChatAvatarNavigationNode: ASDisplayNode {
         
         self.avatarNode.isHidden = false
         self.avatarNode.setPeer(context: context, theme: theme, peer: peer, authorOfMessage: authorOfMessage, overrideImage: overrideImage, emptyColor: emptyColor, clipStyle: clipStyle, synchronousLoad: synchronousLoad, displayDimensions: displayDimensions, storeUnrounded: storeUnrounded)
-        
+
+        self.updateMegramFire(context: context, peer: peer)
+
         if let peer, peer.isSubscription {
             let starView: StarView
             if let current = self.starView {

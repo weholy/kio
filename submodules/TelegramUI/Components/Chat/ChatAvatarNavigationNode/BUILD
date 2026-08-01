@@ -27,6 +27,7 @@ swift_library(
         "//submodules/AvatarVideoNode",
         "//submodules/TelegramUI/Components/Stories/AvatarStoryIndicatorComponent",
         "//submodules/Components/ComponentDisplayAdapters",
+        "//LuxGram/SGMegramFire:SGMegramFire",
     ],
     visibility = [
         "//visibility:public",

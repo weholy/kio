@@ -721,7 +721,10 @@ public extension SGSimpleSettings {
     var unlimitedPinnedChats: Bool { get { storage.namelessBool(NamelessSettingsKey.unlimitedPinnedChats, default: true) } set { storage.set(newValue, forKey: NamelessSettingsKey.unlimitedPinnedChats) } }
     var newAccountSwitcher: Bool { get { storage.namelessBool(NamelessSettingsKey.newAccountSwitcher) } set { storage.set(newValue, forKey: NamelessSettingsKey.newAccountSwitcher) } }
     var profileColorBackground: Bool { get { storage.namelessBool(NamelessSettingsKey.profileColorBackground, default: true) } set { storage.set(newValue, forKey: NamelessSettingsKey.profileColorBackground) } }
-    var profileAvatarBlur: Bool { get { storage.namelessBool(NamelessSettingsKey.profileAvatarBlur, default: true) } set { storage.set(newValue, forKey: NamelessSettingsKey.profileAvatarBlur) } }
+    // Megram: off by default. The frost layer only exists on the profile
+    // header, so a blurred avatar there next to a crisp one in the gallery
+    // read as a defect rather than a feature.
+    var profileAvatarBlur: Bool { get { storage.namelessBool(NamelessSettingsKey.profileAvatarBlur) } set { storage.set(newValue, forKey: NamelessSettingsKey.profileAvatarBlur) } }
     var profileAvatarBlurMinimal: Bool { get { storage.namelessBool(NamelessSettingsKey.profileAvatarBlurMinimal, default: true) } set { storage.set(newValue, forKey: NamelessSettingsKey.profileAvatarBlurMinimal) } }
     var profileAvatarBlurTinting: Bool { get { storage.namelessBool(NamelessSettingsKey.profileAvatarBlurTinting) } set { storage.set(newValue, forKey: NamelessSettingsKey.profileAvatarBlurTinting) } }
     var musicAlbumBlur: Bool { get { storage.namelessBool(NamelessSettingsKey.musicAlbumBlur, default: true) } set { storage.set(newValue, forKey: NamelessSettingsKey.musicAlbumBlur) } }
