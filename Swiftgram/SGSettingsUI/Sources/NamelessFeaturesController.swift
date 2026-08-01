@@ -311,6 +311,7 @@ private enum NLDisclosureLink: String {
     case localStarsAmount
     case deviceModelSpoof
     case accountSwitcher
+    case pluginsCenter
 }
 
 private enum NLAction: Int, CaseIterable {
@@ -342,6 +343,20 @@ private enum NLHubCategory: String, CaseIterable {
     case misc
     case ghost
     case other
+    case plugins
+
+    /// The shelves shown at the hub root, in order. Everything else in this enum still exists as a
+    /// destination (deep links, search results) but is deliberately absent from the root: the hub
+    /// is a short list of places, not an index of every switch in the client.
+    static let rootCategories: [NLHubCategory] = [
+        .appearance,
+        .profiles,
+        .ghost,
+        .tabs,
+        .settingsSections,
+        .plugins,
+        .misc
+    ]
 
     var titleRu: String {
         switch self {
@@ -365,6 +380,7 @@ private enum NLHubCategory: String, CaseIterable {
         case .misc: return "Прочее"
         case .ghost: return "Режим призрака"
         case .other: return "Прочие функции"
+        case .plugins: return "Плагины"
         }
     }
 
@@ -390,6 +406,7 @@ private enum NLHubCategory: String, CaseIterable {
         case .misc: return "Разное"
         case .ghost: return "Онлайн, прочтение, приватность, геолокация"
         case .other: return "Контекст, сторис, медиа, экспорт"
+        case .plugins: return "Установленные расширения клиента"
         }
     }
 
@@ -415,6 +432,7 @@ private enum NLHubCategory: String, CaseIterable {
         case .misc: return .hubPill17
         case .ghost: return .hubPill18
         case .other: return .hubActions
+        case .plugins: return .hubPill2
         }
     }
 
@@ -440,6 +458,9 @@ private enum NLHubCategory: String, CaseIterable {
         case .misc: return .hubMisc
         case .ghost: return .hubGhost
         case .other: return .hubOther
+        // Plugins is not a list of toggles, so it links straight to its own screen instead of
+        // opening a hub category.
+        case .plugins: return .pluginsCenter
         }
     }
 
@@ -465,7 +486,7 @@ private enum NLHubCategory: String, CaseIterable {
         case .hubMisc: return .misc
         case .hubGhost: return .ghost
         case .hubOther: return .other
-        case .none, .onlineHistory, .ghostDetailsToggle, .fakeLocationPicker, .localStarsAmount, .deviceModelSpoof, .accountSwitcher: return nil
+        case .none, .onlineHistory, .ghostDetailsToggle, .fakeLocationPicker, .localStarsAmount, .deviceModelSpoof, .accountSwitcher, .pluginsCenter: return nil
         }
     }
 }
@@ -702,7 +723,7 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
         // MARK: Nameless — quick account switcher right in the hub root. One tap → action
         // sheet with every logged-in account, another tap → switched.
         entries.append(.disclosureDetail(id: id.count, section: .hero, link: .accountSwitcher, text: "🔁 Переключить аккаунт", detail: "Быстрое переключение между аккаунтами"))
-        for cat in NLHubCategory.allCases {
+        for cat in NLHubCategory.rootCategories {
             entries.append(.disclosureDetail(
                 id: id.count,
                 section: cat.pillSection,
@@ -1547,6 +1568,10 @@ private func namelessFeaturesControllerImpl(context: AccountContext, initialCate
                     simplePromise.set(true)
                     askForRestart?()
                 }))
+                return
+            }
+            if link == .pluginsCenter {
+                pushControllerImpl?(mgPluginsController(context: context))
                 return
             }
             if link == .accountSwitcher {

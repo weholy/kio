@@ -13,6 +13,7 @@ import SGStrings
 import SGSimpleSettings
 import SGFakeLocation
 import SGLiquidGlass
+import MGPluginKit
 import GlassBackgroundComponent
 import UIKit
 import SwiftSignalKit
@@ -348,7 +349,15 @@ private func extractAccountManagerState(records: AccountRecordsView<TelegramAcco
         // Official Apple liquid glass only (GlassBackgroundView → UIGlassEffect; no custom blur)
         GlassBackgroundView.useCustomGlassImpl = false
         _ = SGLiquidGlass.registerFactory()
-        
+
+        // MARK: Megram — plugin runtime. The host resolves the account context lazily on every
+        // call, so plugins keep working across account switches and while logged out (as no-ops).
+        MGPluginHostImpl.shared.resolveContext = { [weak self] in
+            return self?.contextValue?.context
+        }
+        MGPluginManager.shared.start(host: MGPluginHostImpl.shared)
+
+
         let _ = voipTokenPromise.get().start(next: { token in
             self.voipDeviceToken.set(.single(token))
         })
@@ -1968,6 +1977,8 @@ private func extractAccountManagerState(records: AccountRecordsView<TelegramAcco
     }
 
     func applicationDidEnterBackground(_ application: UIApplication) {
+        MGPluginManager.shared.dispatchAppBackground()
+
         let _ = (self.sharedContextPromise.get()
         |> take(1)
         |> deliverOnMainQueue).start(next: { sharedApplicationContext in
@@ -2057,6 +2068,8 @@ private func extractAccountManagerState(records: AccountRecordsView<TelegramAcco
     }
 
     func applicationDidBecomeActive(_ application: UIApplication) {
+        MGPluginManager.shared.dispatchAppForeground()
+
         self.isInForegroundValue = true
         self.isInForegroundPromise.set(true)
         self.isActiveValue = true
