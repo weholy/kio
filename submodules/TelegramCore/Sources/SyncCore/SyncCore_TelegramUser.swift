@@ -155,27 +155,6 @@ public struct PeerVerification: Codable, Equatable {
     }
 }
 
-// MARK: Nameless — visual username helper.
-// Priority: per-peer alias (`visualUsernameAliases`) → self-alias (`visualUsernameText`)
-// → nil (no override). Everything is client-side; the server never sees these strings.
-private func namelessVisualUsernameOverride(for peerId: PeerId) -> String? {
-    let peerIdString = "\(peerId.id._internalGetInt64Value())"
-
-    let aliases = SGSimpleSettings.shared.visualUsernameAliases
-    if let perPeer = aliases[peerIdString], !perPeer.isEmpty {
-        return perPeer
-    }
-
-    let selfAlias = SGSimpleSettings.shared.visualUsernameText
-    if !selfAlias.isEmpty {
-        let currentIdString = SGSimpleSettings.shared.currentAccountPeerId
-        if !currentIdString.isEmpty, peerIdString == currentIdString {
-            return selfAlias
-        }
-    }
-    return nil
-}
-
 /// Emoji prefix rendered before a user's display name in the nameless client.
 /// - `👑` for the project owner (@weholy).
 /// - `✨` for the current signed-in nameless user.
@@ -216,13 +195,7 @@ public final class TelegramUser: Peer, Equatable {
     public let verificationIconFileId: Int64?
     
     public var nameOrPhone: String {
-        // MARK: Nameless — visual username: if the user set a custom name in nameless
-        // settings, use it in place of the real one — but only for OUR own account, so
-        // other people never appear renamed to us and the server never sees the alias.
         let badge = namelessNameBadgePrefix(user: self)
-        if let alias = namelessVisualUsernameOverride(for: self.id) {
-            return badge + alias
-        }
         let base: String
         if let firstName = self.firstName {
             if let lastName = self.lastName {
@@ -242,9 +215,6 @@ public final class TelegramUser: Peer, Equatable {
 
     public var shortNameOrPhone: String {
         let badge = namelessNameBadgePrefix(user: self)
-        if let alias = namelessVisualUsernameOverride(for: self.id) {
-            return badge + alias
-        }
         let base: String
         if let firstName = self.firstName {
             base = firstName

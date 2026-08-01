@@ -232,7 +232,6 @@ private enum NLBoolSetting: String {
     case showSeconds
     case showFullViews
     case hidePhoneNumber
-    case visualUsername
     case showIfMutualContacts
     case showRegistrationDate
     // Additional
@@ -311,8 +310,6 @@ private enum NLDisclosureLink: String {
     case fakeLocationPicker
     case localStarsAmount
     case deviceModelSpoof
-    case visualUsernameEditor
-    case localNftCenter
     case accountSwitcher
 }
 
@@ -468,7 +465,7 @@ private enum NLHubCategory: String, CaseIterable {
         case .hubMisc: return .misc
         case .hubGhost: return .ghost
         case .hubOther: return .other
-        case .none, .onlineHistory, .ghostDetailsToggle, .fakeLocationPicker, .localStarsAmount, .deviceModelSpoof, .visualUsernameEditor, .localNftCenter, .accountSwitcher: return nil
+        case .none, .onlineHistory, .ghostDetailsToggle, .fakeLocationPicker, .localStarsAmount, .deviceModelSpoof, .accountSwitcher: return nil
         }
     }
 }
@@ -932,9 +929,6 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
     entries.append(.toggle(id: id.count, section: sec, settingName: .showFullViews, value: s.showFullViews, text: "Полные просмотры", enabled: true))
     entries.append(.toggle(id: id.count, section: sec, settingName: .hidePhoneNumber, value: s.hidePhoneNumber, text: "Скрыть номер телефона", enabled: true))
     entries.append(.toggle(id: id.count, section: sec, settingName: .showCreationDate, value: s.showCreationDate, text: "Дата создания чата/канала", enabled: true))
-    // Visual username is a free-form alias for our own name, not a toggle. Disclosure
-    // opens a small input screen; the current value (or "Выкл.") shows on the right.
-    entries.append(.disclosureDetail(id: id.count, section: sec, link: .visualUsernameEditor, text: "Визуальный юзернейм", detail: s.visualUsernameText.isEmpty ? "Выкл." : s.visualUsernameText))
     entries.append(.toggle(id: id.count, section: sec, settingName: .showIfMutualContacts, value: s.showIfMutualContacts, text: "Если взаимно в контактах", enabled: true))
     entries.append(.toggle(id: id.count, section: sec, settingName: .showRegistrationDate, value: s.showRegistrationDate, text: "Дата регистрации аккаунта", enabled: true))
     entries.append(.toggle(id: id.count, section: sec, settingName: .showDC, value: s.showDC, text: "Показывать DC", enabled: true))
@@ -966,7 +960,6 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
     entries.append(.toggle(id: id.count, section: sec, settingName: .enableLocalPremium, value: s.enableLocalPremium, text: "Локальный премиум", enabled: true))
     entries.append(.toggle(id: id.count, section: sec, settingName: .localStarsEnabled, value: s.localStarsEnabled, text: "Локальные звёзды", enabled: true))
     entries.append(.disclosureDetail(id: id.count, section: sec, link: .localStarsAmount, text: "Баланс звёзд", detail: "\(s.localStarsBalance) ⭐ из \(s.localStarsTopUp)"))
-    entries.append(.disclosureDetail(id: id.count, section: sec, link: .localNftCenter, text: "NFT-подарки и usernames", detail: "\(s.localNftGifts.count) подарков · \(s.localNftUsernames.count) usernames"))
     if s.localStarsSpent > 0 {
         entries.append(.action(id: id.count, section: sec, actionType: .resetLocalStars, text: "Пополнить (сбросить траты: \(s.localStarsSpent) ⭐)", kind: .generic))
     } else {
@@ -1436,7 +1429,6 @@ private func namelessFeaturesControllerImpl(context: AccountContext, initialCate
             case .showFullViews: s.showFullViews = value
             case .hidePhoneNumber: s.hidePhoneNumber = value
             case .showCreationDate: s.showCreationDate = value
-            case .visualUsername: s.visualUsername = value
             case .showIfMutualContacts: s.showIfMutualContacts = value
             case .showRegistrationDate: s.showRegistrationDate = value
             case .vibrationEnabled: s.vibrationEnabled = value
@@ -1550,12 +1542,6 @@ private func namelessFeaturesControllerImpl(context: AccountContext, initialCate
                 }))
                 return
             }
-            if link == .localNftCenter {
-                pushControllerImpl?(namelessLocalNftController(context: context, onSave: {
-                    simplePromise.set(true)
-                }))
-                return
-            }
             if link == .deviceModelSpoof {
                 pushControllerImpl?(namelessDeviceModelSpoofController(context: context, onSave: {
                     simplePromise.set(true)
@@ -1567,9 +1553,6 @@ private func namelessFeaturesControllerImpl(context: AccountContext, initialCate
                 namelessShowAccountSwitcher(context: context, present: { c, a in
                     presentControllerImpl?(c, a as? ViewControllerPresentationArguments)
                 })
-                return
-            }
-            if link == .visualUsernameEditor {
                 return
             }
             guard let category = NLHubCategory.from(link: link) else { return }

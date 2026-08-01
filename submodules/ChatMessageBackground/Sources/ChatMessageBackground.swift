@@ -611,11 +611,19 @@ public final class ChatMessageBubbleBackdrop: ASDisplayNode, SGLiquidGlassContai
         // message bubbles use clear-style glass, not panel glass. This keeps the iOS 26
         // refraction/specular material while avoiding a grey/colored solid fill over chats.
         GlassBackgroundView.useCustomGlassImpl = false
+        // The bubble tint is not decoration. Once the solid fill is gone it is the only thing
+        // that still distinguishes an outgoing message from an incoming one, so it is applied
+        // regardless of the global "tint glass surfaces" preference — that flag only decides
+        // how far it is pushed. A plain untinted `.clear` bubble made both sides of the
+        // conversation render as the same colourless lens over the wallpaper.
         let tint: GlassBackgroundView.TintColor
-        if zone.isTinted && self.currentBubbleColor != .clear {
-            tint = .init(kind: .custom(style: .clear, color: self.currentBubbleColor.withAlphaComponent(isDark ? 0.10 : 0.08)))
+        if self.currentBubbleColor != .clear {
+            let alpha: CGFloat = zone.isTinted ? (isDark ? 0.34 : 0.28) : (isDark ? 0.22 : 0.18)
+            tint = .init(kind: .custom(style: .clear, color: self.currentBubbleColor.withAlphaComponent(alpha)))
         } else {
-            tint = .init(kind: .clear)
+            // No bubble colour to lean on (custom wallpaper themes): lift the material off the
+            // backdrop with a neutral wash so the bubble still has an edge to read against.
+            tint = .init(kind: .custom(style: .clear, color: UIColor(white: 1.0, alpha: isDark ? 0.10 : 0.22)))
         }
         if enabled {
             if self.glassView.superview !== self.view {

@@ -99,9 +99,6 @@ private enum NamelessSettingsKey {
     // Read directly by MTApiEnvironment from UserDefaults so MtProtoKit does not have to
     // link SGSimpleSettings; the key literal is duplicated in MTApiEnvironment.m.
     static let deviceModelSpoof = "nameless.deviceModelSpoof"
-    static let visualUsernameText = "nameless.visualUsernameText"
-    static let localNftGiftsJson = "nameless.localNftGiftsJson"
-    static let localNftUsernamesJson = "nameless.localNftUsernamesJson"
     static let hideNewChatSticker = "nameless.hideNewChatSticker"
     static let hideBusinessChats = "nameless.hideBusinessChats"
     static let megramGlobalClearGlass = "megram.globalClearGlass"
@@ -137,7 +134,6 @@ private enum NamelessSettingsKey {
     static let settingsBigAvatar = "nameless.settingsBigAvatar"
     static let forwardWarnAuthor = "nameless.forwardWarnAuthor"
     static let profileMusicCard = "nameless.profileMusicCard"
-    static let visualUsernameAliases = "nameless.visualUsernameAliases"
     /// Local (fake) stars wallet: master switch and how much of the configured amount
     /// has already been "spent" locally.
     static let localStarsEnabled = "nameless.localStarsEnabled"
@@ -272,7 +268,6 @@ private enum NamelessSettingsKey {
     static let showFullViews = "nameless.showFullViews"
     static let hidePhoneNumber = "nameless.hidePhoneNumber"
     static let showCreationDate = "nameless.showCreationDate"
-    static let visualUsername = "nameless.visualUsername"
     static let showIfMutualContacts = "nameless.showIfMutualContacts"
     static let showRegistrationDate = "nameless.showRegistrationDate"
     // MARK: - Additional (Дополнительно)
@@ -291,42 +286,6 @@ private enum NamelessSettingsKey {
     // When enabled, the '+' attachment picker replaces the classic horizontal tab bar with
     // a compact rounded glass sheet stacking the same buttons as a vertical list.
     static let namelessCompactAttachmentSheet = "nameless.compactAttachmentSheet"
-}
-
-public struct NamelessLocalNftGift: Codable, Equatable {
-    public var id: String
-    public var peerId: String
-    public var title: String
-    public var subtitle: String
-    public var emoji: String
-    public var rarity: String
-    public var serial: String
-
-    public init(id: String = UUID().uuidString, peerId: String, title: String, subtitle: String, emoji: String, rarity: String, serial: String) {
-        self.id = id
-        self.peerId = peerId
-        self.title = title
-        self.subtitle = subtitle
-        self.emoji = emoji
-        self.rarity = rarity
-        self.serial = serial
-    }
-}
-
-public struct NamelessLocalNftUsername: Codable, Equatable {
-    public var id: String
-    public var peerId: String
-    public var username: String
-    public var number: String
-    public var colorHex: String
-
-    public init(id: String = UUID().uuidString, peerId: String, username: String, number: String, colorHex: String) {
-        self.id = id
-        self.peerId = peerId
-        self.username = username
-        self.number = number
-        self.colorHex = colorHex
-    }
 }
 
 private enum NamelessRollbackStorage {
@@ -477,60 +436,6 @@ public extension SGSimpleSettings {
         set { storage.set(newValue, forKey: NamelessSettingsKey.deviceModelSpoof) }
     }
 
-    /// Locally displayed name that replaces our own account name across the UI. Only
-    /// affects rendering in this client — the server-side name is untouched. Empty
-    /// means "use the real name".
-    var visualUsernameText: String {
-        get { storage.namelessString(NamelessSettingsKey.visualUsernameText, default: "") }
-        set { storage.set(newValue, forKey: NamelessSettingsKey.visualUsernameText) }
-    }
-
-    var localNftGifts: [NamelessLocalNftGift] {
-        get {
-            guard let data = storage.namelessString(NamelessSettingsKey.localNftGiftsJson, default: "[]").data(using: .utf8) else {
-                return []
-            }
-            return (try? JSONDecoder().decode([NamelessLocalNftGift].self, from: data)) ?? []
-        }
-        set {
-            let data = (try? JSONEncoder().encode(newValue)) ?? Data()
-            storage.set(String(data: data, encoding: .utf8) ?? "[]", forKey: NamelessSettingsKey.localNftGiftsJson)
-        }
-    }
-
-    var localNftUsernames: [NamelessLocalNftUsername] {
-        get {
-            guard let data = storage.namelessString(NamelessSettingsKey.localNftUsernamesJson, default: "[]").data(using: .utf8) else {
-                return []
-            }
-            return (try? JSONDecoder().decode([NamelessLocalNftUsername].self, from: data)) ?? []
-        }
-        set {
-            let data = (try? JSONEncoder().encode(newValue)) ?? Data()
-            storage.set(String(data: data, encoding: .utf8) ?? "[]", forKey: NamelessSettingsKey.localNftUsernamesJson)
-        }
-    }
-
-    func addLocalNftGift(_ gift: NamelessLocalNftGift) {
-        var gifts = localNftGifts
-        gifts.insert(gift, at: 0)
-        localNftGifts = gifts
-    }
-
-    func removeLocalNftGift(id: String) {
-        localNftGifts = localNftGifts.filter { $0.id != id }
-    }
-
-    func addLocalNftUsername(_ username: NamelessLocalNftUsername) {
-        var usernames = localNftUsernames
-        usernames.insert(username, at: 0)
-        localNftUsernames = usernames
-    }
-
-    func removeLocalNftUsername(id: String) {
-        localNftUsernames = localNftUsernames.filter { $0.id != id }
-    }
-
     /// Hide the greeting sticker on empty chats.
     var hideNewChatSticker: Bool {
         get { storage.namelessBool(NamelessSettingsKey.hideNewChatSticker) }
@@ -602,26 +507,6 @@ public extension SGSimpleSettings {
         set { storage.set(newValue, forKey: NamelessSettingsKey.profileMusicCard) }
     }
 
-    /// Per-peer visual aliases: `"peerId": "Display name"`. Only rendered client-side.
-    var visualUsernameAliases: [String: String] {
-        get {
-            (UserDefaults.standard.dictionary(forKey: NamelessSettingsKey.visualUsernameAliases) as? [String: String]) ?? [:]
-        }
-        set {
-            UserDefaults.standard.set(newValue, forKey: NamelessSettingsKey.visualUsernameAliases)
-        }
-    }
-
-    func setVisualUsernameAlias(_ alias: String, forPeerId peerIdString: String) {
-        var dict = visualUsernameAliases
-        let trimmed = alias.trimmingCharacters(in: .whitespacesAndNewlines)
-        if trimmed.isEmpty {
-            dict.removeValue(forKey: peerIdString)
-        } else {
-            dict[peerIdString] = trimmed
-        }
-        visualUsernameAliases = dict
-    }
 
     // MARK: - Local (fake) stars wallet
     //
@@ -837,7 +722,6 @@ public extension SGSimpleSettings {
     var showSeconds: Bool { get { storage.namelessBool(NamelessSettingsKey.showSeconds, default: true) } set { storage.set(newValue, forKey: NamelessSettingsKey.showSeconds) } }
     var showFullViews: Bool { get { storage.namelessBool(NamelessSettingsKey.showFullViews, default: true) } set { storage.set(newValue, forKey: NamelessSettingsKey.showFullViews) } }
     var hidePhoneNumber: Bool { get { storage.namelessBool(NamelessSettingsKey.hidePhoneNumber) } set { storage.set(newValue, forKey: NamelessSettingsKey.hidePhoneNumber) } }
-    var visualUsername: Bool { get { storage.namelessBool(NamelessSettingsKey.visualUsername) } set { storage.set(newValue, forKey: NamelessSettingsKey.visualUsername) } }
     var showIfMutualContacts: Bool { get { storage.namelessBool(NamelessSettingsKey.showIfMutualContacts, default: true) } set { storage.set(newValue, forKey: NamelessSettingsKey.showIfMutualContacts) } }
     var showRegistrationDate: Bool { get { storage.namelessBool(NamelessSettingsKey.showRegistrationDate, default: true) } set { storage.set(newValue, forKey: NamelessSettingsKey.showRegistrationDate) } }
     // MARK: Additional

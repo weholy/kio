@@ -26,7 +26,6 @@ import UndoUI
 import LottieComponent
 import ButtonComponent
 import ContextUI
-import SGSimpleSettings
 
 final class GiftsListView: UIView {
     private let context: AccountContext
@@ -70,7 +69,6 @@ final class GiftsListView: UIView {
             
     private var starsProducts: [ProfileGiftsContext.State.StarGift]?
     private var starsItems: [AnyHashable: (StarGiftReference?, ComponentView<Empty>)] = [:]
-    private var localNftViews: [String: UIView] = [:]
 
     private(set) var resultsAreEmpty = false
     private var filteredResultsAreEmpty = false
@@ -763,80 +761,8 @@ final class GiftsListView: UIView {
         for id in removeIds {
             self.starsItems.removeValue(forKey: id)
         }
-
-        let localPeerId = "\(self.peerId.id._internalGetInt64Value())"
-        let localGifts = SGSimpleSettings.shared.localNftGifts.filter { $0.peerId == localPeerId }
-        let localUsernames = SGSimpleSettings.shared.localNftUsernames.filter { $0.peerId == localPeerId }
-        var validLocalIds = Set<String>()
-        if !localGifts.isEmpty || !localUsernames.isEmpty {
-            let localStartY = itemFrame.origin.y + (starsProducts.isEmpty ? 0.0 : 10.0)
-            var localFrame = CGRect(x: itemsSideInset, y: localStartY, width: params.size.width - itemsSideInset * 2.0, height: 74.0)
-            let localItems: [(String, String, String, String)] =
-                localGifts.map { ("gift_\($0.id)", "\($0.emoji) \($0.title)", "\($0.subtitle) · \($0.rarity) \($0.serial)", "LOCAL NFT GIFT") } +
-                localUsernames.map { ("username_\($0.id)", "@\($0.username)", "Collectible username \($0.number) · \($0.colorHex)", "LOCAL NFT USERNAME") }
-
-            for item in localItems {
-                validLocalIds.insert(item.0)
-                let view: UIView
-                if let current = self.localNftViews[item.0] {
-                    view = current
-                } else {
-                    view = UIView()
-                    view.layer.cornerRadius = 22.0
-                    view.layer.masksToBounds = true
-                    view.layer.borderWidth = 1.0
-                    let badgeLabel = UILabel()
-                    badgeLabel.tag = 101
-                    badgeLabel.font = Font.semibold(10.0)
-                    badgeLabel.textAlignment = .right
-                    view.addSubview(badgeLabel)
-                    let titleLabel = UILabel()
-                    titleLabel.tag = 102
-                    titleLabel.font = Font.semibold(17.0)
-                    view.addSubview(titleLabel)
-                    let subtitleLabel = UILabel()
-                    subtitleLabel.tag = 103
-                    subtitleLabel.font = Font.regular(13.0)
-                    subtitleLabel.numberOfLines = 2
-                    view.addSubview(subtitleLabel)
-                    self.addSubview(view)
-                    self.localNftViews[item.0] = view
-                }
-
-                view.backgroundColor = params.presentationData.theme.list.itemBlocksBackgroundColor.withAlphaComponent(0.72)
-                view.layer.borderColor = params.presentationData.theme.list.itemAccentColor.withAlphaComponent(0.22).cgColor
-                if let badgeLabel = view.viewWithTag(101) as? UILabel {
-                    badgeLabel.text = item.3
-                    badgeLabel.textColor = params.presentationData.theme.list.itemAccentColor
-                    badgeLabel.frame = CGRect(x: localFrame.width - 154.0, y: 12.0, width: 136.0, height: 14.0)
-                }
-                if let titleLabel = view.viewWithTag(102) as? UILabel {
-                    titleLabel.text = item.1
-                    titleLabel.textColor = params.presentationData.theme.list.itemPrimaryTextColor
-                    titleLabel.frame = CGRect(x: 16.0, y: 13.0, width: localFrame.width - 176.0, height: 22.0)
-                }
-                if let subtitleLabel = view.viewWithTag(103) as? UILabel {
-                    subtitleLabel.text = item.2
-                    subtitleLabel.textColor = params.presentationData.theme.list.itemSecondaryTextColor
-                    subtitleLabel.frame = CGRect(x: 16.0, y: 38.0, width: localFrame.width - 32.0, height: 32.0)
-                }
-                transition.setFrame(view: view, frame: localFrame)
-                localFrame.origin.y += localFrame.height + 10.0
-            }
-        }
-        var removeLocalIds: [String] = []
-        for (id, view) in self.localNftViews where !validLocalIds.contains(id) {
-            view.removeFromSuperview()
-            removeLocalIds.append(id)
-        }
-        for id in removeLocalIds {
-            self.localNftViews.removeValue(forKey: id)
-        }
         
         var contentHeight = ceil(CGFloat(starsProducts.count) / CGFloat(defaultItemsInRow)) * (starsOptionSize.height + optionSpacing) - optionSpacing + topInset + 16.0
-        if !localGifts.isEmpty || !localUsernames.isEmpty {
-            contentHeight += CGFloat(localGifts.count + localUsernames.count) * 84.0 + 10.0
-        }
         
         let size = params.size
         let sideInset = params.sideInset

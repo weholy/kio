@@ -93,10 +93,10 @@ public final class SGLiquidGlassItemBackground {
 
         GlassBackgroundView.useCustomGlassImpl = false
 
-        // Official Apple liquid glass, with the intensity slider selecting how thin the
-        // material is (see SGOfficialGlassTint.tint).
-        let tint = SGOfficialGlassTint.tint(
-            intensity: CGFloat(SGSimpleSettings.shared.namelessLiquidGlassIntensity),
+        // Official Apple liquid glass — always the see-through `.clear` material, with the
+        // intensity slider only scaling the readability dim (see SGOfficialGlassTint.resolve).
+        let tint = SGOfficialGlassTint.resolve(
+            kind: .clear,
             isDark: self.currentIsDark,
             accent: self._tint == .clear ? nil : self._tint
         )

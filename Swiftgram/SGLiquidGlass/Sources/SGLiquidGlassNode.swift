@@ -25,38 +25,41 @@ public enum SGOfficialGlassTint {
         .init(kind: .clear)
     }
 
-    /// Translucency is expressed through the *glass style and its tint alpha*, never through
-    /// the host view's `alpha`. Fading a `UIVisualEffectView` out cross-dissolves it toward a
-    /// flat grey rectangle and kills the refraction/specular that make the material read as
-    /// glass; picking a thinner Apple style keeps the material intact and just lets more of
-    /// the backdrop through.
+    /// Resolves the tint that actually reaches `UIGlassEffect`.
     ///
-    /// - intensity 0.0 … 0.5 → `UIGlassEffect(style: .clear)`, tint alpha ramping up from 0
-    /// - intensity 0.5 … 1.0 → `UIGlassEffect(style: .regular)`, tint alpha ramping to a full panel
-    public static func tint(intensity: CGFloat, isDark: Bool, accent: UIColor?) -> GlassBackgroundView.TintColor {
-        let value = max(0.0, min(1.0, intensity))
-        // Accent tinting only applies when the user turned it on; otherwise the tint is the
-        // neutral one Apple uses (white lift on dark, white wash on light, black dim for the
-        // thin style so text keeps contrast over bright wallpapers).
-        let useAccent = SGSimpleSettings.shared.namelessLiquidGlassTinting && accent != nil
-
-        if value < 0.5 {
-            let t = value / 0.5
-            let alpha = (isDark ? 0.22 : 0.10) * t
-            let base = useAccent ? accent! : (isDark ? UIColor.black : UIColor.white)
-            return .init(kind: .custom(style: .clear, color: base.withAlphaComponent(alpha)))
-        } else {
-            let t = (value - 0.5) / 0.5
-            let minAlpha: CGFloat = isDark ? 0.025 : 0.10
-            let maxAlpha: CGFloat = isDark ? 0.18 : 0.32
-            let alpha = minAlpha + (maxAlpha - minAlpha) * t
-            let base = useAccent ? accent! : UIColor.white
-            return .init(kind: .custom(style: .default, color: base.withAlphaComponent(alpha)))
+    /// The material is *always* `UIGlassEffect(style: .clear)` — the see-through iOS 26 glass
+    /// that refracts whatever is behind it. `.regular` was what made every surface read as
+    /// milky fog: it composites an opaque-ish white/grey wash over the backdrop, so wallpaper
+    /// and bubbles behind the panel disappear. Translucency is therefore never expressed via
+    /// the host view's `alpha` (that cross-dissolves the effect view toward a flat rectangle
+    /// and kills the refraction) — only via the tint alpha layered on top of clear glass.
+    ///
+    /// `intensity` no longer picks the *style*; it only scales the readability dim, so text on
+    /// a menu stays legible over a bright wallpaper. 0.0 → no dim at all, 1.0 → the strongest
+    /// dim we allow (still far more transparent than `.regular` ever was).
+    public static func resolve(kind: GlassBackgroundView.TintColor.Kind, isDark: Bool, accent: UIColor?) -> GlassBackgroundView.TintColor {
+        // An explicit custom colour from a call site wins — it is a deliberate art direction
+        // choice (bubble fill, accent button), we only force its style to `.clear`.
+        if case let .custom(_, color) = kind {
+            return .init(kind: .custom(style: .clear, color: color))
         }
+
+        let intensity = max(0.0, min(1.0, CGFloat(SGSimpleSettings.shared.namelessLiquidGlassIntensity)))
+        // Accent tinting only applies when the user turned it on; otherwise the dim is neutral
+        // (black on dark so panels sink into the backdrop, a whisper of white on light so text
+        // keeps contrast without the surface turning into fog).
+        let useAccent = SGSimpleSettings.shared.namelessLiquidGlassTinting && accent != nil
+        let maxAlpha: CGFloat = isDark ? 0.26 : 0.10
+        let alpha = maxAlpha * intensity
+        if alpha <= 0.001 && !useAccent {
+            return .init(kind: .clear)
+        }
+        let base = useAccent ? accent! : (isDark ? UIColor.black : UIColor.white)
+        return .init(kind: .custom(style: .clear, color: base.withAlphaComponent(alpha)))
     }
 
     public static func forZone(_ zone: SGLiquidGlassZone, isDark: Bool = true, accent: UIColor? = nil) -> GlassBackgroundView.TintColor {
-        return tint(intensity: zone.intensity, isDark: isDark, accent: accent)
+        return resolve(kind: .clear, isDark: isDark, accent: accent)
     }
 }
 
@@ -154,9 +157,9 @@ public final class SGLiquidGlassNode: ASDisplayNode, SGLiquidGlassContainer {
     }
 
     private func officialTint() -> GlassBackgroundView.TintColor {
-        // Intensity drives the Apple glass style + tint alpha (see SGOfficialGlassTint.tint).
-        return SGOfficialGlassTint.tint(
-            intensity: CGFloat(SGSimpleSettings.shared.namelessLiquidGlassIntensity),
+        // The requested `glassKind` is respected — see SGOfficialGlassTint.resolve.
+        return SGOfficialGlassTint.resolve(
+            kind: _kind,
             isDark: _isDark,
             accent: _tintColor == .clear ? nil : _tintColor
         )
@@ -287,8 +290,8 @@ public final class SGLiquidGlassView: UIView, SGLiquidGlassViewProtocol, SGLiqui
     }
 
     private func officialTint() -> GlassBackgroundView.TintColor {
-        return SGOfficialGlassTint.tint(
-            intensity: CGFloat(SGSimpleSettings.shared.namelessLiquidGlassIntensity),
+        return SGOfficialGlassTint.resolve(
+            kind: _kind,
             isDark: _isDark,
             accent: _tintColor == .clear ? nil : _tintColor
         )

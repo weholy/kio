@@ -767,7 +767,11 @@ public class GlassBackgroundView: UIView {
                             case let .custom(style, color):
                                 switch style {
                                 case .default:
-                                    glassEffectValue = UIGlassEffect(style: .regular)
+                                    // The global clear-glass switch also downgrades `.default`
+                                    // custom surfaces: `.regular` composites an opaque wash that
+                                    // reads as fog, so a caller asking for a tinted panel gets
+                                    // the same tint over see-through glass instead.
+                                    glassEffectValue = UIGlassEffect(style: megramForceClear ? .clear : .regular)
                                     glassEffectValue.tintColor = color
                                 case .clear:
                                     glassEffectValue = UIGlassEffect(style: .clear)

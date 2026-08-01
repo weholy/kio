@@ -1084,7 +1084,7 @@ extension ChatControllerImpl {
                         text: "Вы отправляете это сообщение обратно тому, кто его написал. Проверьте адресата.",
                         actions: [TextAlertAction(type: .defaultAction, title: presentationData.strings.Common_OK, action: {})]
                     )
-                    strongSelf.controller?.present(alert, in: .window(.root))
+                    strongSelf.present(alert, in: .window(.root))
                     return
                 }
 

@@ -669,10 +669,11 @@ private final class ContextControllerActionsListSeparatorItemNode: ASDisplayNode
     }
     
     func update(presentationData: PresentationData, constrainedSize: CGSize) -> (minSize: CGSize, apply: (_ size: CGSize, _ transition: ContainedViewLayoutTransition) -> Void) {
-        return (minSize: CGSize(width: 0.0, height: 20.0), apply: { size, transition in
-            let sideInset: CGFloat = 18.0
-            self.separatorView.tintColor = (presentationData.theme.overallDarkAppearance ? UIColor.white : UIColor.black).withAlphaComponent(0.12)
-            transition.updateFrame(view: self.separatorView, frame: CGRect(origin: CGPoint(x: sideInset + 44.0, y: floorToScreenPixels((size.height - 1.0) * 0.5)), size: CGSize(width: max(0.0, size.width - (sideInset + 44.0) - sideInset), height: 1.0)))
+        return (minSize: CGSize(width: 0.0, height: 12.0), apply: { size, transition in
+            // A hairline drawn over clear glass reads as a scratch on the material rather than
+            // as structure. The gap between groups carries the separation instead.
+            self.separatorView.isHidden = true
+            transition.updateFrame(view: self.separatorView, frame: CGRect(origin: CGPoint(), size: CGSize(width: size.width, height: 0.0)))
         })
     }
 }
