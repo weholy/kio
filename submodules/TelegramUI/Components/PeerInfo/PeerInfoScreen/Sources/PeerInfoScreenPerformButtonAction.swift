@@ -12,6 +12,7 @@ import NotificationExceptionsScreen
 import TranslateUI
 import TelegramNotices
 import AlertComponent
+import SGMegramFire
 
 extension PeerInfoScreenNode {
     func performButtonAction(key: PeerInfoHeaderButtonKey, buttonNode: PeerInfoHeaderButtonNode?, gesture: ContextGesture?) {
@@ -770,16 +771,6 @@ extension PeerInfoScreenNode {
                         })))
                     }
 
-                    if !items.isEmpty {
-                        items.append(.separator)
-                    }
-                    items.append(.action(ContextMenuActionItem(text: "Megram", icon: { theme in
-                        generateTintedImage(image: UIImage(bundleImageName: "Chat/Context Menu/Info"), color: theme.contextMenu.primaryColor)
-                    }, action: { [weak self] c, _ in
-                        c?.dismiss(completion: nil)
-                        self?.openMegramMenu(peer: peer, chatPeer: chatPeer)
-                    })))
-                    
                     if case let .user(user) = data.peer, let cachedData = data.cachedData as? CachedUserData, user.botInfo == nil && !user.flags.contains(.isSupport) && user.id != strongSelf.context.account.peerId && strongSelf.peerId.namespace != Namespaces.Peer.SecretChat {
                         let copyProtectionEnabled = cachedData.flags.contains(.myCopyProtectionEnabled) || cachedData.flags.contains(.copyProtectionEnabled)
                         items.append(.action(ContextMenuActionItem(text: !copyProtectionEnabled ? strongSelf.presentationData.strings.PeerInfo_DisableSharing : strongSelf.presentationData.strings.PeerInfo_EnableSharing, icon: { theme in
@@ -867,7 +858,16 @@ extension PeerInfoScreenNode {
                             }
                         })))
                     }
-                    
+
+                    items.append(.action(ContextMenuActionItem(text: "Megram", icon: { theme in
+                        generateTintedImage(image: UIImage(bundleImageName: "Chat/Context Menu/Info"), color: theme.contextMenu.primaryColor)
+                    }, action: { [weak self] c, _ in
+                        guard let self, let c else {
+                            return
+                        }
+                        c.pushItems(items: .single(ContextController.Items(content: .list(self.megramMenuItems(peer: peer, chatPeer: chatPeer)))))
+                    })))
+
                     if strongSelf.peerId.namespace == Namespaces.Peer.CloudUser && user.botInfo == nil && !user.flags.contains(.isSupport) {
                         if data.isContact {
                             if let cachedData = data.cachedData as? CachedUserData, cachedData.isBlocked {
@@ -1326,33 +1326,68 @@ extension PeerInfoScreenNode {
         }
     }
 
-    private func openMegramMenu(peer: EnginePeer, chatPeer: EnginePeer) {
-        guard let controller = self.controller else {
-            return
-        }
-        let presentationData = self.presentationData
-        let actionSheet = ActionSheetController(presentationData: presentationData)
-        var items: [ActionSheetItem] = [
-            ActionSheetButtonItem(title: "Назад", color: .accent, action: { [weak actionSheet] in
-                actionSheet?.dismissAnimated()
-            }),
-            ActionSheetButtonItem(title: "Не показывать удаленные", color: .accent, action: { [weak self, weak actionSheet] in
-                actionSheet?.dismissAnimated()
-                self?.toggleMegramFlag(peerId: peer.id, key: "hide_deleted")
-            }),
-            ActionSheetButtonItem(title: "Не показывать измененные", color: .accent, action: { [weak self, weak actionSheet] in
-                actionSheet?.dismissAnimated()
-                self?.toggleMegramFlag(peerId: peer.id, key: "hide_edited")
-            }),
-            ActionSheetButtonItem(title: "Включить режим призрака", color: .accent, action: { [weak self, weak actionSheet] in
-                actionSheet?.dismissAnimated()
-                self?.toggleMegramFlag(peerId: peer.id, key: "ghost_mode")
-            }),
-            ActionSheetButtonItem(title: "Предложить огонек", color: .accent, action: { [weak self, weak actionSheet] in
-                actionSheet?.dismissAnimated()
-                self?.openMegramFireScreen(peer: peer, chatPeer: chatPeer)
-            })
+    // MARK: - Megram
+
+    /// Per-chat Megram switches. These are scoped to one peer, unlike the
+    /// global toggles in the Megram settings hub.
+    private func megramFlag(peerId: PeerId, key: String) -> Bool {
+        return UserDefaults.standard.bool(forKey: "megram.\(peerId.toInt64()).\(key)")
+    }
+
+    private func toggleMegramFlag(peerId: PeerId, key: String) {
+        let defaults = UserDefaults.standard
+        let storageKey = "megram.\(peerId.toInt64()).\(key)"
+        defaults.set(!defaults.bool(forKey: storageKey), forKey: storageKey)
+    }
+
+    /// Submenu pushed from the "Megram" row. `Назад` pops back to the main list
+    /// rather than dismissing, so it behaves like the other native submenus.
+    func megramMenuItems(peer: EnginePeer, chatPeer: EnginePeer) -> [ContextMenuItem] {
+        var items: [ContextMenuItem] = []
+
+        items.append(.action(ContextMenuActionItem(text: self.presentationData.strings.Common_Back, icon: { theme in
+            return generateTintedImage(image: UIImage(bundleImageName: "Chat/Context Menu/Back"), color: theme.contextMenu.primaryColor)
+        }, iconPosition: .left, action: { c, _ in
+            c?.popItems()
+        })))
+        items.append(.separator)
+
+        let toggles: [(title: String, key: String, iconName: String)] = [
+            ("Не показывать удалённые", "hide_deleted", "Chat/Context Menu/Delete"),
+            ("Не показывать изменённые", "hide_edited", "Chat/Context Menu/Edit"),
+            ("Включить режим призрака", "ghost_mode", "Chat/Context Menu/Eye")
         ]
+        for toggle in toggles {
+            let isEnabled = self.megramFlag(peerId: peer.id, key: toggle.key)
+            items.append(.action(ContextMenuActionItem(text: toggle.title, icon: { theme in
+                let imageName = isEnabled ? "Chat/Context Menu/Check" : toggle.iconName
+                return generateTintedImage(image: UIImage(bundleImageName: imageName), color: theme.contextMenu.primaryColor)
+            }, action: { [weak self] c, _ in
+                guard let self else {
+                    return
+                }
+                self.toggleMegramFlag(peerId: peer.id, key: toggle.key)
+                // Replace the current level rather than pushing, so the
+                // checkmark updates in place and `Назад` still goes one step up.
+                c?.setItems(.single(ContextController.Items(content: .list(self.megramMenuItems(peer: peer, chatPeer: chatPeer)))), minHeight: nil, animated: true)
+            })))
+        }
+
+        let fireDays = MegramFireStore.badgeDays(peerId: peer.id.toInt64())
+        let fireTitle: String
+        if let fireDays {
+            fireTitle = "Огонёк · \(fireDays)"
+        } else {
+            fireTitle = "Предложить огонёк"
+        }
+        items.append(.action(ContextMenuActionItem(text: fireTitle, icon: { theme in
+            return generateTintedImage(image: UIImage(bundleImageName: "Chat/Context Menu/Info"), color: theme.contextMenu.primaryColor)
+        }, action: { [weak self] c, f in
+            f(.default)
+            c?.dismiss(completion: nil)
+            self?.proposeMegramFire(peer: peer)
+        })))
+
         var hasAdministrators = false
         switch chatPeer {
         case .legacyGroup:
@@ -1365,33 +1400,39 @@ extension PeerInfoScreenNode {
             break
         }
         if hasAdministrators {
-            items.append(ActionSheetButtonItem(title: "Администраторы", color: .accent, action: { [weak self, weak actionSheet] in
-                actionSheet?.dismissAnimated()
+            items.append(.separator)
+            items.append(.action(ContextMenuActionItem(text: "Администраторы", icon: { theme in
+                return generateTintedImage(image: UIImage(bundleImageName: "Chat/Context Menu/Groups"), color: theme.contextMenu.primaryColor)
+            }, action: { [weak self] _, f in
+                f(.dismissWithoutContent)
                 self?.openParticipantsSection(section: .admins)
-            }))
+            })))
         }
-        actionSheet.setItemGroups([
-            ActionSheetItemGroup(items: items),
-            ActionSheetItemGroup(items: [
-                ActionSheetButtonItem(title: presentationData.strings.Common_Cancel, color: .accent, font: .bold, action: { [weak actionSheet] in
-                    actionSheet?.dismissAnimated()
-                })
-            ])
-        ])
-        controller.present(actionSheet, in: .window(.root), with: ViewControllerPresentationArguments(presentationAnimation: .modalSheet))
+
+        return items
     }
 
-    private func toggleMegramFlag(peerId: PeerId, key: String) {
-        let defaults = UserDefaults.standard
-        let storageKey = "megram.\(peerId.id._internalGetInt64Value()).\(key)"
-        let value = defaults.bool(forKey: storageKey)
-        defaults.set(!value, forKey: storageKey)
-    }
-
-    private func openMegramFireScreen(peer: EnginePeer, chatPeer: EnginePeer) {
+    /// Lights the fire and, the first time only, sends the invitation into the
+    /// chat so the other side knows the streak has started. Re-opening an
+    /// existing fire never sends anything.
+    private func proposeMegramFire(peer: EnginePeer) {
         guard let controller = self.controller else {
             return
         }
-        controller.present(MegramFireScreen(context: self.context, peer: peer), in: .window(.root))
+        let rawPeerId = peer.id.toInt64()
+        if !MegramFireStore.isActive(peerId: rawPeerId) {
+            var username: String?
+            if case let .user(user) = peer {
+                username = user.addressName
+            }
+            let timestamp = Int32(Date().timeIntervalSince1970)
+            MegramFireStore.activate(peerId: rawPeerId, username: username, timestamp: timestamp)
+
+            let text = "Давай заведём огонёк 🔥 Пишем друг другу каждый день — серия растёт."
+            let _ = enqueueMessages(account: self.context.account, peerId: peer.id, messages: [
+                .message(text: text, attributes: [], inlineStickers: [:], mediaReference: nil, threadId: nil, replyToMessageId: nil, replyToStoryId: nil, localGroupingKey: nil, correlationId: nil, bubbleUpEmojiOrStickersets: [])
+            ]).startStandalone()
+        }
+        controller.present(MegramFireScreen(context: self.context, peer: peer), in: .window(.root), with: ViewControllerPresentationArguments(presentationAnimation: .modalSheet))
     }
 }
