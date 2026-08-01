@@ -433,16 +433,13 @@ final class PeerInfoHeaderNode: ASDisplayNode {
             self.requestOpenAvatarForEditing?(false)
             return
         }
-        if self.isAvatarExpanded || gallery {
-            if let currentEntry = self.avatarListNode.listContainerNode.currentEntry, let firstEntry = self.avatarListNode.listContainerNode.galleryEntries.first {
-                let entry = first ? firstEntry : currentEntry
-                self.requestAvatarExpansion?(true, self.avatarListNode.listContainerNode.galleryEntries, entry, self.avatarTransitionArguments(entry: currentEntry))
-            }
-        } else if let entry = self.avatarListNode.listContainerNode.galleryEntries.first {
-            self.requestAvatarExpansion?(false, self.avatarListNode.listContainerNode.galleryEntries, nil, self.avatarTransitionArguments(entry: entry))
-        } else if let storyParams = self.avatarListNode.listContainerNode.storyParams, storyParams.count != 0 {
+        if self.avatarListNode.listContainerNode.galleryEntries.isEmpty, let storyParams = self.avatarListNode.listContainerNode.storyParams, storyParams.count != 0 {
             self.requestAvatarExpansion?(false, self.avatarListNode.listContainerNode.galleryEntries, nil, nil)
-        } else {
+            return
+        }
+        // Megram: the photo already fills the screen, so there is nothing left
+        // to expand into. Tapping and dragging must not open the gallery.
+        if self.avatarListNode.listContainerNode.galleryEntries.isEmpty {
             self.cancelUpload?()
         }
     }
@@ -500,6 +497,13 @@ final class PeerInfoHeaderNode: ASDisplayNode {
     
     private var currentPanelStatusData: PeerInfoStatusData?
     func update(width: CGFloat, containerHeight: CGFloat, containerInset: CGFloat, statusBarHeight: CGFloat, navigationHeight: CGFloat, isModalOverlay: Bool, isMediaOnly: Bool, contentOffset: CGFloat, paneContainerY: CGFloat, presentationData: PresentationData, peer: EnginePeer?, cachedData: EngineCachedPeerData?, threadData: MessageHistoryThreadData?, peerNotificationSettings: TelegramPeerNotificationSettings?, threadNotificationSettings: TelegramPeerNotificationSettings?, globalNotificationSettings: EngineGlobalNotificationSettings?, statusData: PeerInfoStatusData?, panelStatusData: (PeerInfoStatusData?, PeerInfoStatusData?, CGFloat?), isSecretChat: Bool, isContact: Bool, isSettings: Bool, state: PeerInfoState, profileGiftsContext: ProfileGiftsContext?, screenData: PeerInfoScreenData?, isSearching: Bool, metrics: LayoutMetrics, deviceMetrics: DeviceMetrics, transition: ContainedViewLayoutTransition, additive: Bool, animateHeader: Bool) -> CGFloat {
+        // Megram: a profile with a photo always opens expanded and stays that
+        // way. Editing still falls back to the regular round-avatar layout,
+        // because that is where the photo can be replaced.
+        if !state.isEditing, let peer, peer.smallProfileImage != nil, !self.isAvatarExpanded {
+            self.isAvatarExpanded = true
+        }
+
         if self.appliedCustomNavigationContentNode !== self.customNavigationContentNode {
             if let previous = self.appliedCustomNavigationContentNode {
                 ComponentTransition(transition).setAlpha(view: previous.view, alpha: 0.0, completion: { [weak previous] _ in
@@ -1182,7 +1186,9 @@ final class PeerInfoHeaderNode: ASDisplayNode {
         self.avatarOverlayNode.updateTransitionFraction(transitionFraction, transition: transition)
         
         let expandedAvatarControlsHeight: CGFloat = 61.0
-        var expandedAvatarListHeight = min(width, containerHeight - expandedAvatarControlsHeight)
+        // Megram: the expanded photo fills the whole screen rather than a
+        // square crop, so the container takes the full container height.
+        var expandedAvatarListHeight = containerHeight - expandedAvatarControlsHeight
         if self.isSettings || self.isMyProfile {
             expandedAvatarListHeight = expandedAvatarListHeight + 60.0
         } else {
