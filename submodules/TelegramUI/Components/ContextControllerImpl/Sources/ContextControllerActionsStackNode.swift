@@ -210,12 +210,16 @@ public final class ContextControllerActionsListActionItemNode: HighlightTracking
     }
     
     public func update(presentationData: PresentationData, constrainedSize: CGSize) -> (minSize: CGSize, apply: (_ size: CGSize, _ transition: ContainedViewLayoutTransition) -> Void) {
-        let sideInset: CGFloat = 28.0
-        let verticalInset: CGFloat = 15.0
+        // System iOS 26 menu metrics. The fork had grown these to 28/15/26/32 with a semibold
+        // 19pt title, which is why every menu — message, three-dots, navigation bar — came out
+        // far larger than the system menus sitting right next to them.
+        let sideInset: CGFloat = 16.0
+        let verticalInset: CGFloat = 11.0
         let titleSubtitleSpacing: CGFloat = 1.0
-        let iconSideInset: CGFloat = 26.0
-        let standardIconWidth: CGFloat = 32.0
-        let iconSpacing: CGFloat = 16.0
+        let iconSideInset: CGFloat = 16.0
+        let standardIconWidth: CGFloat = 24.0
+        let iconSpacing: CGFloat = 12.0
+        let minimumItemHeight: CGFloat = 46.0
         
         var forcedHeight: CGFloat?
         var titleVerticalOffset: CGFloat?
@@ -232,8 +236,8 @@ public final class ContextControllerActionsListActionItemNode: HighlightTracking
             titleFont = smallTextFont
             titleBoldFont = Font.semibold(max(15.0, floor(presentationData.listsFontSize.baseDisplaySize * 15.0 / 17.0)))
         case .regular:
-            titleFont = Font.semibold(max(19.0, presentationData.listsFontSize.baseDisplaySize + 1.0))
-            titleBoldFont = titleFont
+            titleFont = Font.regular(presentationData.listsFontSize.baseDisplaySize)
+            titleBoldFont = Font.semibold(presentationData.listsFontSize.baseDisplaySize)
         }
         
         let subtitleFont = Font.regular(presentationData.listsFontSize.baseDisplaySize * 14.0 / 17.0)
@@ -365,6 +369,22 @@ public final class ContextControllerActionsListActionItemNode: HighlightTracking
         
         self.subtitleNode.attributedText = subtitle
         
+        // Menu icons are laid out at their natural size, so a caller handing over a full-resolution
+        // asset (an app badge, a plugin's own artwork) blew the row up to hundreds of points tall
+        // and painted a giant shape over the whole menu. Fitting every icon into the standard slot
+        // makes that impossible for any current or future item.
+        func fittedIconSize(_ size: CGSize?) -> CGSize? {
+            guard let size, size.width > 0.0, size.height > 0.0 else {
+                return size
+            }
+            let limit = standardIconWidth
+            guard size.width > limit || size.height > limit else {
+                return size
+            }
+            let scale = min(limit / size.width, limit / size.height)
+            return CGSize(width: floor(size.width * scale), height: floor(size.height * scale))
+        }
+
         var iconSize: CGSize?
         if let iconSource = self.item.iconSource {
             iconSize = iconSource.size
@@ -380,7 +400,7 @@ public final class ContextControllerActionsListActionItemNode: HighlightTracking
                 }).strict()
             }
         } else if let image = self.iconNode.image {
-            iconSize = image.size
+            iconSize = fittedIconSize(image.size)
         } else if let animationName = self.item.animationName {
             if self.animationNode == nil {
                 let animationNode = AnimationNode(animation: animationName, colors: ["__allcolors__": titleColor], scale: 1.0)
@@ -392,7 +412,7 @@ public final class ContextControllerActionsListActionItemNode: HighlightTracking
         } else {
             let iconImage = self.item.icon(presentationData.theme)
             self.iconNode.image = iconImage
-            iconSize = iconImage?.size
+            iconSize = fittedIconSize(iconImage?.size)
         }
         
         if let iconAnimation = self.item.iconAnimation {
@@ -556,7 +576,7 @@ public final class ContextControllerActionsListActionItemNode: HighlightTracking
             minSize.width += iconSpacing
         }
         if let forcedHeight {
-            minSize.height = max(62.0, forcedHeight)
+            minSize.height = max(minimumItemHeight, forcedHeight)
         } else {
             minSize.height += verticalInset * 2.0
             minSize.height += titleSize.height
@@ -564,7 +584,7 @@ public final class ContextControllerActionsListActionItemNode: HighlightTracking
                 minSize.height += titleSubtitleSpacing
                 minSize.height += subtitleSize.height
             }
-            minSize.height = max(62.0, minSize.height)
+            minSize.height = max(minimumItemHeight, minSize.height)
         }
         
         return (minSize: minSize, apply: { size, transition in
@@ -577,7 +597,7 @@ public final class ContextControllerActionsListActionItemNode: HighlightTracking
             }
             var subtitleFrame = CGRect(origin: CGPoint(x: titleFrame.minX, y: titleFrame.maxY + titleSubtitleSpacing), size: subtitleSize)
             if iconSize != nil {
-                titleFrame.origin.x = iconSideInset + 48.0
+                titleFrame.origin.x = iconSideInset + standardIconWidth + iconSpacing
                 subtitleFrame.origin.x = titleFrame.minX
             }
             

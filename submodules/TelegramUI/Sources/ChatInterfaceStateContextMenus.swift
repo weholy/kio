@@ -1539,18 +1539,9 @@ func contextMenuForChatPresentationInterfaceState(chatPresentationInterfaceState
             })))
         }
         
-        let showJsonAction: ContextMenuItem = .action(ContextMenuActionItem(text: "JSON", icon: { theme in
-            return generateTintedImage(image: UIImage(bundleImageName: "Chat/Context Menu/Settings"), color: theme.actionSheet.primaryTextColor)
-        }, action: { _, f in
-            showMessageJson(controllerInteraction: controllerInteraction, chatPresentationInterfaceState: chatPresentationInterfaceState, message: message, context: context)
-            f(.default)
-        }))
-        if SGSimpleSettings.shared.contextShowJson {
-            actions.append(showJsonAction)
-        } else {
-            sgActions.append(showJsonAction)
-        }
-        
+        // MARK: Megram — the raw-JSON dump was a debugging aid, not a shipping feature. It is off
+        // the message menu entirely; `showMessageJson` stays in the tree for the debug screens.
+
         var threadId: Int64?
         var threadMessageCount: Int = 0
         if case .peer = chatPresentationInterfaceState.chatLocation, let channel = chatPresentationInterfaceState.renderedPeer?.peer as? TelegramChannel, case .group = channel.info {
@@ -2624,7 +2615,10 @@ func contextMenuForChatPresentationInterfaceState(chatPresentationInterfaceState
             }
         }
         
-        return ContextController.Items(content: .list(actions), tip: nil)
+        // MARK: Megram — lead the message menu with the compact Select / Copy / Delete row and
+        // keep the rest as the usual list underneath. `withLeadingActionsRow` reuses the items it
+        // promotes, so availability and behaviour are decided above, exactly as before.
+        return ContextController.Items(content: .list(actions.withLeadingActionsRow(strings: chatPresentationInterfaceState.strings)), tip: nil)
     }
 }
 

@@ -130,15 +130,6 @@ public final class ChatEmptyNodeGreetingChatContent: ASDisplayNode, ChatEmptyNod
         self.addSubnode(self.titleNode)
         self.addSubnode(self.textNode)
         self.addSubnode(self.stickerNode)
-        // MARK: Nameless — "Скрыть приветственный стикер" hides the whole empty-chat card
-        // (title + sub-text + sticker) so nothing can be accidentally tapped when checking
-        // a profile of a fresh contact.
-        if SGSimpleSettings.shared.hideNewChatSticker {
-            self.stickerNode.isHidden = true
-            self.stickerNode.isUserInteractionEnabled = false
-            self.titleNode.isHidden = true
-            self.textNode.isHidden = true
-        }
     }
     
     override public func didLoad() {
@@ -1649,8 +1640,21 @@ public final class ChatEmptyNode: ASDisplayNode {
     }
     
     public func updateLayout(interfaceState: ChatPresentationInterfaceState, subject: Subject, loadingNode: ChatLoadingNode?, backgroundNode: WallpaperBackgroundNode?, size: CGSize, insets: UIEdgeInsets, leftInset: CGFloat, rightInset: CGFloat, transition: ContainedViewLayoutTransition) {
+        // MARK: Nameless — "Скрыть приветственный стикер". The switch used to reach inside a
+        // single content node and hide three of its subnodes, which left every other kind of
+        // empty-chat card untouched — most visibly the business greeting, whose sticker
+        // placeholder and "set this message for all new chats" caption stayed on screen. Hiding
+        // the container covers every kind at once, including ones added later.
+        if SGSimpleSettings.shared.hideNewChatSticker {
+            self.isHidden = true
+            self.isUserInteractionEnabled = false
+            return
+        }
+        self.isHidden = false
+        self.isUserInteractionEnabled = true
+
         self.wallpaperBackgroundNode = backgroundNode
-        
+
         if self.currentTheme !== interfaceState.theme || self.currentStrings !== interfaceState.strings {
             self.currentTheme = interfaceState.theme
             self.currentStrings = interfaceState.strings
