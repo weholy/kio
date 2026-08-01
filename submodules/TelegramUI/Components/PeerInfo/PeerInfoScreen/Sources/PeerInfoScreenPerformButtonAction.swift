@@ -769,6 +769,16 @@ extension PeerInfoScreenNode {
                             c?.pushItems(items: .single(ContextController.Items(content: .list(subItems))))
                         })))
                     }
+
+                    if !items.isEmpty {
+                        items.append(.separator)
+                    }
+                    items.append(.action(ContextMenuActionItem(text: "Megram", icon: { theme in
+                        generateTintedImage(image: UIImage(bundleImageName: "Chat/Context Menu/Info"), color: theme.contextMenu.primaryColor)
+                    }, action: { [weak self] c, _ in
+                        c?.dismiss(completion: nil)
+                        self?.openMegramMenu(peer: peer, chatPeer: chatPeer)
+                    })))
                     
                     if case let .user(user) = data.peer, let cachedData = data.cachedData as? CachedUserData, user.botInfo == nil && !user.flags.contains(.isSupport) && user.id != strongSelf.context.account.peerId && strongSelf.peerId.namespace != Namespaces.Peer.SecretChat {
                         let copyProtectionEnabled = cachedData.flags.contains(.myCopyProtectionEnabled) || cachedData.flags.contains(.copyProtectionEnabled)
@@ -1314,5 +1324,74 @@ extension PeerInfoScreenNode {
         case .addContact:
             self.openAddContact()
         }
+    }
+
+    private func openMegramMenu(peer: EnginePeer, chatPeer: EnginePeer) {
+        guard let controller = self.controller else {
+            return
+        }
+        let presentationData = self.presentationData
+        let actionSheet = ActionSheetController(presentationData: presentationData)
+        var items: [ActionSheetItem] = [
+            ActionSheetButtonItem(title: "Назад", color: .accent, action: { [weak actionSheet] in
+                actionSheet?.dismissAnimated()
+            }),
+            ActionSheetButtonItem(title: "Не показывать удаленные", color: .accent, action: { [weak self, weak actionSheet] in
+                actionSheet?.dismissAnimated()
+                self?.toggleMegramFlag(peerId: peer.id, key: "hide_deleted")
+            }),
+            ActionSheetButtonItem(title: "Не показывать измененные", color: .accent, action: { [weak self, weak actionSheet] in
+                actionSheet?.dismissAnimated()
+                self?.toggleMegramFlag(peerId: peer.id, key: "hide_edited")
+            }),
+            ActionSheetButtonItem(title: "Включить режим призрака", color: .accent, action: { [weak self, weak actionSheet] in
+                actionSheet?.dismissAnimated()
+                self?.toggleMegramFlag(peerId: peer.id, key: "ghost_mode")
+            }),
+            ActionSheetButtonItem(title: "Предложить огонек", color: .accent, action: { [weak self, weak actionSheet] in
+                actionSheet?.dismissAnimated()
+                self?.openMegramFireScreen(peer: peer, chatPeer: chatPeer)
+            })
+        ]
+        var hasAdministrators = false
+        switch chatPeer {
+        case .legacyGroup:
+            hasAdministrators = true
+        case let .channel(channel):
+            if case .group = channel.info {
+                hasAdministrators = true
+            }
+        default:
+            break
+        }
+        if hasAdministrators {
+            items.append(ActionSheetButtonItem(title: "Администраторы", color: .accent, action: { [weak self, weak actionSheet] in
+                actionSheet?.dismissAnimated()
+                self?.openParticipantsSection(section: .admins)
+            }))
+        }
+        actionSheet.setItemGroups([
+            ActionSheetItemGroup(items: items),
+            ActionSheetItemGroup(items: [
+                ActionSheetButtonItem(title: presentationData.strings.Common_Cancel, color: .accent, font: .bold, action: { [weak actionSheet] in
+                    actionSheet?.dismissAnimated()
+                })
+            ])
+        ])
+        controller.present(actionSheet, in: .window(.root), with: ViewControllerPresentationArguments(presentationAnimation: .modalSheet))
+    }
+
+    private func toggleMegramFlag(peerId: PeerId, key: String) {
+        let defaults = UserDefaults.standard
+        let storageKey = "megram.\(peerId.id._internalGetInt64Value()).\(key)"
+        let value = defaults.bool(forKey: storageKey)
+        defaults.set(!value, forKey: storageKey)
+    }
+
+    private func openMegramFireScreen(peer: EnginePeer, chatPeer: EnginePeer) {
+        guard let controller = self.controller else {
+            return
+        }
+        controller.present(MegramFireScreen(context: self.context, peer: peer), in: .window(.root))
     }
 }

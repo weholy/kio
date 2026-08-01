@@ -228,6 +228,34 @@ private enum NamelessSettingsKey {
     static let visualUsername = "nameless.visualUsername"
     static let showIfMutualContacts = "nameless.showIfMutualContacts"
     static let showRegistrationDate = "nameless.showRegistrationDate"
+    static let hideProfileGiftsTab = "nameless.profile.hideGiftsTab"
+    static let profileTrackCard = "nameless.profile.trackCard"
+    static let hideContactsTab = "nameless.tabs.hideContacts"
+    static let hideCallsTab = "nameless.tabs.hideCalls"
+    static let tabBarHeight = "nameless.tabs.height"
+    static let tabBarWidth = "nameless.tabs.width"
+    static let hideSettingsFavorites = "nameless.settingsSections.favorites"
+    static let hideSettingsDevices = "nameless.settingsSections.devices"
+    static let hideSettingsChatFolders = "nameless.settingsSections.chatFolders"
+    static let hideSettingsPowerSaving = "nameless.settingsSections.powerSaving"
+    static let hideSettingsLanguage = "nameless.settingsSections.language"
+    static let hideSettingsNotifications = "nameless.settingsSections.notifications"
+    static let hideSettingsPrivacy = "nameless.settingsSections.privacy"
+    static let hideSettingsDataAndStorage = "nameless.settingsSections.dataAndStorage"
+    static let hideSettingsAppearance = "nameless.settingsSections.appearance"
+    static let hideSettingsProxy = "nameless.settingsSections.proxy"
+    static let hideSettingsMyProfile = "nameless.settingsSections.myProfile"
+    static let hideSettingsRecentCalls = "nameless.settingsSections.recentCalls"
+    static let hideSettingsPremium = "nameless.settingsSections.premium"
+    static let hideSettingsStars = "nameless.settingsSections.stars"
+    static let hideSettingsBusiness = "nameless.settingsSections.business"
+    static let hideSettingsSupport = "nameless.settingsSections.support"
+    static let hideSettingsFaq = "nameless.settingsSections.faq"
+    static let hideSettingsTips = "nameless.settingsSections.tips"
+    static let hideSettingsSendGift = "nameless.settingsSections.sendGift"
+    static let hideSettingsEmojiStatus = "nameless.settingsSections.emojiStatus"
+    static let hideSettingsProfileColor = "nameless.settingsSections.profileColor"
+    static let hideSettingsChangePhoto = "nameless.settingsSections.changePhoto"
     // MARK: - Additional (Дополнительно)
     static let vibrationEnabled = "nameless.vibration.enabled"
     static let reactionsEnabled = "nameless.reactions.enabled"
@@ -555,6 +583,34 @@ public extension SGSimpleSettings {
     var visualUsername: Bool { get { storage.namelessBool(NamelessSettingsKey.visualUsername) } set { storage.set(newValue, forKey: NamelessSettingsKey.visualUsername) } }
     var showIfMutualContacts: Bool { get { storage.namelessBool(NamelessSettingsKey.showIfMutualContacts, default: true) } set { storage.set(newValue, forKey: NamelessSettingsKey.showIfMutualContacts) } }
     var showRegistrationDate: Bool { get { storage.namelessBool(NamelessSettingsKey.showRegistrationDate, default: true) } set { storage.set(newValue, forKey: NamelessSettingsKey.showRegistrationDate) } }
+    var hideProfileGiftsTab: Bool { get { storage.namelessBool(NamelessSettingsKey.hideProfileGiftsTab) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideProfileGiftsTab) } }
+    var profileTrackCard: Bool { get { storage.namelessBool(NamelessSettingsKey.profileTrackCard, default: true) } set { storage.set(newValue, forKey: NamelessSettingsKey.profileTrackCard) } }
+    var hideContactsTab: Bool { get { storage.namelessBool(NamelessSettingsKey.hideContactsTab) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideContactsTab) } }
+    var hideCallsTab: Bool { get { storage.namelessBool(NamelessSettingsKey.hideCallsTab) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideCallsTab) } }
+    var tabBarHeight: Int32 { get { storage.namelessInt32(NamelessSettingsKey.tabBarHeight, default: 100) } set { storage.set(Int(newValue), forKey: NamelessSettingsKey.tabBarHeight) } }
+    var tabBarWidth: Int32 { get { storage.namelessInt32(NamelessSettingsKey.tabBarWidth, default: 100) } set { storage.set(Int(newValue), forKey: NamelessSettingsKey.tabBarWidth) } }
+    var hideSettingsFavorites: Bool { get { storage.namelessBool(NamelessSettingsKey.hideSettingsFavorites) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideSettingsFavorites) } }
+    var hideSettingsDevices: Bool { get { storage.namelessBool(NamelessSettingsKey.hideSettingsDevices) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideSettingsDevices) } }
+    var hideSettingsChatFolders: Bool { get { storage.namelessBool(NamelessSettingsKey.hideSettingsChatFolders) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideSettingsChatFolders) } }
+    var hideSettingsPowerSaving: Bool { get { storage.namelessBool(NamelessSettingsKey.hideSettingsPowerSaving) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideSettingsPowerSaving) } }
+    var hideSettingsLanguage: Bool { get { storage.namelessBool(NamelessSettingsKey.hideSettingsLanguage) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideSettingsLanguage) } }
+    var hideSettingsNotifications: Bool { get { storage.namelessBool(NamelessSettingsKey.hideSettingsNotifications) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideSettingsNotifications) } }
+    var hideSettingsPrivacy: Bool { get { storage.namelessBool(NamelessSettingsKey.hideSettingsPrivacy) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideSettingsPrivacy) } }
+    var hideSettingsDataAndStorage: Bool { get { storage.namelessBool(NamelessSettingsKey.hideSettingsDataAndStorage) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideSettingsDataAndStorage) } }
+    var hideSettingsAppearance: Bool { get { storage.namelessBool(NamelessSettingsKey.hideSettingsAppearance) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideSettingsAppearance) } }
+    var hideSettingsProxy: Bool { get { storage.namelessBool(NamelessSettingsKey.hideSettingsProxy) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideSettingsProxy) } }
+    var hideSettingsMyProfile: Bool { get { storage.namelessBool(NamelessSettingsKey.hideSettingsMyProfile) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideSettingsMyProfile) } }
+    var hideSettingsRecentCalls: Bool { get { storage.namelessBool(NamelessSettingsKey.hideSettingsRecentCalls) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideSettingsRecentCalls) } }
+    var hideSettingsPremium: Bool { get { storage.namelessBool(NamelessSettingsKey.hideSettingsPremium) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideSettingsPremium) } }
+    var hideSettingsStars: Bool { get { storage.namelessBool(NamelessSettingsKey.hideSettingsStars) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideSettingsStars) } }
+    var hideSettingsBusiness: Bool { get { storage.namelessBool(NamelessSettingsKey.hideSettingsBusiness) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideSettingsBusiness) } }
+    var hideSettingsSupport: Bool { get { storage.namelessBool(NamelessSettingsKey.hideSettingsSupport) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideSettingsSupport) } }
+    var hideSettingsFaq: Bool { get { storage.namelessBool(NamelessSettingsKey.hideSettingsFaq) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideSettingsFaq) } }
+    var hideSettingsTips: Bool { get { storage.namelessBool(NamelessSettingsKey.hideSettingsTips) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideSettingsTips) } }
+    var hideSettingsSendGift: Bool { get { storage.namelessBool(NamelessSettingsKey.hideSettingsSendGift) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideSettingsSendGift) } }
+    var hideSettingsEmojiStatus: Bool { get { storage.namelessBool(NamelessSettingsKey.hideSettingsEmojiStatus) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideSettingsEmojiStatus) } }
+    var hideSettingsProfileColor: Bool { get { storage.namelessBool(NamelessSettingsKey.hideSettingsProfileColor) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideSettingsProfileColor) } }
+    var hideSettingsChangePhoto: Bool { get { storage.namelessBool(NamelessSettingsKey.hideSettingsChangePhoto) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideSettingsChangePhoto) } }
     // MARK: Additional
     var vibrationEnabled: Bool { get { storage.namelessBool(NamelessSettingsKey.vibrationEnabled, default: true) } set { storage.set(newValue, forKey: NamelessSettingsKey.vibrationEnabled) } }
     var speedBoostEnabled: Bool { get { storage.namelessBool(NamelessSettingsKey.speedBoostEnabled) } set { storage.set(newValue, forKey: NamelessSettingsKey.speedBoostEnabled) } }

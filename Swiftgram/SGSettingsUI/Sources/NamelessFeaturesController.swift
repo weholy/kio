@@ -1,5 +1,4 @@
-// MARK: nameless — Features Controller (restructured)
-// 4 вкладки: Внешний вид | Режим призрака | Прочие функции | Поиск
+// MARK: Megram — Features Controller
 import SGSimpleSettings
 import SGItemListUI
 import SGFakeLocation
@@ -222,6 +221,34 @@ private enum NLBoolSetting: String {
     case visualUsername
     case showIfMutualContacts
     case showRegistrationDate
+    case hideProfileGiftsTab
+    case profileTrackCard
+    case hideBottomTabPanel
+    case hideContactsTab
+    case hideCallsTab
+    case tabBarSearchNearBottom
+    case hideSettingsFavorites
+    case hideSettingsDevices
+    case hideSettingsChatFolders
+    case hideSettingsPowerSaving
+    case hideSettingsLanguage
+    case hideSettingsNotifications
+    case hideSettingsPrivacy
+    case hideSettingsDataAndStorage
+    case hideSettingsAppearance
+    case hideSettingsProxy
+    case hideSettingsMyProfile
+    case hideSettingsRecentCalls
+    case hideSettingsPremium
+    case hideSettingsStars
+    case hideSettingsBusiness
+    case hideSettingsSupport
+    case hideSettingsFaq
+    case hideSettingsTips
+    case hideSettingsSendGift
+    case hideSettingsEmojiStatus
+    case hideSettingsProfileColor
+    case hideSettingsChangePhoto
     // Additional
     case vibrationEnabled
     case speedBoostEnabled
@@ -235,6 +262,8 @@ private enum NLSliderSetting: String {
     case cameraJpegQuality
     case particleEffectSpeed
     case particleEffectDensity
+    case tabBarHeight
+    case tabBarWidth
 }
 
 private enum NLOneFromManySetting: String {
@@ -245,7 +274,11 @@ private enum NLOneFromManySetting: String {
 private enum NLDisclosureLink: String {
     case none
     case hubAppearance
+    case hubProfile
     case hubGhost
+    case hubTabs
+    case hubSettingsSections
+    case hubPlugins
     case hubOther
     case hubSearch
     case onlineHistory
@@ -260,55 +293,73 @@ private enum NLAction: Int, CaseIterable {
     case resetAll
 }
 
-/// 4 категории для нового layout (вместо 9)
 private enum NLHubCategory: String, CaseIterable {
-    case appearance   // Внешний вид — всё что связано с интерфейсом + сообщения
-    case ghost        // Режим призрака — привacidad + геолокация + статусы
-    case other        // Прочие функции — контекст, сторис, медиа, экспорт
-    case search       // Поиск — поиск по настройкам с навигацией
+    case appearance
+    case profile
+    case ghost
+    case tabs
+    case settingsSections
+    case plugins
+    case other
 
     var titleRu: String {
         switch self {
         case .appearance: return "Внешний вид"
+        case .profile: return "Профиль"
         case .ghost: return "Режим призрака"
-        case .other: return "Прочие функции"
-        case .search: return "Поиск"
+        case .tabs: return "Вкладки"
+        case .settingsSections: return "Разделы настроек"
+        case .plugins: return "Плагины"
+        case .other: return "Прочее"
         }
     }
 
     var subtitleRu: String {
         switch self {
-        case .appearance: return "Интерфейс, сообщения, Liquid Glass, камера"
-        case .ghost: return "Онлайн, прочтение, приватность, геолокация"
-        case .other: return "Контекст, сторис, медиа, экспорт"
-        case .search: return "Найти и перейти к настройке"
+        case .appearance: return "Аватары, сообщения, HD-фото, стекло"
+        case .profile: return "ID, DC, номер, подарки, статус сети"
+        case .ghost: return "Онлайн, прочтение, статусы, геолокация"
+        case .tabs: return "Нижняя панель, контакты, звонки, поиск"
+        case .settingsSections: return "Скрытие блоков основного экрана"
+        case .plugins: return "Системный раздел плагинов"
+        case .other: return "Голосовые и служебные функции"
         }
     }
 
     var pillSection: NLSectionId {
         switch self {
         case .appearance: return .hubPill0
-        case .ghost: return .hubPill1
-        case .other: return .hubPill2
-        case .search: return .hubPill3
+        case .profile: return .hubPill1
+        case .ghost: return .hubPill2
+        case .tabs: return .hubPill3
+        case .settingsSections: return .hubPill4
+        case .plugins: return .hubPill5
+        case .other: return .hubPill6
         }
     }
 
     var disclosure: NLDisclosureLink {
         switch self {
         case .appearance: return .hubAppearance
+        case .profile: return .hubProfile
         case .ghost: return .hubGhost
+        case .tabs: return .hubTabs
+        case .settingsSections: return .hubSettingsSections
+        case .plugins: return .hubPlugins
         case .other: return .hubOther
-        case .search: return .hubSearch
         }
     }
 
     static func from(link: NLDisclosureLink) -> NLHubCategory? {
         switch link {
         case .hubAppearance: return .appearance
+        case .hubProfile: return .profile
         case .hubGhost: return .ghost
+        case .hubTabs: return .tabs
+        case .hubSettingsSections: return .settingsSections
+        case .hubPlugins: return .plugins
         case .hubOther: return .other
-        case .hubSearch: return .search
+        case .hubSearch: return nil
         case .none, .onlineHistory, .ghostDetailsToggle, .fakeLocationPicker: return nil
         }
     }
@@ -323,118 +374,18 @@ private struct NLSearchableItem {
 
 /// Full-text searchable index of all settings
 private let nlSearchIndex: [NLSearchableItem] = [
-    // Appearance
-    NLSearchableItem(title: "Квадратные аватары", category: .appearance),
-    NLSearchableItem(title: "Новый список чатов", category: .appearance),
-    NLSearchableItem(title: "Компактный список чатов", category: .appearance),
-    NLSearchableItem(title: "Безлимитное закрепление", category: .appearance),
-    NLSearchableItem(title: "Папки снизу", category: .appearance),
-    NLSearchableItem(title: "OLED-режим", category: .appearance),
-    NLSearchableItem(title: "Обводка сообщений", category: .appearance),
-    NLSearchableItem(title: "Прозрачные сообщения", category: .appearance),
-    NLSearchableItem(title: "Размытие сообщений", category: .appearance),
-    NLSearchableItem(title: "Широкие посты", category: .appearance),
-    NLSearchableItem(title: "Эффект частиц", category: .appearance),
-    NLSearchableItem(title: "Блюр аватара", category: .appearance),
-    NLSearchableItem(title: "Цвет профиля", category: .appearance),
-    NLSearchableItem(title: "Видео-фон чата", category: .appearance),
-    NLSearchableItem(title: "Liquid Glass", category: .appearance),
-    NLSearchableItem(title: "Камера HD", category: .appearance),
-    NLSearchableItem(title: "Телескоп", category: .appearance),
-    NLSearchableItem(title: "Счётчик символов", category: .appearance),
-    NLSearchableItem(title: "Сокращать сообщения", category: .appearance),
-    NLSearchableItem(title: "Оригинал редактирования", category: .appearance),
-    NLSearchableItem(title: "Двойной тап редактирование", category: .appearance),
-    NLSearchableItem(title: "Секунды в метке времени", category: .appearance),
-    NLSearchableItem(title: "Новый вид заголовка", category: .appearance),
-    NLSearchableItem(title: "Новый переключатель аккаунтов", category: .appearance),
-    NLSearchableItem(title: "Скрыть нижний таббар", category: .appearance),
-    NLSearchableItem(title: "Кнопка записи голосовых", category: .appearance),
-    NLSearchableItem(title: "Отправка по Return", category: .appearance),
-    NLSearchableItem(title: "Скрыть реакции", category: .appearance),
-    NLSearchableItem(title: "Вкладка эмодзи первой", category: .appearance),
-    NLSearchableItem(title: "Кастомные иконки", category: .appearance),
-    NLSearchableItem(title: "Насыщенность цветов", category: .appearance),
-    NLSearchableItem(title: "Размер стикеров", category: .appearance),
-    NLSearchableItem(title: "Блюр обложки плеера", category: .appearance),
-    NLSearchableItem(title: "Эффект в плеере", category: .appearance),
-    NLSearchableItem(title: "Предупреждение при звонке", category: .appearance),
-    // Ghost
-    NLSearchableItem(title: "Режим призрака", category: .ghost),
-    NLSearchableItem(title: "Скрыть онлайн", category: .ghost),
-    NLSearchableItem(title: "Скрыть печатает", category: .ghost),
-    NLSearchableItem(title: "Скрыть запись голосового", category: .ghost),
-    NLSearchableItem(title: "Скрыть загрузку файлов", category: .ghost),
-    NLSearchableItem(title: "Скрыть отправку фото", category: .ghost),
-    NLSearchableItem(title: "Скрыть отправку видео", category: .ghost),
-    NLSearchableItem(title: "Скрыть выбор локации", category: .ghost),
-    NLSearchableItem(title: "Скрыть выбор контакта", category: .ghost),
-    NLSearchableItem(title: "Скрыть статус игры", category: .ghost),
-    NLSearchableItem(title: "Скрыть запись кружка", category: .ghost),
-    NLSearchableItem(title: "Скрыть говорение в звонке", category: .ghost),
-    NLSearchableItem(title: "Скрыть выбор стикера", category: .ghost),
-    NLSearchableItem(title: "Скрыть прочтение", category: .ghost),
-    NLSearchableItem(title: "Скрыть просмотр сторис", category: .ghost),
-    NLSearchableItem(title: "Задержка отправки", category: .ghost),
-    NLSearchableItem(title: "Fake typing", category: .ghost),
-    NLSearchableItem(title: "Анти-спам", category: .ghost),
-    NLSearchableItem(title: "Авто-очистка истории", category: .ghost),
-    NLSearchableItem(title: "Всегда онлайн", category: .ghost),
-    NLSearchableItem(title: "История онлайна", category: .ghost),
-    NLSearchableItem(title: "Подмена геолокации", category: .ghost),
-    NLSearchableItem(title: "Фейковая геолокация", category: .ghost),
-    NLSearchableItem(title: "Обход защищённого контента", category: .ghost),
-    NLSearchableItem(title: "Сохранять защищённый контент", category: .ghost),
-    NLSearchableItem(title: "Самоуничтожающиеся", category: .ghost),
-    NLSearchableItem(title: "Без скриншотов", category: .ghost),
-    NLSearchableItem(title: "Без размытия секретных", category: .ghost),
-    NLSearchableItem(title: "Отключить рекламу", category: .ghost),
-    NLSearchableItem(title: "Скрыть номер телефона", category: .ghost),
-    NLSearchableItem(title: "ID и DC в профиле", category: .ghost),
-    NLSearchableItem(title: "Дата регистрации", category: .ghost),
-    NLSearchableItem(title: "Защита от мошенников", category: .ghost),
-    NLSearchableItem(title: "Убрать спойлеры", category: .ghost),
-    NLSearchableItem(title: "Скрыть спонсора прокси", category: .ghost),
-    NLSearchableItem(title: "Скрыть просмотр видео", category: .ghost),
-    NLSearchableItem(title: "Эмодзи взаимодействие", category: .ghost),
-    NLSearchableItem(title: "Эмодзи подтверждение", category: .ghost),
-    NLSearchableItem(title: "Скрыть отправку кружка", category: .ghost),
-    // Other
-    NLSearchableItem(title: "Контекстное меню", category: .other),
-    NLSearchableItem(title: "Сохранить в облако", category: .other),
-    NLSearchableItem(title: "Скрыть имя пересылки", category: .other),
-    NLSearchableItem(title: "Выбрать от пользователя", category: .other),
-    NLSearchableItem(title: "Ограничить", category: .other),
-    NLSearchableItem(title: "Пожаловаться", category: .other),
-    NLSearchableItem(title: "Ответить", category: .other),
-    NLSearchableItem(title: "Закрепить", category: .other),
-    NLSearchableItem(title: "Сохранить медиа", category: .other),
-    NLSearchableItem(title: "Ответы на сообщение", category: .other),
-    NLSearchableItem(title: "JSON", category: .other),
-    NLSearchableItem(title: "Локальный премиум", category: .other),
-    NLSearchableItem(title: "Перевести", category: .other),
-    NLSearchableItem(title: "Zalgo-фильтр", category: .other),
-    NLSearchableItem(title: "Ускорение отправки", category: .other),
-    NLSearchableItem(title: "Безлимитные стикеры", category: .other),
-    NLSearchableItem(title: "Сторис", category: .other),
-    NLSearchableItem(title: "Stealth-режим", category: .other),
-    NLSearchableItem(title: "Переслать в историю", category: .other),
-    NLSearchableItem(title: "Экспорт настроек", category: .other),
-    NLSearchableItem(title: "Импорт настроек", category: .other),
-    NLSearchableItem(title: "Сбросить nameless", category: .other),
-    NLSearchableItem(title: "Скачивание эмодзи", category: .other),
-    NLSearchableItem(title: "Видео в кружок", category: .other),
-    NLSearchableItem(title: "Свайп PiP видео", category: .other),
-    NLSearchableItem(title: "Встроенный микрофон", category: .other),
-    NLSearchableItem(title: "Отправка больших фото", category: .other),
-    NLSearchableItem(title: "Качество JPEG", category: .other),
-    NLSearchableItem(title: "Запомнить камеру", category: .other),
-    NLSearchableItem(title: "Статичный зум", category: .other),
-    NLSearchableItem(title: "Всегда HD", category: .other),
-    NLSearchableItem(title: "Дата создания чата", category: .other),
-    NLSearchableItem(title: "Полные просмотры", category: .other),
-    NLSearchableItem(title: "Визуальный юзернейм", category: .other),
-    NLSearchableItem(title: "Компактные числа", category: .other),
+    "Квадратные аватары", "Безлимитное закрепление", "Подписи вкладок", "Круглые вкладки", "Отправка по Return", "Эффект удаления", "Вкладка эмодзи", "Скрыть приветственный эмодзи", "Скрыть панель бизнес-бота", "Сокращать длинные сообщения", "Счётчик символов при вводе", "Счётчик символов в чате", "Скролл к следующему каналу", "Liquid Glass на сообщения", "Стеклянное меню вложения", "HD-фото при отправке", "Всегда в HD"
+].map { NLSearchableItem(title: $0, category: .appearance) } + [
+    "Отображать ID аккаунта в профиле", "Отображать DC аккаунта в профиле", "Скрыть номер телефона", "Скрыть вкладку «Подарки»", "Вы оба в контактах", "Дата создания чата", "Точное время захода в сеть", "Карточка трека"
+].map { NLSearchableItem(title: $0, category: .profile) } + [
+    "Режим призрака"
+].map { NLSearchableItem(title: $0, category: .ghost) } + [
+    "Скрыть панель вкладок", "Скрыть вкладку Контакты", "Скрыть вкладку Звонки", "Кнопка поиска рядом с нижним таббаром", "Высота панели", "Ширина панели"
+].map { NLSearchableItem(title: $0, category: .tabs) } + [
+    "Избранное", "Устройства", "Папки с чатами", "Энергосбережение", "Язык", "Уведомление", "Конфиденциальность", "Данные и память", "Оформление", "Прокси", "Мой профиль", "Недавние звонки", "Premium", "Звёзды", "Бизнес", "Поддержка", "Вопросы и ответы", "Советы", "Отправить подарок", "Установить статус-эмодзи", "Изменить цвет профиля", "Изменить фотографию"
+].map { NLSearchableItem(title: $0, category: .settingsSections) } + [
+    NLSearchableItem(title: "Плагины", category: .plugins),
+    NLSearchableItem(title: "Не слушать следующее голосовое", category: .other)
 ]
 
 // MARK: - State
@@ -462,8 +413,8 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
 
     // Hub root — 4 glass pills
     if !searching, state.hubCategory == nil {
-        entries.append(.notice(id: id.count, section: .hero, text: "**nameless**"))
-        entries.append(.notice(id: id.count, section: .hero, text: "12.8 · Liquid Glass edition"))
+        entries.append(.notice(id: id.count, section: .hero, text: "**Megram**"))
+        entries.append(.notice(id: id.count, section: .hero, text: "Liquid Glass edition"))
         entries.append(.searchInput(id: id.count, section: .search, title: NSAttributedString(string: "🔍"), text: state.searchQuery ?? "", placeholder: "Поиск настроек"))
         for cat in NLHubCategory.allCases {
             entries.append(.disclosureDetail(
@@ -476,7 +427,7 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
         }
         entries.append(.action(id: id.count, section: .hubActions, actionType: .exportSettings, text: "Экспорт настроек", kind: .generic))
         entries.append(.action(id: id.count, section: .hubPill4, actionType: .importSettings, text: "Импорт настроек", kind: .generic))
-        entries.append(.action(id: id.count, section: .hubPill5, actionType: .resetAll, text: "Сбросить nameless", kind: .destructive))
+        entries.append(.action(id: id.count, section: .hubPill5, actionType: .resetAll, text: "Сбросить Megram", kind: .destructive))
         return filterSGItemListUIEntrires(entries: entries, by: state.searchQuery)
     }
 
@@ -503,6 +454,103 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
     entries.append(.searchInput(id: id.count, section: .search, title: NSAttributedString(string: "🔍"), text: state.searchQuery ?? "", placeholder: "Поиск настроек"))
     let sec: NLSectionId = .items
     let cat = state.hubCategory
+
+    if cat == .appearance {
+        entries.append(.header(id: id.count, section: sec, text: "ВНЕШНИЙ ВИД", badge: nil))
+        entries.append(.notice(id: id.count, section: sec, text: "Пункты собраны как на Megram: название, короткое пояснение и переключатель. Большой аватар в шапке настроек включён системно."))
+        entries.append(.toggle(id: id.count, section: sec, settingName: .squareAvatars, value: s.squareAvatars, text: "Квадратные аватары", enabled: true))
+        entries.append(.toggle(id: id.count, section: sec, settingName: .unlimitedPinnedChats, value: s.unlimitedPinnedChats, text: "Безлимитное закрепление", enabled: true))
+        entries.append(.toggle(id: id.count, section: sec, settingName: .showTabNames, value: s.showTabNames, text: "Подписи вкладок", enabled: !s.hideTabBar))
+        entries.append(.toggle(id: id.count, section: sec, settingName: .roundTabs, value: s.roundTabs, text: "Круглые вкладки", enabled: !s.hideTabBar))
+        entries.append(.toggle(id: id.count, section: sec, settingName: .sendWithReturnKey, value: s.sendWithReturnKey, text: "Отправка по Return", enabled: true))
+        entries.append(.toggle(id: id.count, section: sec, settingName: .disableSnapDeletionEffect, value: !s.disableSnapDeletionEffect, text: "Эффект удаления", enabled: true))
+        entries.append(.toggle(id: id.count, section: sec, settingName: .forceEmojiTab, value: s.forceEmojiTab, text: "Вкладка эмодзи", enabled: true))
+        entries.append(.toggle(id: id.count, section: sec, settingName: .defaultEmojisFirst, value: s.defaultEmojisFirst, text: "Скрыть приветственный эмодзи", enabled: true))
+        entries.append(.toggle(id: id.count, section: sec, settingName: .hideChannelBottomButton, value: !s.hideChannelBottomButton, text: "Скрыть панель бизнес-бота", enabled: true))
+        entries.append(.toggle(id: id.count, section: sec, settingName: .truncateLongMessages, value: s.truncateLongMessages, text: "Сокращать длинные сообщения", enabled: true))
+        entries.append(.toggle(id: id.count, section: sec, settingName: .charCounterInput, value: s.charCounterInput, text: "Счётчик символов при вводе", enabled: true))
+        entries.append(.toggle(id: id.count, section: sec, settingName: .charCounterInChat, value: s.charCounterInChat, text: "Счётчик символов в чате", enabled: true))
+        entries.append(.toggle(id: id.count, section: sec, settingName: .disableScrollToNextChannel2, value: !s.disableScrollToNextChannel, text: "Скролл к следующему каналу", enabled: true))
+        entries.append(.toggle(id: id.count, section: sec, settingName: .namelessLiquidGlassMessages, value: s.namelessLiquidGlassMessages, text: "Liquid Glass на сообщения", enabled: s.liquidGlassEnabled))
+        entries.append(.toggle(id: id.count, section: sec, settingName: .namelessLiquidGlassContextMenu, value: s.namelessLiquidGlassContextMenu, text: "Стеклянное меню вложения", enabled: s.liquidGlassEnabled))
+        entries.append(.toggle(id: id.count, section: sec, settingName: .cameraSendHDPhoto, value: s.cameraSendHDPhoto, text: "HD-фото при отправке", enabled: true))
+        entries.append(.toggle(id: id.count, section: sec, settingName: .cameraAlwaysSendHD, value: s.cameraAlwaysSendHD, text: "Всегда в HD", enabled: true))
+        return filterSGItemListUIEntrires(entries: entries, by: state.searchQuery)
+    }
+
+    if cat == .profile {
+        entries.append(.header(id: id.count, section: sec, text: "ПРОФИЛЬ", badge: nil))
+        entries.append(.notice(id: id.count, section: sec, text: "Информация и приватность, которые отображаются в профиле собеседника и аккаунта."))
+        entries.append(.toggle(id: id.count, section: sec, settingName: .showProfileId, value: s.showProfileId, text: "Отображать ID аккаунта в профиле", enabled: true))
+        entries.append(.toggle(id: id.count, section: sec, settingName: .showDC, value: s.showDC, text: "Отображать DC аккаунта в профиле", enabled: true))
+        entries.append(.toggle(id: id.count, section: sec, settingName: .hidePhoneNumber, value: s.hidePhoneNumber, text: "Скрыть номер телефона", enabled: true))
+        entries.append(.toggle(id: id.count, section: sec, settingName: .hideProfileGiftsTab, value: s.hideProfileGiftsTab, text: "Скрыть вкладку «Подарки»", enabled: true))
+        entries.append(.toggle(id: id.count, section: sec, settingName: .showIfMutualContacts, value: s.showIfMutualContacts, text: "Отображать значок «вы оба в контактах»", enabled: true))
+        entries.append(.toggle(id: id.count, section: sec, settingName: .showCreationDate, value: s.showCreationDate, text: "Отображать дату создания чата", enabled: true))
+        entries.append(.toggle(id: id.count, section: sec, settingName: .showSeconds, value: s.showSeconds, text: "Отображать точное время захода в сеть", enabled: true))
+        entries.append(.toggle(id: id.count, section: sec, settingName: .profileTrackCard, value: s.profileTrackCard, text: "Карточка трека", enabled: true))
+        return filterSGItemListUIEntrires(entries: entries, by: state.searchQuery)
+    }
+
+    if cat == .tabs {
+        entries.append(.header(id: id.count, section: sec, text: "ВКЛАДКИ", badge: nil))
+        entries.append(.notice(id: id.count, section: sec, text: "Управление нижним таббаром, видимостью вкладок и кнопкой поиска."))
+        entries.append(.toggle(id: id.count, section: sec, settingName: .hideBottomTabPanel, value: s.hideTabBar, text: "Скрыть панель вкладок", enabled: true))
+        entries.append(.toggle(id: id.count, section: sec, settingName: .hideContactsTab, value: s.hideContactsTab, text: "Скрыть вкладку Контакты", enabled: !s.hideTabBar))
+        entries.append(.toggle(id: id.count, section: sec, settingName: .hideCallsTab, value: s.hideCallsTab, text: "Скрыть вкладку Звонки", enabled: !s.hideTabBar))
+        entries.append(.toggle(id: id.count, section: sec, settingName: .tabBarSearchNearBottom, value: s.tabBarSearchEnabled, text: "Показать кнопку поиска рядом с нижним таббаром", enabled: !s.hideTabBar))
+        entries.append(.header(id: id.count, section: sec, text: "ВЫСОТА ПАНЕЛИ", badge: nil))
+        entries.append(.percentageSlider(id: id.count, section: sec, settingName: .tabBarHeight, value: s.tabBarHeight))
+        entries.append(.header(id: id.count, section: sec, text: "ШИРИНА ПАНЕЛИ", badge: nil))
+        entries.append(.percentageSlider(id: id.count, section: sec, settingName: .tabBarWidth, value: s.tabBarWidth))
+        return filterSGItemListUIEntrires(entries: entries, by: state.searchQuery)
+    }
+
+    if cat == .settingsSections {
+        entries.append(.header(id: id.count, section: sec, text: "РАЗДЕЛЫ НАСТРОЕК", badge: nil))
+        entries.append(.notice(id: id.count, section: sec, text: "Включённый пункт скрывает соответствующий раздел в настройках."))
+        entries.append(.toggle(id: id.count, section: sec, settingName: .hideSettingsFavorites, value: s.hideSettingsFavorites, text: "Избранное", enabled: true))
+        entries.append(.toggle(id: id.count, section: sec, settingName: .hideSettingsDevices, value: s.hideSettingsDevices, text: "Устройства", enabled: true))
+        entries.append(.toggle(id: id.count, section: sec, settingName: .hideSettingsChatFolders, value: s.hideSettingsChatFolders, text: "Папки с чатами", enabled: true))
+        entries.append(.toggle(id: id.count, section: sec, settingName: .hideSettingsPowerSaving, value: s.hideSettingsPowerSaving, text: "Энергосбережение", enabled: true))
+        entries.append(.toggle(id: id.count, section: sec, settingName: .hideSettingsLanguage, value: s.hideSettingsLanguage, text: "Язык", enabled: true))
+        entries.append(.toggle(id: id.count, section: sec, settingName: .hideSettingsNotifications, value: s.hideSettingsNotifications, text: "Уведомление", enabled: true))
+        entries.append(.toggle(id: id.count, section: sec, settingName: .hideSettingsPrivacy, value: s.hideSettingsPrivacy, text: "Конфиденциальность", enabled: true))
+        entries.append(.toggle(id: id.count, section: sec, settingName: .hideSettingsDataAndStorage, value: s.hideSettingsDataAndStorage, text: "Данные и память", enabled: true))
+        entries.append(.toggle(id: id.count, section: sec, settingName: .hideSettingsAppearance, value: s.hideSettingsAppearance, text: "Оформление", enabled: true))
+        entries.append(.toggle(id: id.count, section: sec, settingName: .hideSettingsProxy, value: s.hideSettingsProxy, text: "Прокси", enabled: true))
+        entries.append(.toggle(id: id.count, section: sec, settingName: .hideSettingsMyProfile, value: s.hideSettingsMyProfile, text: "Мой профиль", enabled: true))
+        entries.append(.toggle(id: id.count, section: sec, settingName: .hideSettingsRecentCalls, value: s.hideSettingsRecentCalls, text: "Недавние звонки", enabled: true))
+        entries.append(.toggle(id: id.count, section: sec, settingName: .hideSettingsPremium, value: s.hideSettingsPremium, text: "Premium", enabled: true))
+        entries.append(.toggle(id: id.count, section: sec, settingName: .hideSettingsStars, value: s.hideSettingsStars, text: "Звёзды", enabled: true))
+        entries.append(.toggle(id: id.count, section: sec, settingName: .hideSettingsBusiness, value: s.hideSettingsBusiness, text: "Бизнес", enabled: true))
+        entries.append(.toggle(id: id.count, section: sec, settingName: .hideSettingsSupport, value: s.hideSettingsSupport, text: "Поддержка", enabled: true))
+        entries.append(.toggle(id: id.count, section: sec, settingName: .hideSettingsFaq, value: s.hideSettingsFaq, text: "Вопросы и ответы", enabled: true))
+        entries.append(.toggle(id: id.count, section: sec, settingName: .hideSettingsTips, value: s.hideSettingsTips, text: "Советы", enabled: true))
+        entries.append(.toggle(id: id.count, section: sec, settingName: .hideSettingsSendGift, value: s.hideSettingsSendGift, text: "Отправить подарок", enabled: true))
+        entries.append(.toggle(id: id.count, section: sec, settingName: .hideSettingsEmojiStatus, value: s.hideSettingsEmojiStatus, text: "Установить статус-эмодзи", enabled: true))
+        entries.append(.toggle(id: id.count, section: sec, settingName: .hideSettingsProfileColor, value: s.hideSettingsProfileColor, text: "Изменить цвет профиля", enabled: true))
+        entries.append(.toggle(id: id.count, section: sec, settingName: .hideSettingsChangePhoto, value: s.hideSettingsChangePhoto, text: "Изменить фотографию", enabled: true))
+        return filterSGItemListUIEntrires(entries: entries, by: state.searchQuery)
+    }
+
+    if cat == .plugins {
+        entries.append(.header(id: id.count, section: sec, text: "ПЛАГИНЫ", badge: nil))
+        entries.append(.notice(id: id.count, section: sec, text: "Раздел сохранён без изменений логики плагинов. Система плагинов: \(s.pluginSystemEnabled ? "включена" : "выключена")."))
+        return filterSGItemListUIEntrires(entries: entries, by: state.searchQuery)
+    }
+
+    if cat == .other {
+        entries.append(.header(id: id.count, section: sec, text: "ПРОЧЕЕ", badge: nil))
+        entries.append(.toggle(id: id.count, section: sec, settingName: .noAutoNextVoice, value: s.noAutoNextVoice, text: "Не слушать следующее голосовое", enabled: true))
+        let actSec: NLSectionId = .actions
+        entries.append(.header(id: id.count, section: actSec, text: "ЭКСПОРТ / ИМПОРТ", badge: nil))
+        entries.append(.action(id: id.count, section: actSec, actionType: .exportSettings, text: "Экспорт настроек в JSON", kind: .generic))
+        entries.append(.action(id: id.count, section: actSec, actionType: .importSettings, text: "Импорт настроек из JSON", kind: .generic))
+        entries.append(.action(id: id.count, section: actSec, actionType: .saveKeychain, text: "Сохранить настройки в Keychain", kind: .generic))
+        entries.append(.action(id: id.count, section: actSec, actionType: .resetAll, text: "Сбросить Megram", kind: .destructive))
+        return filterSGItemListUIEntrires(entries: entries, by: state.searchQuery)
+    }
 
     // ═══════════════════════════════════════════
     // ВНЕШНИЙ ВИД — интерфейс + сообщения + Liquid Glass + камера + медиа + информация
@@ -1022,10 +1070,18 @@ private func namelessFeaturesControllerImpl(context: AccountContext, initialCate
                     : SGSimpleSettings.MessageDoubleTapAction.default.rawValue
             case .cameraDefaultBack: s.cameraDefaultBack = value
             case .cameraUseDeviceMicrophone: s.cameraUseDeviceMicrophone = value
-            case .cameraSendHDPhoto: s.cameraSendHDPhoto = value
+            case .cameraSendHDPhoto:
+                s.cameraSendHDPhoto = value
+                if value {
+                    s.cameraAlwaysSendHD = false
+                }
             case .cameraRememberLast: s.cameraRememberLast = value
             case .cameraStaticZoom: s.cameraStaticZoom = value
-            case .cameraAlwaysSendHD: s.cameraAlwaysSendHD = value
+            case .cameraAlwaysSendHD:
+                s.cameraAlwaysSendHD = value
+                if value {
+                    s.cameraSendHDPhoto = false
+                }
             case .showIdAndDC: s.showIdAndDC = value
             case .showSeconds: s.showSeconds = value
             case .showFullViews: s.showFullViews = value
@@ -1034,6 +1090,42 @@ private func namelessFeaturesControllerImpl(context: AccountContext, initialCate
             case .visualUsername: s.visualUsername = value
             case .showIfMutualContacts: s.showIfMutualContacts = value
             case .showRegistrationDate: s.showRegistrationDate = value
+            case .hideProfileGiftsTab: s.hideProfileGiftsTab = value
+            case .profileTrackCard: s.profileTrackCard = value
+            case .hideBottomTabPanel: s.hideTabBar = value; simplePromise.set(true); askForRestart?()
+            case .hideContactsTab:
+                s.hideContactsTab = value
+                let _ = updateCallListSettingsInteractively(accountManager: context.sharedContext.accountManager, { $0.withUpdatedShowContactsTab(!value) }).start()
+                simplePromise.set(true)
+                askForRestart?()
+            case .hideCallsTab:
+                s.hideCallsTab = value
+                let _ = updateCallListSettingsInteractively(accountManager: context.sharedContext.accountManager, { $0.withUpdatedShowTab(!value) }).start()
+                simplePromise.set(true)
+                askForRestart?()
+            case .tabBarSearchNearBottom: s.tabBarSearchEnabled = value
+            case .hideSettingsFavorites: s.hideSettingsFavorites = value
+            case .hideSettingsDevices: s.hideSettingsDevices = value
+            case .hideSettingsChatFolders: s.hideSettingsChatFolders = value
+            case .hideSettingsPowerSaving: s.hideSettingsPowerSaving = value
+            case .hideSettingsLanguage: s.hideSettingsLanguage = value
+            case .hideSettingsNotifications: s.hideSettingsNotifications = value
+            case .hideSettingsPrivacy: s.hideSettingsPrivacy = value
+            case .hideSettingsDataAndStorage: s.hideSettingsDataAndStorage = value
+            case .hideSettingsAppearance: s.hideSettingsAppearance = value
+            case .hideSettingsProxy: s.hideSettingsProxy = value
+            case .hideSettingsMyProfile: s.hideSettingsMyProfile = value
+            case .hideSettingsRecentCalls: s.hideSettingsRecentCalls = value
+            case .hideSettingsPremium: s.hideSettingsPremium = value
+            case .hideSettingsStars: s.hideSettingsStars = value
+            case .hideSettingsBusiness: s.hideSettingsBusiness = value
+            case .hideSettingsSupport: s.hideSettingsSupport = value
+            case .hideSettingsFaq: s.hideSettingsFaq = value
+            case .hideSettingsTips: s.hideSettingsTips = value
+            case .hideSettingsSendGift: s.hideSettingsSendGift = value
+            case .hideSettingsEmojiStatus: s.hideSettingsEmojiStatus = value
+            case .hideSettingsProfileColor: s.hideSettingsProfileColor = value
+            case .hideSettingsChangePhoto: s.hideSettingsChangePhoto = value
             case .vibrationEnabled: s.vibrationEnabled = value
             case .speedBoostEnabled: s.speedBoostEnabled = value
             case .bypassProtectedContent: s.bypassProtectedContent = value
@@ -1076,6 +1168,10 @@ private func namelessFeaturesControllerImpl(context: AccountContext, initialCate
             case .particleEffectDensity:
                 let v = Double(value) / 100.0
                 if abs(s.particleEffectDensity - v) > 0.001 { s.particleEffectDensity = v; simplePromise.set(true) }
+            case .tabBarHeight:
+                if s.tabBarHeight != value { s.tabBarHeight = value; simplePromise.set(true); askForRestart?() }
+            case .tabBarWidth:
+                if s.tabBarWidth != value { s.tabBarWidth = value; simplePromise.set(true); askForRestart?() }
             }
         },
         setOneFromManyValue: { setting in
@@ -1174,7 +1270,7 @@ private func namelessFeaturesControllerImpl(context: AccountContext, initialCate
     |> map { _, state, presentationData -> (ItemListControllerState, (ItemListNodeState, NLArguments)) in
         let entries = nlBuildEntries(presentationData: presentationData, state: state, simpleUpdated: true)
         let title = state.hubCategory?.titleRu ?? ""
-        let cs = ItemListControllerState(presentationData: ItemListPresentationData(presentationData), title: .text(title.isEmpty ? "nameless" : title), leftNavigationButton: nil, rightNavigationButton: nil, backNavigationButton: ItemListBackButton(title: presentationData.strings.Common_Back))
+        let cs = ItemListControllerState(presentationData: ItemListPresentationData(presentationData), title: .text(title.isEmpty ? "Megram" : title), leftNavigationButton: nil, rightNavigationButton: nil, backNavigationButton: ItemListBackButton(title: presentationData.strings.Common_Back))
         let ls = ItemListNodeState(presentationData: ItemListPresentationData(presentationData), entries: entries, style: .blocks)
         return (cs, (ls, arguments))
     }

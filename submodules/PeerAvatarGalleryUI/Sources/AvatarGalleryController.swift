@@ -691,6 +691,9 @@ public class AvatarGalleryController: ViewController, StandalonePresentableContr
         })
         self.displayNode = GalleryControllerNode(context: self.context, controllerInteraction: controllerInteraction, titleView: self.titleView)
         self.displayNodeDidLoad()
+        if UserDefaults.standard.object(forKey: "nameless.profileAvatarBlur") == nil || UserDefaults.standard.bool(forKey: "nameless.profileAvatarBlur") {
+            self.galleryNode.backgroundNode.backgroundColor = UIColor(white: 0.04, alpha: UserDefaults.standard.bool(forKey: "nameless.profileAvatarBlurMinimal") ? 0.82 : 0.92)
+        }
         
         self.galleryNode.pager.updateOnReplacement = true
         self.galleryNode.statusBar = self.statusBar
