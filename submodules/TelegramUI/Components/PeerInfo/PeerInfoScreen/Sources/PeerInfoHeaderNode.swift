@@ -127,6 +127,8 @@ final class PeerInfoHeaderNode: ASDisplayNode {
     var standardTitle: ComponentView<Empty>?
     
     let titleCredibilityIconView: ComponentHostView<Empty>
+    /// Megram's mark, drawn to the left of the name at the same size as the status icon on the right.
+    let megramNameLogoView: UIImageView
     var credibilityIconSize: CGSize?
     let titleExpandedCredibilityIconView: ComponentHostView<Empty>
     var titleExpandedCredibilityIconSize: CGSize?
@@ -244,6 +246,16 @@ final class PeerInfoHeaderNode: ASDisplayNode {
         
         self.titleCredibilityIconView = ComponentHostView<Empty>()
         self.titleNode.stateNode(forKey: TitleNodeStateRegular)?.view.addSubview(self.titleCredibilityIconView)
+
+        // MARK: Megram — client mark to the left of the name.
+        //
+        // Sits in the title's own coordinate space alongside the status icon, so it inherits every
+        // transition the title already has and needs no separate animation. Non-interactive: it is
+        // a mark, not a control, and must not swallow the tap that opens the premium sheet.
+        self.megramNameLogoView = UIImageView(image: UIImage(bundleImageName: "MegramNameLogo"))
+        self.megramNameLogoView.contentMode = .scaleAspectFit
+        self.megramNameLogoView.isUserInteractionEnabled = false
+        self.titleNode.stateNode(forKey: TitleNodeStateRegular)?.view.addSubview(self.megramNameLogoView)
         
         self.titleExpandedCredibilityIconView = ComponentHostView<Empty>()
         self.titleNode.stateNode(forKey: TitleNodeStateExpanded)?.view.addSubview(self.titleExpandedCredibilityIconView)
@@ -1580,7 +1592,29 @@ final class PeerInfoHeaderNode: ASDisplayNode {
             nextIconX += 4.0 + credibilityIconSize.width
             nextExpandedIconX += 4.0 + titleExpandedCredibilityIconSize.width
         }
-                
+
+        // MARK: Megram — the client mark, mirrored against the status icon.
+        //
+        // Sized from `credibilityIconSize` so it matches whatever the status icon on the right is
+        // currently drawn at, falling back to the standard 24pt when there is no status. Placed at
+        // negative x because icon frames are relative to the title text, which starts at zero; the
+        // title is then nudged right by half the mark's footprint so name + marks stay centred as a
+        // whole rather than the name drifting off-centre.
+        if self.megramNameLogoView.image != nil {
+            let side = self.credibilityIconSize.flatMap { $0.height > 0.0 ? $0.height : nil } ?? 24.0
+            let logoSize = CGSize(width: side, height: side)
+            let spacing: CGFloat = 4.0
+            titleHorizontalOffset += (logoSize.width + spacing) / 2.0
+            transition.updateFrame(
+                view: self.megramNameLogoView,
+                frame: CGRect(
+                    origin: CGPoint(x: -(logoSize.width + spacing), y: floor((titleSize.height - logoSize.height) / 2.0)),
+                    size: logoSize
+                )
+            )
+        }
+
+
         if let verifiedIconSize = self.verifiedIconSize, let titleExpandedVerifiedIconSize = self.titleExpandedVerifiedIconSize, verifiedIconSize.width > 0.0 {
             let leftOffset: CGFloat
             let leftExpandedOffset: CGFloat
