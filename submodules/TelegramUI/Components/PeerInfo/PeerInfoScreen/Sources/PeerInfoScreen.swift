@@ -6000,9 +6000,51 @@ final class PeerInfoScreenNode: ViewControllerTracingNode, PeerInfoScreenNodePro
                 }
             }
             
-            // Megram: the photo is permanently expanded, so dragging the header
-            // neither collapses it nor opens the gallery.
-            self.canOpenAvatarByDragging = false
+            let offsetY = self.scrollNode.view.contentOffset.y
+            var shouldBeExpanded: Bool?
+            
+            var isLandscape = false
+            if let (layout, _) = self.validLayout, layout.size.width > layout.size.height {
+                isLandscape = true
+            }
+            if offsetY <= -32.0 && scrollView.isDragging && scrollView.isTracking {
+                if let peer = self.data?.peer, self.chatLocation.threadId == nil, peer.smallProfileImage != nil && self.state.updatingAvatar == nil && !isLandscape {
+                    shouldBeExpanded = true
+                    
+                    if self.canOpenAvatarByDragging && self.headerNode.isAvatarExpanded && offsetY <= -32.0 {
+                        self.hapticFeedback.impact()
+                        
+                        self.canOpenAvatarByDragging = false
+                        let contentOffset = scrollView.contentOffset.y
+                        scrollView.panGestureRecognizer.isEnabled = false
+                        self.headerNode.initiateAvatarExpansion(gallery: true, first: false)
+                        scrollView.panGestureRecognizer.isEnabled = true
+                        scrollView.contentOffset = CGPoint(x: 0.0, y: contentOffset)
+                        UIView.animate(withDuration: 0.1) {
+                            scrollView.contentOffset = CGPoint()
+                        }
+                    }
+                }
+            } else if offsetY >= 1.0 {
+                shouldBeExpanded = false
+                self.canOpenAvatarByDragging = false
+            }
+            if let shouldBeExpanded = shouldBeExpanded, shouldBeExpanded != self.headerNode.isAvatarExpanded {
+                let transition: ContainedViewLayoutTransition = .animated(duration: 0.35, curve: .spring)
+                
+                if shouldBeExpanded {
+                    self.hapticFeedback.impact()
+                } else {
+                    self.hapticFeedback.tap()
+                }
+                
+                self.headerNode.updateIsAvatarExpanded(shouldBeExpanded, transition: transition)
+                self.updateNavigationExpansionPresentation(isExpanded: shouldBeExpanded, animated: true)
+                
+                if let (layout, navigationHeight) = self.validLayout {
+                    self.containerLayoutUpdated(layout: layout, navigationHeight: navigationHeight, transition: transition, additive: true)
+                }
+            }
         }
         
         self.updateNavigation(transition: .immediate, additive: false, animateHeader: true)

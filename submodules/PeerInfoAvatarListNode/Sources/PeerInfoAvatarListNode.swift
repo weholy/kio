@@ -1118,8 +1118,6 @@ public final class PeerInfoAvatarListContainerNode: ASDisplayNode {
         self.controlsContainerNode.addSubnode(self.topShadowNode)
         self.addSubnode(self.bottomShadowNode)
         self.controlsContainerNode.addSubnode(self.stripContainerNode)
-        // Megram: with swiping gone the page indicator has nothing to indicate.
-        self.stripContainerNode.isHidden = true
         self.controlsClippingNode.addSubnode(self.controlsContainerNode)
         self.controlsClippingOffsetNode.addSubnode(self.controlsClippingNode)
         self.addSubnode(self.setByYouNode)
@@ -1131,11 +1129,8 @@ public final class PeerInfoAvatarListContainerNode: ASDisplayNode {
             }
             return strongSelf.currentIndex != 0
         }
-        let megramPanRecognizer = UIPanGestureRecognizer(target: self, action: #selector(self.panGesture(_:)))
-        // Megram: the profile photo is static — no swiping between avatars.
-        megramPanRecognizer.isEnabled = false
-        self.view.addGestureRecognizer(megramPanRecognizer)
-
+        self.view.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(self.panGesture(_:))))
+        
         let recognizer = TapLongTapOrDoubleTapGestureRecognizer(target: self, action: #selector(self.tapLongTapOrDoubleTapGesture(_:)))
         recognizer.tapActionAtPoint = { _ in
             return .keepWithSingleTap
