@@ -737,6 +737,26 @@ private let nlAppearanceWhitelist: Set<NLBoolSetting> = [
     .cameraAlwaysSendHD
 ]
 
+/// "Профиль" — what the profile screen shows about a peer.
+private let nlProfileWhitelist: Set<NLBoolSetting> = [
+    .showIdAndDC,
+    .showDC,
+    .hidePhoneNumber,
+    .nxHideGiftsTab,
+    .showIfMutualContacts,
+    .showCreationDate,
+    .showSeconds
+]
+
+/// "Вкладки" — the bottom tab bar. The height and width controls are sliders, which the filter
+/// passes through untouched.
+private let nlTabsWhitelist: Set<NLBoolSetting> = [
+    .hideTabBar,
+    .nxHideContactsTab,
+    .nxHideCallsTab,
+    .nxSearchButtonNearTabBar
+]
+
 /// Drops switches outside `allowed`, then drops any header left standing over nothing.
 private func nlFiltered(_ entries: [NLEntry], keeping allowed: Set<NLBoolSetting>) -> [NLEntry] {
     var kept: [NLEntry] = []
@@ -850,7 +870,10 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
     let cat = state.hubCategory
     let appearanceCategories: Set<NLHubCategory> = [.appearance, .liquidGlass, .profiles, .tabs, .folders, .chatList, .stories, .mediaCamera, .inputEmoji, .voice, .calls, .music]
     let ghostCategories: Set<NLHubCategory> = [.ghost]
-    let otherCategories: Set<NLHubCategory> = [.other, .voiceMorph, .network, .settingsSections, .backup, .misc]
+    // Профиль and Вкладки draw from both halves of the builder: their switches are split between
+    // the appearance block and the Nextgram-parity block. Rendering both and then trimming with a
+    // whitelist is what lets a tab's contents be declared in one place.
+    let otherCategories: Set<NLHubCategory> = [.other, .voiceMorph, .network, .settingsSections, .backup, .misc, .profiles, .tabs]
     let showAppearance = cat == nil || cat.map { appearanceCategories.contains($0) } == true
     let showGhost = cat == nil || cat.map { ghostCategories.contains($0) } == true
     let showOther = cat == nil || cat.map { otherCategories.contains($0) } == true
@@ -1172,8 +1195,17 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
 
     // Applied only to the category screen, never to search results or the hub root: a search for a
     // switch that lives elsewhere must still find it.
-    if state.hubCategory == .appearance, state.searchQuery?.isEmpty ?? true {
-        entries = nlFiltered(entries, keeping: nlAppearanceWhitelist)
+    if state.searchQuery?.isEmpty ?? true {
+        switch state.hubCategory {
+        case .appearance:
+            entries = nlFiltered(entries, keeping: nlAppearanceWhitelist)
+        case .profiles:
+            entries = nlFiltered(entries, keeping: nlProfileWhitelist)
+        case .tabs:
+            entries = nlFiltered(entries, keeping: nlTabsWhitelist)
+        default:
+            break
+        }
     }
 
     return filterSGItemListUIEntrires(entries: entries, by: state.searchQuery)
