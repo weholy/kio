@@ -10,6 +10,7 @@ swift_library(
         "-warnings-as-errors",
     ],
     deps = [
+        "//Swiftgram/SGSimpleSettings:SGSimpleSettings",
         "//Swiftgram/SGLiquidGlass:SGLiquidGlass",
         "//submodules/TelegramUI/Components/GlassBackgroundComponent:GlassBackgroundComponent",
         "//Swiftgram/SGLiquidGlassCore:SGLiquidGlassCore",

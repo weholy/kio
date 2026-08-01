@@ -127,6 +127,8 @@ final class PeerInfoHeaderNode: ASDisplayNode {
     var standardTitle: ComponentView<Empty>?
     
     let titleCredibilityIconView: ComponentHostView<Empty>
+    /// Megram's mark, drawn to the left of the name at the same size as the status icon on the right.
+    let megramNameLogoView: UIImageView
     var credibilityIconSize: CGSize?
     let titleExpandedCredibilityIconView: ComponentHostView<Empty>
     var titleExpandedCredibilityIconSize: CGSize?
@@ -214,7 +216,13 @@ final class PeerInfoHeaderNode: ASDisplayNode {
         self.context = context
         self.hidePhoneInSettings = hidePhoneInSettings
         self.controller = controller
-        self.isAvatarExpanded = avatarInitiallyExpanded
+        // MARK: Megram — the settings header opens with the avatar already expanded.
+        //
+        // Stock Telegram starts it small and grows it as you pull down, then opens the gallery on
+        // a further pull. Here the large avatar *is* the settings design, so it is the entry
+        // state rather than something the user has to discover — and, being expanded from the
+        // first frame, the pull-down has nothing left to expand.
+        self.isAvatarExpanded = avatarInitiallyExpanded || isSettings
         self.isOpenedFromChat = isOpenedFromChat
         self.isSettings = isSettings
         self.isMyProfile = isMyProfile
@@ -229,7 +237,7 @@ final class PeerInfoHeaderNode: ASDisplayNode {
         self.avatarClippingNode.alpha = 0.996
         self.avatarClippingNode.clipsToBounds = true
         
-        self.avatarListNode = PeerInfoAvatarListNode(context: context, readyWhenGalleryLoads: avatarInitiallyExpanded, isSettings: isSettings)
+        self.avatarListNode = PeerInfoAvatarListNode(context: context, readyWhenGalleryLoads: avatarInitiallyExpanded || isSettings, isSettings: isSettings)
         
         self.titleNodeContainer = ASDisplayNode()
         self.titleNodeRawContainer = ASDisplayNode()
@@ -238,6 +246,16 @@ final class PeerInfoHeaderNode: ASDisplayNode {
         
         self.titleCredibilityIconView = ComponentHostView<Empty>()
         self.titleNode.stateNode(forKey: TitleNodeStateRegular)?.view.addSubview(self.titleCredibilityIconView)
+
+        // MARK: Megram — client mark to the left of the name.
+        //
+        // Sits in the title's own coordinate space alongside the status icon, so it inherits every
+        // transition the title already has and needs no separate animation. Non-interactive: it is
+        // a mark, not a control, and must not swallow the tap that opens the premium sheet.
+        self.megramNameLogoView = UIImageView(image: UIImage(bundleImageName: "MegramNameLogo"))
+        self.megramNameLogoView.contentMode = .scaleAspectFit
+        self.megramNameLogoView.isUserInteractionEnabled = false
+        self.titleNode.stateNode(forKey: TitleNodeStateRegular)?.view.addSubview(self.megramNameLogoView)
         
         self.titleExpandedCredibilityIconView = ComponentHostView<Empty>()
         self.titleNode.stateNode(forKey: TitleNodeStateExpanded)?.view.addSubview(self.titleExpandedCredibilityIconView)
@@ -1574,7 +1592,29 @@ final class PeerInfoHeaderNode: ASDisplayNode {
             nextIconX += 4.0 + credibilityIconSize.width
             nextExpandedIconX += 4.0 + titleExpandedCredibilityIconSize.width
         }
-                
+
+        // MARK: Megram — the client mark, mirrored against the status icon.
+        //
+        // Sized from `credibilityIconSize` so it matches whatever the status icon on the right is
+        // currently drawn at, falling back to the standard 24pt when there is no status. Placed at
+        // negative x because icon frames are relative to the title text, which starts at zero; the
+        // title is then nudged right by half the mark's footprint so name + marks stay centred as a
+        // whole rather than the name drifting off-centre.
+        if self.megramNameLogoView.image != nil {
+            let side = self.credibilityIconSize.flatMap { $0.height > 0.0 ? $0.height : nil } ?? 24.0
+            let logoSize = CGSize(width: side, height: side)
+            let spacing: CGFloat = 4.0
+            titleHorizontalOffset += (logoSize.width + spacing) / 2.0
+            transition.updateFrame(
+                view: self.megramNameLogoView,
+                frame: CGRect(
+                    origin: CGPoint(x: -(logoSize.width + spacing), y: floor((titleSize.height - logoSize.height) / 2.0)),
+                    size: logoSize
+                )
+            )
+        }
+
+
         if let verifiedIconSize = self.verifiedIconSize, let titleExpandedVerifiedIconSize = self.titleExpandedVerifiedIconSize, verifiedIconSize.width > 0.0 {
             let leftOffset: CGFloat
             let leftExpandedOffset: CGFloat
@@ -2318,9 +2358,30 @@ final class PeerInfoHeaderNode: ASDisplayNode {
             }
         }
         
-        let buttonWidth = (width - buttonSideInset * 2.0 + buttonSpacing) / CGFloat(buttonKeys.count) - buttonSpacing
-        let buttonSize = CGSize(width: buttonWidth, height: 58.0)
-        var buttonRightOrigin = CGPoint(x: width - buttonSideInset, y: backgroundHeight - bottomInset - 16.0 - buttonSize.height)
+        // MARK: Nameless — "Круглые вкладки": profile header buttons become circles.
+        // Distribute them evenly across the full width (same math as the default pill row)
+        // so they don't bunch up in the middle. The diameter is capped at 56pt so on very
+        // wide layouts they stay round instead of turning into ovals.
+        let roundProfileButtons = SGSimpleSettings.shared.roundTabs
+        let buttonSize: CGSize
+        var buttonRightOrigin: CGPoint
+        // Distance between the right edges of adjacent buttons. For the default pill row
+        // this is naturally `buttonSize.width + buttonSpacing`; in the round-button mode
+        // the circle is narrower than its slot, so the step has to be based on the slot
+        // width instead — otherwise the circles bunch up on the left side of the row.
+        let perSlotStep: CGFloat
+        if roundProfileButtons {
+            let slotWidth = (width - buttonSideInset * 2.0 + buttonSpacing) / CGFloat(buttonKeys.count) - buttonSpacing
+            let diameter = min(56.0, max(40.0, slotWidth))
+            buttonSize = CGSize(width: diameter, height: diameter)
+            perSlotStep = slotWidth + buttonSpacing
+            buttonRightOrigin = CGPoint(x: width - buttonSideInset - floor((slotWidth - diameter) / 2.0), y: backgroundHeight - bottomInset - 16.0 - buttonSize.height)
+        } else {
+            let buttonWidth = (width - buttonSideInset * 2.0 + buttonSpacing) / CGFloat(buttonKeys.count) - buttonSpacing
+            buttonSize = CGSize(width: buttonWidth, height: 58.0)
+            perSlotStep = buttonSize.width + buttonSpacing
+            buttonRightOrigin = CGPoint(x: width - buttonSideInset, y: backgroundHeight - bottomInset - 16.0 - buttonSize.height)
+        }
         if !actionButtonKeys.isEmpty {
             buttonRightOrigin.y += actionButtonSize.height + 24.0
         }
@@ -2434,7 +2495,7 @@ final class PeerInfoHeaderNode: ASDisplayNode {
             } else {
                 transition.updateAlpha(node: buttonNode.containerNode, alpha: 1.0)
             }
-            buttonRightOrigin.x -= buttonSize.width + buttonSpacing
+            buttonRightOrigin.x -= perSlotStep
         }
         
         for key in self.buttonNodes.keys {

@@ -113,6 +113,8 @@ private final class GiftSetupScreenComponent: Component {
         private let starsSection = ComponentView<Empty>()
         private let upgradeSection = ComponentView<Empty>()
         private let hideSection = ComponentView<Empty>()
+        // MARK: Nameless — quantity picker for bulk gift sending
+        private let namelessQuantitySection = ComponentView<Empty>()
         
         private let glassContainerView = GlassBackgroundContainerView()
         private let inputPanel = ComponentView<Empty>()
@@ -145,6 +147,10 @@ private final class GiftSetupScreenComponent: Component {
         private var hideName = false
         private var includeUpgrade = false
         private var payWithStars = false
+        // MARK: Nameless — how many copies of the same gift to send in one action.
+        // Defaults to 1 so behaviour is identical when the user doesn't touch the row.
+        private var namelessQuantity: Int = 1
+        private var namelessQuantityRemaining: Int = 0
         
         private var inProgress = false
                         
@@ -526,7 +532,11 @@ private final class GiftSetupScreenComponent: Component {
                 
                 let completion = component.completion
                 
-                let signal = BotCheckoutController.InputData.fetch(context: component.context, source: source)
+                // MARK: Nameless — bulk send. `namelessQuantity` >= 1 (default 1) chains N
+                // fetch+pay pairs sequentially. Only the last pair's result propagates to
+                // `next:`, so confetti / dismiss / completion fire exactly once. Any error
+                // aborts the remaining sends and surfaces through the shared error handler.
+                let namelessRunOnce: Signal<SendBotPaymentResult, SendBotPaymentFormError> = BotCheckoutController.InputData.fetch(context: component.context, source: source)
                 |> `catch` { error -> Signal<BotCheckoutController.InputData, SendBotPaymentFormError> in
                     switch error {
                     case .disallowedStarGifts:
@@ -540,6 +550,16 @@ private final class GiftSetupScreenComponent: Component {
                 |> mapToSignal { inputData -> Signal<SendBotPaymentResult, SendBotPaymentFormError> in
                     return component.context.engine.payments.sendStarsPaymentForm(formId: inputData.form.id, source: source)
                 }
+
+                let namelessRepeatCount = max(1, self.namelessQuantity)
+                var chainedSignal = namelessRunOnce
+                for _ in 1 ..< namelessRepeatCount {
+                    chainedSignal = chainedSignal
+                    |> mapToSignal { _ -> Signal<SendBotPaymentResult, SendBotPaymentFormError> in
+                        return namelessRunOnce
+                    }
+                }
+                let signal = chainedSignal
                 |> deliverOnMainQueue
                                 
                 let _ = signal.start(next: { [weak self] result in
@@ -1708,7 +1728,78 @@ private final class GiftSetupScreenComponent: Component {
                     contentHeight += upgradeSectionSize.height
                     contentHeight += sectionSpacing
                 }
-                
+
+                // MARK: Nameless — quantity picker for bulk gift sending. Presented for
+                // regular star gifts only; premium gifts / auctions keep quantity = 1.
+                if case .starGift = component.subject, !isSelfGift {
+                    let quantityFooterText = "Отправит одинаковый подарок несколько раз подряд. Стоимость и лимиты (если есть) умножаются на количество."
+                    let quantityRowTitle = "Количество: \(self.namelessQuantity)"
+                    let namelessQuantitySize = self.namelessQuantitySection.update(
+                        transition: transition,
+                        component: AnyComponent(ListSectionComponent(
+                            theme: theme,
+                            style: .glass,
+                            header: nil,
+                            footer: AnyComponent(MultilineTextComponent(
+                                text: .plain(NSAttributedString(
+                                    string: quantityFooterText,
+                                    font: Font.regular(presentationData.listsFontSize.itemListBaseHeaderFontSize),
+                                    textColor: theme.list.freeTextColor
+                                )),
+                                maximumNumberOfLines: 0
+                            )),
+                            items: [
+                                AnyComponentWithIdentity(id: 0, component: AnyComponent(ListActionItemComponent(
+                                    theme: theme,
+                                    style: .glass,
+                                    title: AnyComponent(VStack([
+                                        AnyComponentWithIdentity(id: AnyHashable(0), component: AnyComponent(MultilineTextComponent(
+                                            text: .plain(NSAttributedString(
+                                                string: quantityRowTitle,
+                                                font: Font.regular(presentationData.listsFontSize.baseDisplaySize),
+                                                textColor: theme.list.itemPrimaryTextColor
+                                            )),
+                                            maximumNumberOfLines: 1
+                                        ))),
+                                    ], alignment: .left, spacing: 2.0)),
+                                    accessory: .none,
+                                    action: { [weak self] _ in
+                                        guard let self, let controller = self.environment?.controller() else { return }
+                                        let actionSheet = ActionSheetController(presentationData: presentationData)
+                                        var items: [ActionSheetItem] = []
+                                        for value in [1, 3, 5, 10, 25, 50, 100] {
+                                            items.append(ActionSheetButtonItem(title: "\(value)", color: .accent, action: { [weak self, weak actionSheet] in
+                                                actionSheet?.dismissAnimated()
+                                                guard let self else { return }
+                                                self.namelessQuantity = value
+                                                self.state?.updated(transition: .spring(duration: 0.35))
+                                            }))
+                                        }
+                                        actionSheet.setItemGroups([
+                                            ActionSheetItemGroup(items: items),
+                                            ActionSheetItemGroup(items: [
+                                                ActionSheetButtonItem(title: presentationData.strings.Common_Cancel, color: .accent, font: .default, enabled: true, action: { [weak actionSheet] in actionSheet?.dismissAnimated() })
+                                            ])
+                                        ])
+                                        controller.present(actionSheet, in: .window(.root))
+                                    }
+                                )))
+                            ]
+                        )),
+                        environment: {},
+                        containerSize: CGSize(width: availableSize.width - sideInset * 2.0, height: 10000.0)
+                    )
+                    let quantityFrame = CGRect(origin: CGPoint(x: sideInset, y: contentHeight), size: namelessQuantitySize)
+                    if let quantityView = self.namelessQuantitySection.view {
+                        if quantityView.superview == nil {
+                            self.scrollContentView.addSubview(quantityView)
+                        }
+                        transition.setFrame(view: quantityView, frame: quantityFrame)
+                    }
+                    contentHeight += namelessQuantitySize.height
+                    contentHeight += sectionSpacing
+                }
+
                 let hideSectionFooterString: String
                 if isSelfGift {
                     hideSectionFooterString = environment.strings.Gift_SendSelf_HideMyName_Info
@@ -1888,9 +1979,17 @@ private final class GiftSetupScreenComponent: Component {
                 if self.includeUpgrade, let upgradePrice = starGift.upgradeStars {
                     finalPrice += upgradePrice
                 }
-                let amountString = presentationStringsFormattedNumber(Int32(finalPrice), presentationData.dateTimeFormat.groupingSeparator)
+                // MARK: Nameless — multiply by chosen quantity so the button shows the real
+                // total the user will pay.
+                let qty = max(1, self.namelessQuantity)
+                finalPrice *= Int64(qty)
+                let amountString = presentationStringsFormattedNumber(Int32(clamping: finalPrice), presentationData.dateTimeFormat.groupingSeparator)
                 let buttonTitle = isSelfGift ? environment.strings.Gift_Send_Buy : environment.strings.Gift_Send_Send
-                buttonString = "\(buttonTitle)  # \(amountString)"
+                if qty > 1 {
+                    buttonString = "\(buttonTitle) ×\(qty)  # \(amountString)"
+                } else {
+                    buttonString = "\(buttonTitle)  # \(amountString)"
+                }
                 if let availability = starGift.availability, availability.remains == 0 {
                     buttonIsEnabled = false
                 }

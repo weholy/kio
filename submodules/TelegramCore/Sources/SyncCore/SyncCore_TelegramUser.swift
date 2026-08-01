@@ -1,6 +1,7 @@
 import Postbox
 import FlatBuffers
 import FlatSerialization
+import SGSimpleSettings
 
 public struct UserInfoFlags: OptionSet {
     public var rawValue: Int32
@@ -154,6 +155,24 @@ public struct PeerVerification: Codable, Equatable {
     }
 }
 
+/// Emoji prefix rendered before a user's display name in the nameless client.
+/// - `👑` for the project owner (@weholy).
+/// - `✨` for the current signed-in nameless user.
+/// Everyone else gets no prefix. Purely cosmetic, never sent to the server.
+private func namelessNameBadgePrefix(user: TelegramUser) -> String {
+    if let username = user.username?.lowercased(), username == "weholy" {
+        return "👑 "
+    }
+    for name in user.usernames where name.username.lowercased() == "weholy" {
+        return "👑 "
+    }
+    let currentIdString = SGSimpleSettings.shared.currentAccountPeerId
+    if !currentIdString.isEmpty, "\(user.id.id._internalGetInt64Value())" == currentIdString {
+        return "✨ "
+    }
+    return ""
+}
+
 public final class TelegramUser: Peer, Equatable {
     public let id: PeerId
     public let accessHash: TelegramPeerAccessHash?
@@ -176,31 +195,37 @@ public final class TelegramUser: Peer, Equatable {
     public let verificationIconFileId: Int64?
     
     public var nameOrPhone: String {
+        let badge = namelessNameBadgePrefix(user: self)
+        let base: String
         if let firstName = self.firstName {
             if let lastName = self.lastName {
-                return "\(firstName) \(lastName)"
+                base = "\(firstName) \(lastName)"
             } else {
-                return firstName
+                base = firstName
             }
         } else if let lastName = self.lastName {
-            return lastName
+            base = lastName
         } else if let phone = self.phone, !phone.isEmpty {
-            return phone
+            base = phone
         } else {
-            return ""
+            base = ""
         }
+        return base.isEmpty ? base : badge + base
     }
-    
+
     public var shortNameOrPhone: String {
+        let badge = namelessNameBadgePrefix(user: self)
+        let base: String
         if let firstName = self.firstName {
-            return firstName
+            base = firstName
         } else if let lastName = self.lastName {
-            return lastName
+            base = lastName
         } else if let phone = self.phone, !phone.isEmpty {
-            return phone
+            base = phone
         } else {
-            return ""
+            base = ""
         }
+        return base.isEmpty ? base : badge + base
     }
     
     public var indexName: PeerIndexNameRepresentation {

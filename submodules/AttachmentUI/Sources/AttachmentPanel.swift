@@ -31,6 +31,7 @@ import OverlayStatusController
 import UndoUI
 import TabSelectionRecognizer
 import EmojiTextAttachmentView
+import SGSimpleSettings
 
 private let legacyButtonSize = CGSize(width: 88.0, height: 49.0)
 private let glassButtonSize = CGSize(width: 72.0, height: 62.0)
@@ -1004,6 +1005,12 @@ final class AttachmentPanel: ASDisplayNode, ASScrollViewDelegate, ASGestureRecog
     private var tabSelectionRecognizer: TabSelectionRecognizer?
     private var selectionGestureState: (startX: CGFloat, currentX: CGFloat, itemId: AnyHashable, isLifted: Bool)?
     private var lensIsLifted = false
+
+    // Megram: the vertical list of attachment sources now lives in the chat, anchored to "+"
+    // (`ChatAttachmentGlassMenu`), and is shown *before* this controller exists. The panel is
+    // therefore always entered with a source already chosen, and only ever renders the classic
+    // token bar — which stays for the entry points that legitimately open several sources at
+    // once (bots, edit-media) and for the caption field.
 
     private var textInputPanelNode: AttachmentTextInputPanelNode?
     private var progressNode: LoadingProgressNode?
@@ -2572,17 +2579,20 @@ final class AttachmentPanel: ASDisplayNode, ASScrollViewDelegate, ASGestureRecog
                 panelSize.height = topAccessoryHeight
             }
 
+            // Megram: chunkier corners for the attach panel (matches the reference iOS 26
+            // sheet with visibly rounded rectangle instead of an oval pill).
             let cornerRadius: CGFloat
             if isSelecting {
-                cornerRadius = min(20.0, basePanelHeight * 0.5)
+                cornerRadius = min(22.0, basePanelHeight * 0.5)
             } else if self.hasMediaAccessoryPanel {
-                cornerRadius = 18.5
+                cornerRadius = 22.0
             } else {
-                cornerRadius = glassPanelHeight * 0.5
+                cornerRadius = min(28.0, glassPanelHeight * 0.5)
             }
             let backgroundOriginX: CGFloat = isSelecting ? panelSideInset : floorToScreenPixels((layout.size.width - panelSize.width) / 2.0)
 
-            backgroundView.update(size: panelSize, cornerRadius: cornerRadius, isDark: self.presentationData.theme.overallDarkAppearance, tintColor: .init(kind: .panel), isInteractive: true, transition: ComponentTransition(transition))
+            // Megram: attachment panel uses `.clear` glass for the see-through iOS 26 chrome
+            backgroundView.update(size: panelSize, cornerRadius: cornerRadius, isDark: self.presentationData.theme.overallDarkAppearance, tintColor: .init(kind: .clear), isInteractive: true, transition: ComponentTransition(transition))
 
             let lensSideInset: CGFloat = defaultPanelSideInset + layout.safeInsets.left
             let lensPanelSize = CGSize(width: layout.size.width - layout.safeInsets.left - layout.safeInsets.right - lensSideInset * 2.0, height: glassPanelHeight)
@@ -2675,12 +2685,20 @@ final class AttachmentPanel: ASDisplayNode, ASScrollViewDelegate, ASGestureRecog
             containerTransition = transition
         }
         let alphaTransition = ContainedViewLayoutTransition.animated(duration: isSelecting ? 0.1 : 0.25, curve: .easeInOut)
-        alphaTransition.updateAlpha(node: self.scrollNode, alpha: isSelecting || isAnyButtonVisible ? 0.0 : 1.0)
+        // A single-source panel has nothing to switch between: the token bar would be one lone
+        // pill under the sheet. Hide it and let the content own the space.
+        let classicBarHidden = buttons.count < 2 || hideButtons
+        alphaTransition.updateAlpha(node: self.scrollNode, alpha: (isSelecting || isAnyButtonVisible || classicBarHidden) ? 0.0 : 1.0)
         containerTransition.updateTransformScale(node: self.scrollNode, scale: isSelecting || isAnyButtonVisible ? 0.85 : 1.0)
 
         if let liquidLensView = self.liquidLensView {
-            alphaTransition.updateAlpha(layer: liquidLensView.layer, alpha: isSelecting || isAnyButtonVisible ? 0.0 : 1.0)
+            alphaTransition.updateAlpha(layer: liquidLensView.layer, alpha: (isSelecting || isAnyButtonVisible || classicBarHidden) ? 0.0 : 1.0)
             containerTransition.updateTransformScale(layer: liquidLensView.layer, scale: isSelecting || isAnyButtonVisible ? 0.85 : 1.0)
+        }
+        if classicBarHidden, let backgroundView = self.backgroundView {
+            alphaTransition.updateAlpha(layer: backgroundView.layer, alpha: 0.0)
+        } else if !isSelecting && !isAnyButtonVisible, let backgroundView = self.backgroundView {
+            alphaTransition.updateAlpha(layer: backgroundView.layer, alpha: 1.0)
         }
 
         if isSelectingUpdated {

@@ -24,6 +24,8 @@ swift_library(
 #        "//Swiftgram/SGAPI:SGAPI",
         "//Swiftgram/SGAPIToken:SGAPIToken",
         "//Swiftgram/SGLiquidGlassCore:SGLiquidGlassCore",
+        "//Swiftgram/MGPluginKit:MGPluginKit",
+        "//Swiftgram/MGLocalGifts:MGLocalGifts",
         "//submodules/SSignalKit/SwiftSignalKit:SwiftSignalKit",
         "//submodules/Display:Display",
         "//submodules/Postbox:Postbox",

@@ -5,6 +5,7 @@ import Display
 import libprisma
 import SwiftSignalKit
 import TelegramPresentationData
+import SGSimpleSettings
 
 public func chatInputStateStringWithAppliedEntities(_ text: String, entities: [MessageTextEntity]) -> NSAttributedString {
     var nsString: NSString?
@@ -350,6 +351,12 @@ public func stringWithAppliedEntities(_ text: String, entities: [MessageTextEnti
                 }
                 string.addAttribute(NSAttributedString.Key(rawValue: TelegramTextAttributes.BankCard), value: nsString!.substring(with: range), range: range)
             case .Spoiler:
+                // MARK: Nameless — "Убрать спойлеры везде": render spoilered text as ordinary
+                // text instead of installing the dust-cover attribute, so nothing has to be
+                // tapped to be read.
+                if SGSimpleSettings.shared.removeSpoilersEverywhere {
+                    break
+                }
                 if external {
                     string.addAttribute(NSAttributedString.Key.backgroundColor, value: UIColor.gray, range: range)
                 } else {

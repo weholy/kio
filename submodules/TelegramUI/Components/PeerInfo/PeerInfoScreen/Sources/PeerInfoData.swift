@@ -1,5 +1,6 @@
 import SGRegDateScheme
 import SGRegDate
+import SGSimpleSettings
 import Foundation
 import UIKit
 import Postbox
@@ -1532,7 +1533,10 @@ func peerInfoScreenData(
                     availablePanes?.insert(.stories, at: 0)
                     if availablePanes != nil, profileGiftsContext != nil, let cachedData = peerView.cachedData as? CachedUserData {
                         if let starGiftsCount = cachedData.starGiftsCount, starGiftsCount > 0 {
-                            availablePanes?.insert(.gifts, at: 1)
+                            // MARK: Megram — nxHideGiftsTab hides the Gifts pane from own profile
+                            if !SGSimpleSettings.shared.nxHideGiftsTab {
+                                availablePanes?.insert(.gifts, at: 1)
+                            }
                         }
                     }
                     if let hasStoryArchive, hasStoryArchive {
@@ -1544,7 +1548,7 @@ func peerInfoScreenData(
                     }
                     
                     if availablePanes != nil, profileGiftsContext != nil, let cachedData = peerView.cachedData as? CachedUserData, peerView.peerId != context.account.peerId {
-                        if let starGiftsCount = cachedData.starGiftsCount, starGiftsCount > 0 {
+                        if let starGiftsCount = cachedData.starGiftsCount, starGiftsCount > 0, !SGSimpleSettings.shared.nxHideGiftsTab {
                             availablePanes?.insert(.gifts, at: hasStories ? 1 : 0)
                         }
                     }
@@ -1831,7 +1835,7 @@ func peerInfoScreenData(
                     }
                     
                     if availablePanes != nil, let cachedData = peerView.cachedData as? CachedChannelData {
-                        if (cachedData.starGiftsCount ?? 0) > 0 || (profileGiftsState.count ?? 0) > 0 || forceHasGifts {
+                        if ((cachedData.starGiftsCount ?? 0) > 0 || (profileGiftsState.count ?? 0) > 0 || forceHasGifts) && !SGSimpleSettings.shared.nxHideGiftsTab {
                             availablePanes?.insert(.gifts, at: hasStories ? 1 : 0)
                         }
                     }

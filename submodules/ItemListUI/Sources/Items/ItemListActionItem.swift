@@ -293,6 +293,13 @@ public class ItemListActionItemNode: ListViewItemNode, ItemListItemNode {
                                     hasBottomCorners = true
                                     strongSelf.bottomStripeNode.isHidden = hasCorners
                             }
+                            if item.systemStyle == .glass {
+                                hasTopCorners = true
+                                hasBottomCorners = true
+                                isMiddleOfSection = false
+                                strongSelf.topStripeNode.isHidden = true
+                                strongSelf.bottomStripeNode.isHidden = true
+                            }
 
                             let bgFrame = CGRect(origin: CGPoint(x: 0.0, y: -min(insets.top, separatorHeight)), size: CGSize(width: params.width, height: contentSize.height + min(insets.top, separatorHeight) + min(insets.bottom, separatorHeight)))
                             if SGLiquidGlassZone.settings.isEnabled {

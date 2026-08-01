@@ -38,6 +38,7 @@ swift_library(
         "//submodules/UndoUI",
         "//submodules/TelegramUI/Components/LensTransition",
         "//submodules/Components/BalancedTextComponent",
+        "//Swiftgram/SGSimpleSettings:SGSimpleSettings",
     ],
     visibility = [
         "//visibility:public",

@@ -55,6 +55,7 @@ private enum DoubleBottomEntry: ItemListNodeEntry {
                 title: text,
                 value: value,
                 enabled: enabled,
+                isolatedCard: true,
                 sectionId: section,
                 style: .blocks,
                 updated: { value in

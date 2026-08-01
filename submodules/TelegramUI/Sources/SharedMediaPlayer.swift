@@ -9,6 +9,7 @@ import AccountContext
 import TelegramUniversalVideoContent
 import DeviceProximity
 import PeerMessagesMediaPlaylist
+import SGSimpleSettings
 
 private enum SharedMediaPlaybackItem: Equatable {
     case audio(MediaPlayer)
@@ -258,6 +259,13 @@ final class SharedMediaPlayer {
                                             strongSelf.playbackItem?.seek(0.0)
                                             strongSelf.playbackItem?.play()
                                         default:
+                                            // MARK: Nameless — "Не слушать след. голосовое":
+                                            // stop at the end of a voice/round-video message
+                                            // instead of rolling into the next one. Music
+                                            // playlists keep auto-advancing.
+                                            if strongSelf.type == .voice && SGSimpleSettings.shared.noAutoNextVoice {
+                                                break
+                                            }
                                             strongSelf.scheduledPlaybackAction = .play
                                             strongSelf.control(.next)
                                     }

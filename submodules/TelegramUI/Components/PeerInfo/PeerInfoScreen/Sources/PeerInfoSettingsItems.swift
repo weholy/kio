@@ -210,7 +210,7 @@ func settingsItems(showProfileId: Bool, data: PeerInfoScreenData?, context: Acco
     }
 
     // Hub entry: opens categorized nameless settings
-    items[.swiftgram]!.append(PeerInfoScreenDisclosureItem(id: 0, label: swiftgramLabel, text: "nameless", icon: PresentationResourcesSettings.nameless, action: {
+    items[.swiftgram]!.append(PeerInfoScreenDisclosureItem(id: 0, label: swiftgramLabel, text: "Megram", icon: PresentationResourcesSettings.nameless, action: {
         interaction.openSettings(.nameless)
     }))
 

@@ -1,6 +1,7 @@
 import Foundation
 import Postbox
 import SwiftSignalKit
+import SGSimpleSettings
 
 public enum TogglePeerChatPinnedLocation {
     case group(PeerGroupId)
@@ -41,11 +42,17 @@ func _internal_toggleItemPinned(postbox: Postbox, accountPeerId: PeerId, locatio
                 additionalCount = 1
             }
             
-            let limitCount: Int
+            var limitCount: Int
             if case .root = groupId {
                 limitCount = Int(userLimitsConfiguration.maxPinnedChatCount)
             } else {
                 limitCount = Int(userLimitsConfiguration.maxArchivedPinnedChatCount)
+            }
+            // MARK: Nameless — "Закрепление чатов (без лимита)". The pinned list is synced to
+            // the server, which enforces its own cap; lifting the client-side check simply
+            // stops us refusing locally before trying.
+            if SGSimpleSettings.shared.unlimitedPinnedChats {
+                limitCount = Int.max
             }
             
             let count = sameKind.count + additionalCount

@@ -88,18 +88,30 @@ public final class SGLiquidGlassItemBackground {
             // Host must be transparent or Apple glass is covered
             host.backgroundColor = .clear
         }
+        // Rounded section corners come from the glass surface once the host stops drawing its own
+        // background, so a caller that never supplied radii would leave square black rectangles.
+        if self.currentRadii.topLeft <= 0.0, self.currentRadii.topRight <= 0.0,
+           self.currentRadii.bottomLeft <= 0.0, self.currentRadii.bottomRight <= 0.0 {
+            self.currentRadii = .init(radius: 11.0)
+        }
         self.glassView.isHidden = !enabled
         guard enabled, self.currentSize.width > 0.5, self.currentSize.height > 0.5 else { return }
 
         GlassBackgroundView.useCustomGlassImpl = false
 
-        // Official Apple liquid glass: `.panel` → UIGlassEffect(style: .regular)
-        let tint: GlassBackgroundView.TintColor
-        if SGLiquidGlassZone.settings.isTinted, self._tint != .clear {
-            tint = .init(kind: .custom(style: .default, color: self._tint.withAlphaComponent(0.35)))
+        // Settings blocks are not chat bubbles: there is no wallpaper behind them, only the flat
+        // page. Fully see-through glass over a flat dark page is just a black rectangle — which is
+        // exactly what the settings screens turned into. So a section carries its own theme fill
+        // as the glass tint, strongly enough to read as a card, and the material supplies the edge
+        // and refraction on top. Message bubbles keep the untinted clear material, since there a
+        // wallpaper really is behind them.
+        let cardColor: UIColor
+        if self._tint != .clear {
+            cardColor = self._tint.withAlphaComponent(self.currentIsDark ? 0.55 : 0.65)
         } else {
-            tint = .init(kind: .panel)
+            cardColor = UIColor(white: self.currentIsDark ? 1.0 : 1.0, alpha: self.currentIsDark ? 0.10 : 0.55)
         }
+        let tint = GlassBackgroundView.TintColor(kind: .custom(style: .clear, color: cardColor))
 
         self.glassView.update(
             size: self.currentSize,

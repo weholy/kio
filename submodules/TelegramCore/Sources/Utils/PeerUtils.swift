@@ -217,7 +217,17 @@ public extension Peer {
     var isPremium: Bool {
         switch self {
         case let user as TelegramUser:
-            return user.flags.contains(.isPremium)
+            if user.flags.contains(.isPremium) {
+                return true
+            }
+            // MARK: Nameless — local premium. Only ever claims premium for *our own* account,
+            // so other people never appear premium to us and nothing is asserted to the server.
+            if SGSimpleSettings.shared.enableLocalPremium,
+               !SGSimpleSettings.shared.currentAccountPeerId.isEmpty,
+               "\(user.id.id._internalGetInt64Value())" == SGSimpleSettings.shared.currentAccountPeerId {
+                return true
+            }
+            return false
         default:
             return false
         }

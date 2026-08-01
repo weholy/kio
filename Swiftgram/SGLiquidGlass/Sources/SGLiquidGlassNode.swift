@@ -25,11 +25,41 @@ public enum SGOfficialGlassTint {
         .init(kind: .clear)
     }
 
-    public static func forZone(_ zone: SGLiquidGlassZone) -> GlassBackgroundView.TintColor {
-        // Everywhere: official Apple liquid glass = UIGlassEffect(.regular) via .panel
-        // (matches chat bubbles / settings pills / tab bar in Whitegram reference)
-        let _ = zone
-        return .init(kind: .panel)
+    /// Resolves the tint that actually reaches `UIGlassEffect`.
+    ///
+    /// The material is *always* `UIGlassEffect(style: .clear)` — the see-through iOS 26 glass
+    /// that refracts whatever is behind it. `.regular` was what made every surface read as
+    /// milky fog: it composites an opaque-ish white/grey wash over the backdrop, so wallpaper
+    /// and bubbles behind the panel disappear. Translucency is therefore never expressed via
+    /// the host view's `alpha` (that cross-dissolves the effect view toward a flat rectangle
+    /// and kills the refraction) — only via the tint alpha layered on top of clear glass.
+    ///
+    /// `intensity` no longer picks the *style*; it only scales the readability dim, so text on
+    /// a menu stays legible over a bright wallpaper. 0.0 → no dim at all, 1.0 → the strongest
+    /// dim we allow (still far more transparent than `.regular` ever was).
+    public static func resolve(kind: GlassBackgroundView.TintColor.Kind, isDark: Bool, accent: UIColor?) -> GlassBackgroundView.TintColor {
+        // An explicit custom colour from a call site wins — it is a deliberate art direction
+        // choice (bubble fill, accent button), we only force its style to `.clear`.
+        if case let .custom(_, color) = kind {
+            return .init(kind: .custom(style: .clear, color: color))
+        }
+
+        let intensity = max(0.0, min(1.0, CGFloat(SGSimpleSettings.shared.namelessLiquidGlassIntensity)))
+        // Accent tinting only applies when the user turned it on; otherwise the dim is neutral
+        // (black on dark so panels sink into the backdrop, a whisper of white on light so text
+        // keeps contrast without the surface turning into fog).
+        let useAccent = SGSimpleSettings.shared.namelessLiquidGlassTinting && accent != nil
+        let maxAlpha: CGFloat = isDark ? 0.26 : 0.10
+        let alpha = maxAlpha * intensity
+        if alpha <= 0.001 && !useAccent {
+            return .init(kind: .clear)
+        }
+        let base = useAccent ? accent! : (isDark ? UIColor.black : UIColor.white)
+        return .init(kind: .custom(style: .clear, color: base.withAlphaComponent(alpha)))
+    }
+
+    public static func forZone(_ zone: SGLiquidGlassZone, isDark: Bool = true, accent: UIColor? = nil) -> GlassBackgroundView.TintColor {
+        return resolve(kind: .clear, isDark: isDark, accent: accent)
     }
 }
 
@@ -56,9 +86,9 @@ private func pushOfficialGlass(
         isVisible: isVisible,
         transition: .immediate
     )
-    let intensity = CGFloat(SGSimpleSettings.shared.namelessLiquidGlassIntensity)
-    // Full opacity — never dim glass into a gray fog
-    view.alpha = (intensity <= 0.01) ? 1.0 : max(0.85, min(1.0, intensity))
+    // Always fully opaque: see the note on `SGOfficialGlassTint.tint(intensity:isDark:accent:)`
+    // — translucency comes from the glass style, not from dimming the view.
+    view.alpha = 1.0
 }
 
 // MARK: - Glass Node (ASDisplayKit wrapper around official GlassBackgroundView)
@@ -127,11 +157,12 @@ public final class SGLiquidGlassNode: ASDisplayNode, SGLiquidGlassContainer {
     }
 
     private func officialTint() -> GlassBackgroundView.TintColor {
-        if _tintColor != .clear {
-            let style: GlassBackgroundView.TintColor.CustomStyle = (_kind == .clear) ? .clear : .default
-            return .init(kind: .custom(style: style, color: _tintColor.withAlphaComponent(0.35)))
-        }
-        return .init(kind: _kind)
+        // The requested `glassKind` is respected — see SGOfficialGlassTint.resolve.
+        return SGOfficialGlassTint.resolve(
+            kind: _kind,
+            isDark: _isDark,
+            accent: _tintColor == .clear ? nil : _tintColor
+        )
     }
 
     private func push() {
@@ -171,8 +202,30 @@ public final class SGLiquidGlassNode: ASDisplayNode, SGLiquidGlassContainer {
     public func refreshGlass(zone: SGLiquidGlassZone) {
         guard isNodeLoaded else { return }
         let enabled = zone.isEnabled
-        _kind = SGOfficialGlassTint.forZone(zone).kind
-        glassView.isHidden = !enabled || !_glassVisible
+        let shouldHide = !enabled || !_glassVisible
+        // MARK: Nameless — "Анимация фейда при включении": cross-fade the surface when glass
+        // is switched on/off instead of popping. Only animates on an actual visibility change.
+        if zone.fadeAnimationEnabled, glassView.isHidden != shouldHide {
+            if shouldHide {
+                glassView.alpha = 1.0
+                UIView.animate(withDuration: 0.25, animations: {
+                    self.glassView.alpha = 0.0
+                }, completion: { _ in
+                    self.glassView.isHidden = true
+                    self.glassView.alpha = 1.0
+                })
+            } else {
+                glassView.isHidden = false
+                // push() rebuilds the effect and resets alpha to 1, so fade from 0 afterwards.
+                push()
+                glassView.alpha = 0.0
+                UIView.animate(withDuration: 0.25) {
+                    self.glassView.alpha = 1.0
+                }
+            }
+            return
+        }
+        glassView.isHidden = shouldHide
         if enabled {
             push()
         }
@@ -237,11 +290,11 @@ public final class SGLiquidGlassView: UIView, SGLiquidGlassViewProtocol, SGLiqui
     }
 
     private func officialTint() -> GlassBackgroundView.TintColor {
-        if _tintColor != .clear {
-            let style: GlassBackgroundView.TintColor.CustomStyle = (_kind == .clear) ? .clear : .default
-            return .init(kind: .custom(style: style, color: _tintColor.withAlphaComponent(0.35)))
-        }
-        return .init(kind: _kind)
+        return SGOfficialGlassTint.resolve(
+            kind: _kind,
+            isDark: _isDark,
+            accent: _tintColor == .clear ? nil : _tintColor
+        )
     }
 
     private func push() {
@@ -270,7 +323,6 @@ public final class SGLiquidGlassView: UIView, SGLiquidGlassViewProtocol, SGLiqui
 
     public func refreshGlass(zone: SGLiquidGlassZone) {
         let enabled = zone.isEnabled
-        _kind = SGOfficialGlassTint.forZone(zone).kind
         glassView.isHidden = !enabled || !_visible
         if enabled {
             push()

@@ -32,6 +32,7 @@ swift_library(
         "//submodules/PremiumUI",
         "//submodules/TelegramUI/Components/LottieComponent",
         "//submodules/Components/BundleIconComponent",
+        "//Swiftgram/SGSimpleSettings:SGSimpleSettings",
     ],
     visibility = [
         "//visibility:public",

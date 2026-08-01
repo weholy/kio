@@ -527,9 +527,17 @@ public final class ChatMessageBubbleBackdrop: ASDisplayNode, SGLiquidGlassContai
     /// Liquid glass surface layered above the wallpaper background but below
     /// the bubble mask image. When `nameless.liquidGlass.messages` is enabled
     /// this gives every chat bubble the iOS 26 Liquid Glass look.
-    private let glassView: GlassBackgroundView
+    private var glassView: GlassBackgroundView?
+    /// What was last pushed into `glassView`. Every apply pass of every visible bubble calls
+    /// `setType`, and during a scroll that is dozens of calls per frame — rebuilding an identical
+    /// glass surface each time is the difference between a smooth flick and a stuttering one.
+    private var appliedGlassState: (size: CGSize, radii: GlassBackgroundView.CornerRadii, isDark: Bool, tint: GlassBackgroundView.TintColor)?
     private var currentBubbleColor: UIColor = .clear
     private var currentGlassRadii: GlassBackgroundView.CornerRadii = .init(radius: 0)
+    /// Lazily-created frost layer for the "Размытие сообщений" option. Kept separate from
+    /// `glassView` because that one is the Liquid Glass surface and is mutually exclusive
+    /// with the classic (non-glass) bubble rendering path.
+    private var namelessBlurView: UIVisualEffectView?
     
     public var overrideMask: Bool = false {
         didSet {
@@ -550,8 +558,11 @@ public final class ChatMessageBubbleBackdrop: ASDisplayNode, SGLiquidGlassContai
                 }
             }
             // nameless: keep glass in sync
-            if self.glassView.frame != self.bounds {
-                self.glassView.frame = self.bounds
+            if let glassView = self.glassView, glassView.frame != self.bounds {
+                glassView.frame = self.bounds
+            }
+            if let namelessBlurView = self.namelessBlurView, namelessBlurView.frame != self.bounds {
+                namelessBlurView.frame = self.bounds
             }
             if let backgroundContent = self.backgroundContent {
                 backgroundContent.frame = self.bounds
@@ -566,41 +577,111 @@ public final class ChatMessageBubbleBackdrop: ASDisplayNode, SGLiquidGlassContai
     }
     
     public override init() {
-        self.glassView = GlassBackgroundView()
         super.init()
 
         self.clipsToBounds = true
-        self.glassView.isUserInteractionEnabled = false
-        self.glassView.isHidden = true
-        self.view.insertSubview(self.glassView, at: 0)
+    }
+
+    /// Creates the glass surface the first time a bubble actually shows one.
+    ///
+    /// A `GlassBackgroundView` is a `UIVisualEffectView` plus its mask stack — far too expensive
+    /// to allocate for every bubble the history recycles, most of which are off-screen or drawn
+    /// with a flat fill. Building it on demand keeps that cost proportional to the bubbles that
+    /// really are glass.
+    private func ensureGlassView() -> GlassBackgroundView {
+        if let glassView = self.glassView {
+            return glassView
+        }
+        let glassView = GlassBackgroundView()
+        glassView.isUserInteractionEnabled = false
+        glassView.frame = self.bounds
+        self.glassView = glassView
+        self.view.insertSubview(glassView, at: 0)
+        return glassView
+    }
+
+    /// MARK: Nameless — installs/removes the frost layer behind the bubble content.
+    /// The node already clips to its bubble shape, so the blur inherits the correct outline
+    /// without needing its own mask.
+    private func updateNamelessBlurEffect(isEnabled: Bool) {
+        if isEnabled {
+            let blurView: UIVisualEffectView
+            if let current = self.namelessBlurView {
+                blurView = current
+            } else {
+                blurView = UIVisualEffectView(effect: UIBlurEffect(style: .systemThinMaterial))
+                blurView.isUserInteractionEnabled = false
+                self.namelessBlurView = blurView
+                // Above the wallpaper-sampled fill, below the bubble's own content. Glass and
+                // blur are mutually exclusive, so when glass was never built the blur simply goes
+                // to the bottom.
+                if let glassView = self.glassView {
+                    self.view.insertSubview(blurView, aboveSubview: glassView)
+                } else {
+                    self.view.insertSubview(blurView, at: 0)
+                }
+            }
+            blurView.frame = self.bounds
+            blurView.isHidden = false
+        } else if let blurView = self.namelessBlurView {
+            self.namelessBlurView = nil
+            blurView.removeFromSuperview()
+        }
     }
 
     private func updateGlass(size: CGSize, isDark: Bool, zone: SGLiquidGlassZone, transition: ComponentTransition = .immediate) {
         let enabled = zone.isEnabled && size.width > 0.5 && size.height > 0.5
         // Official Apple liquid glass ONLY:
-        // GlassBackgroundView(.panel) → UIGlassEffect(style: .regular)
-        // (same as official Telegram-iOS chat chrome / input pills)
+        // message bubbles use clear-style glass, not panel glass. This keeps the iOS 26
+        // refraction/specular material while avoiding a grey/colored solid fill over chats.
         GlassBackgroundView.useCustomGlassImpl = false
+        // The bubble tint is not decoration. Once the solid fill is gone it is the only thing
+        // that still distinguishes an outgoing message from an incoming one, so it is applied
+        // regardless of the global "tint glass surfaces" preference — that flag only decides
+        // how far it is pushed. A plain untinted `.clear` bubble made both sides of the
+        // conversation render as the same colourless lens over the wallpaper.
+        // Pure glass: no tint at all, so the bubble is the material and nothing else. The cost is
+        // that incoming and outgoing look identical apart from which side they sit on — which is
+        // exactly what the switch is for.
         let tint: GlassBackgroundView.TintColor
-        if zone.isTinted && self.currentBubbleColor != .clear {
-            // Light accent over panel glass (official custom default style)
-            tint = .init(kind: .custom(style: .default, color: self.currentBubbleColor.withAlphaComponent(0.28)))
+        if SGSimpleSettings.shared.megramPureClearBubbles {
+            tint = .init(kind: .clear)
+        } else if self.currentBubbleColor != .clear {
+            let alpha: CGFloat = zone.isTinted ? (isDark ? 0.18 : 0.15) : (isDark ? 0.12 : 0.10)
+            tint = .init(kind: .custom(style: .clear, color: self.currentBubbleColor.withAlphaComponent(alpha)))
         } else {
-            tint = .init(kind: .panel)
+            // No bubble colour to lean on (custom wallpaper themes): the faintest neutral wash,
+            // just enough to give the glass an edge to read against.
+            tint = .init(kind: .custom(style: .clear, color: UIColor(white: 1.0, alpha: isDark ? 0.07 : 0.12)))
         }
         if enabled {
-            if self.glassView.superview !== self.view {
-                self.view.insertSubview(self.glassView, at: 0)
+            let state = (size: size, radii: self.currentGlassRadii, isDark: isDark, tint: tint)
+            let glassView = self.ensureGlassView()
+            if glassView.superview !== self.view {
+                self.view.insertSubview(glassView, at: 0)
             }
-            self.glassView.frame = CGRect(origin: .zero, size: size)
-            self.glassView.update(size: size, cornerRadii: self.currentGlassRadii, isDark: isDark, tintColor: tint, isInteractive: false, isVisible: true, transition: transition)
-            self.glassView.isHidden = false
-            self.glassView.alpha = 1.0
+            glassView.frame = CGRect(origin: .zero, size: size)
+            // Rebuilding the effect is what costs; pushing an identical state is pure waste, and
+            // `setType` runs for every visible bubble on every apply pass.
+            if let applied = self.appliedGlassState,
+               applied.size == state.size,
+               applied.radii == state.radii,
+               applied.isDark == state.isDark,
+               applied.tint == state.tint {
+            } else {
+                self.appliedGlassState = state
+                glassView.update(size: size, cornerRadii: self.currentGlassRadii, isDark: isDark, tintColor: tint, isInteractive: false, isVisible: true, transition: transition)
+            }
+            glassView.isHidden = false
+            glassView.alpha = 1.0
             // Kill solid wallpaper-sampled fill — glass is the bubble surface
             self.backgroundContent?.isHidden = true
             self.backgroundContent?.alpha = 0.0
+            // Liquid Glass already frosts the backdrop; a second blur would just muddy it.
+            self.updateNamelessBlurEffect(isEnabled: false)
         } else {
-            self.glassView.isHidden = true
+            self.appliedGlassState = nil
+            self.glassView?.isHidden = true
             self.backgroundContent?.isHidden = false
             var alpha: CGFloat = 1.0
             if SGSimpleSettings.shared.messageTransparent {
@@ -609,6 +690,10 @@ public final class ChatMessageBubbleBackdrop: ASDisplayNode, SGLiquidGlassContai
                 alpha = 0.65
             }
             self.backgroundContent?.alpha = alpha
+            // MARK: Nameless — "Размытие сообщений": frost the bubble so the wallpaper behind
+            // it is blurred rather than merely shown through. Only meaningful when the bubble
+            // is not fully opaque, which is why it composes with the transparency options above.
+            self.updateNamelessBlurEffect(isEnabled: SGSimpleSettings.shared.messageBlurEffect)
             if SGSimpleSettings.shared.messageOutline {
                 self.view.layer.borderWidth = UIScreen.main.scale > 0 ? (1.0 / UIScreen.main.scale) * 2.0 : 1.0
                 self.view.layer.borderColor = (isDark ? UIColor.white : UIColor.black).withAlphaComponent(0.22).cgColor
@@ -664,6 +749,8 @@ public final class ChatMessageBubbleBackdrop: ASDisplayNode, SGLiquidGlassContai
     }
 
     public func refreshGlass(zone: SGLiquidGlassZone) {
+        // A settings change is exactly the case the memo must not swallow.
+        self.appliedGlassState = nil
         self.updateGlass(size: self.bounds.size, isDark: self.theme?.theme.overallDarkAppearance ?? false, zone: zone)
     }
     

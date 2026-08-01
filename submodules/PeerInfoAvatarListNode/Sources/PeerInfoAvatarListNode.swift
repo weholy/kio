@@ -18,6 +18,7 @@ import AvatarNode
 import AvatarVideoNode
 import ComponentFlow
 import ComponentDisplayAdapters
+import SGSimpleSettings
 import StorySetIndicatorComponent
 import HierarchyTrackingLayer
 
@@ -890,6 +891,13 @@ public final class PeerInfoAvatarListContainerNode: ASDisplayNode {
     private var validLayout: CGSize?
     public var isCollapsing = false
     private var isExpanded = false
+
+    // MARK: Nameless — "Блюр аватара в профиле". A frost layer over the avatar carousel,
+    // with optional reduced strength and accent tinting. Sits above the photos but below
+    // `controlsContainerNode`, so page strips, shadows and the story ring stay sharp.
+    private var namelessAvatarBlurView: UIVisualEffectView?
+    private var namelessAvatarBlurTintView: UIView?
+    private var namelessAvatarBlurStyle: UIBlurEffect.Style?
     
     public var firstFullSizeOnly = false
     public var customCenterTapAction: (() -> Void)?
@@ -1442,6 +1450,57 @@ public final class PeerInfoAvatarListContainerNode: ASDisplayNode {
         return items.count == 0
     }
     
+    /// MARK: Nameless — installs/updates/removes the profile avatar frost layer.
+    private func updateNamelessAvatarBlur(size: CGSize) {
+        let s = SGSimpleSettings.shared
+        guard s.profileAvatarBlur else {
+            if let blurView = self.namelessAvatarBlurView {
+                self.namelessAvatarBlurView = nil
+                self.namelessAvatarBlurStyle = nil
+                blurView.removeFromSuperview()
+            }
+            if let tintView = self.namelessAvatarBlurTintView {
+                self.namelessAvatarBlurTintView = nil
+                tintView.removeFromSuperview()
+            }
+            return
+        }
+
+        let blurView: UIVisualEffectView
+        if let current = self.namelessAvatarBlurView {
+            blurView = current
+        } else {
+            blurView = UIVisualEffectView(effect: nil)
+            blurView.isUserInteractionEnabled = false
+            self.namelessAvatarBlurView = blurView
+            // Below the controls so strips/shadows stay crisp.
+            self.view.insertSubview(blurView, belowSubview: self.controlsContainerNode.view)
+        }
+        let style: UIBlurEffect.Style = s.profileAvatarBlurMinimal ? .systemUltraThinMaterialDark : .systemMaterialDark
+        if self.namelessAvatarBlurStyle != style {
+            self.namelessAvatarBlurStyle = style
+            blurView.effect = UIBlurEffect(style: style)
+        }
+        blurView.frame = CGRect(origin: CGPoint(), size: size)
+
+        if s.profileAvatarBlurTinting {
+            let tintView: UIView
+            if let current = self.namelessAvatarBlurTintView {
+                tintView = current
+            } else {
+                tintView = UIView()
+                tintView.isUserInteractionEnabled = false
+                self.namelessAvatarBlurTintView = tintView
+                blurView.contentView.addSubview(tintView)
+            }
+            tintView.frame = CGRect(origin: CGPoint(), size: size)
+            tintView.backgroundColor = UIColor(white: 0.0, alpha: 0.18)
+        } else if let tintView = self.namelessAvatarBlurTintView {
+            self.namelessAvatarBlurTintView = nil
+            tintView.removeFromSuperview()
+        }
+    }
+
     private var additionalEntryProgress: Signal<Float?, NoError>? = nil
     public func update(size: CGSize, peer: EnginePeer?, customNode: ASDisplayNode? = nil, additionalEntry: Signal<(TelegramMediaImageRepresentation, Float)?, NoError> = .single(nil), isExpanded: Bool, transition: ContainedViewLayoutTransition) {
         self.validLayout = size
@@ -1452,7 +1511,9 @@ public final class PeerInfoAvatarListContainerNode: ASDisplayNode {
         }
         self.leftHighlightNode.frame = CGRect(origin: CGPoint(), size: CGSize(width: fadeWidth, height: size.height))
         self.rightHighlightNode.frame = CGRect(origin: CGPoint(x: size.width - fadeWidth, y: 0.0), size: CGSize(width: fadeWidth, height: size.height))
-        
+
+        self.updateNamelessAvatarBlur(size: size)
+
         if let peer = peer, !self.initializedList {
             self.initializedList = true
                     

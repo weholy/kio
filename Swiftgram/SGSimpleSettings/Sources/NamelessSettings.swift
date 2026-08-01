@@ -95,6 +95,51 @@ private enum NamelessSettingsKey {
     static let emojiDownloaderEnabled = "nameless.emojiDownloaderEnabled"
     static let feelRichEnabled = "nameless.feelRichEnabled"
     static let feelRichStarsAmount = "nameless.feelRichStarsAmount"
+    // Free-form override for the device model reported to Telegram. Empty string = off.
+    // Read directly by MTApiEnvironment from UserDefaults so MtProtoKit does not have to
+    // link SGSimpleSettings; the key literal is duplicated in MTApiEnvironment.m.
+    static let deviceModelSpoof = "nameless.deviceModelSpoof"
+    static let hideNewChatSticker = "nameless.hideNewChatSticker"
+    static let hideBusinessChats = "nameless.hideBusinessChats"
+    static let megramGlobalClearGlass = "megram.globalClearGlass"
+    static let megramFullGiftCatalog = "megram.fullGiftCatalog"
+    static let megramPureClearBubbles = "megram.pureClearBubbles"
+    // MARK: Megram — Nextgram parity keys (UI-only for now, no consumers)
+    static let nxHideGiftsTab = "megram.nx.hideGiftsTab"
+    static let nxHideContactsTab = "megram.nx.hideContactsTab"
+    static let nxHideCallsTab = "megram.nx.hideCallsTab"
+    static let nxSearchButtonNearTabBar = "megram.nx.searchButtonNearTabBar"
+    static let nxFoldersAtBottom = "megram.nx.foldersAtBottom"
+    static let nxRememberLastFolder = "megram.nx.rememberLastFolder"
+    static let nxNewChatListLook = "megram.nx.newChatListLook"
+    static let nxHideChatsTitle = "megram.nx.hideChatsTitle"
+    static let nxRamUnderClock = "megram.nx.ramUnderClock"
+    static let nxPremiumBadgeInChatList = "megram.nx.premiumBadgeInChatList"
+    static let nxAccountSwitcherInChatList = "megram.nx.accountSwitcherInChatList"
+    static let nxPipOnSwipe = "megram.nx.pipOnSwipe"
+    static let nxRoundVideoBackCamera = "megram.nx.roundVideoBackCamera"
+    static let nxCameraInGallery = "megram.nx.cameraInGallery"
+    static let nxStripPhotoMetadata = "megram.nx.stripPhotoMetadata"
+    static let nxFormattingPanel = "megram.nx.formattingPanel"
+    static let nxVoiceOneTime = "megram.nx.voiceOneTime"
+    static let nxTranscribeAppleSpeech = "megram.nx.transcribeAppleSpeech"
+    static let nxVoiceMorpherEnabled = "megram.nx.voiceMorpherEnabled"
+    static let nxForceTCPCalls = "megram.nx.forceTCPCalls"
+    static let nxMusicCrossfade = "megram.nx.musicCrossfade"
+    static let nxMusicEqualizer = "megram.nx.musicEqualizer"
+    static let nxLiveActivityWidget = "megram.nx.liveActivityWidget"
+    static let nxWinterSnow = "megram.nx.winterSnow"
+    static let nxCustomFontEnabled = "megram.nx.customFontEnabled"
+    static let nxAutoClearCacheOnLaunch = "megram.nx.autoClearCacheOnLaunch"
+    static let nxHapticsOnUI = "megram.nx.hapticsOnUI"
+    static let nxThermalCalmDown = "megram.nx.thermalCalmDown"
+    static let settingsBigAvatar = "nameless.settingsBigAvatar"
+    static let forwardWarnAuthor = "nameless.forwardWarnAuthor"
+    static let profileMusicCard = "nameless.profileMusicCard"
+    /// Local (fake) stars wallet: master switch and how much of the configured amount
+    /// has already been "spent" locally.
+    static let localStarsEnabled = "nameless.localStarsEnabled"
+    static let localStarsSpent = "nameless.localStarsSpent"
     static let fakeLocationEnabled = "nameless.fakeLocationEnabled"
     static let fakeLatitude = "nameless.fakeLatitude"
     static let fakeLongitude = "nameless.fakeLongitude"
@@ -225,7 +270,6 @@ private enum NamelessSettingsKey {
     static let showFullViews = "nameless.showFullViews"
     static let hidePhoneNumber = "nameless.hidePhoneNumber"
     static let showCreationDate = "nameless.showCreationDate"
-    static let visualUsername = "nameless.visualUsername"
     static let showIfMutualContacts = "nameless.showIfMutualContacts"
     static let showRegistrationDate = "nameless.showRegistrationDate"
     // MARK: - Additional (Дополнительно)
@@ -240,6 +284,10 @@ private enum NamelessSettingsKey {
     static let antiScamEnabled = "nameless.antiScam"
     static let warnBeforeCall = "nameless.warnBeforeCall"
     static let outgoingPhotoQuality = "nameless.outgoingPhotoQuality"
+    // MARK: - Attachment UI
+    // When enabled, the '+' attachment picker replaces the classic horizontal tab bar with
+    // a compact rounded glass sheet stacking the same buttons as a vertical list.
+    static let namelessCompactAttachmentSheet = "nameless.compactAttachmentSheet"
 }
 
 private enum NamelessRollbackStorage {
@@ -289,6 +337,7 @@ public extension Notification.Name {
     static let luxgramLiquidGlassDidChange = Notification.Name("nameless.liquidGlassDidChange")
     static let namelessVideoBackgroundDidChange = Notification.Name("nameless.videoBackgroundDidChange")
     static let sgHideProxySponsorDidChange = Notification.Name("nameless.hideProxySponsorDidChange")
+    static let namelessLocalStarsDidChange = Notification.Name("nameless.localStarsDidChange")
 }
 
 public extension SGSimpleSettings {
@@ -370,7 +419,17 @@ public extension SGSimpleSettings {
     var disableScreenshotDetection: Bool { get { storage.namelessBool(NamelessSettingsKey.disableScreenshotDetection) } set { storage.set(newValue, forKey: NamelessSettingsKey.disableScreenshotDetection) } }
     var disableSecretChatBlurOnScreenshot: Bool { get { storage.namelessBool(NamelessSettingsKey.disableSecretChatBlurOnScreenshot) } set { storage.set(newValue, forKey: NamelessSettingsKey.disableSecretChatBlurOnScreenshot) } }
     var enableLocalPremium: Bool { get { storage.namelessBool(NamelessSettingsKey.enableLocalPremium, default: true) } set { storage.set(newValue, forKey: NamelessSettingsKey.enableLocalPremium) } }
-    var liquidGlassEnabled: Bool { get { storage.namelessBool(NamelessSettingsKey.liquidGlassEnabled, default: true) } set { storage.set(newValue, forKey: NamelessSettingsKey.liquidGlassEnabled) } }
+    /// Apple liquid glass on every surface. Mutually exclusive with `blurInsteadGlass`, which is
+    /// literally the request to render those surfaces with a plain blur instead.
+    var liquidGlassEnabled: Bool {
+        get { storage.namelessBool(NamelessSettingsKey.liquidGlassEnabled, default: true) }
+        set {
+            storage.set(newValue, forKey: NamelessSettingsKey.liquidGlassEnabled)
+            if newValue {
+                storage.set(false, forKey: NamelessSettingsKey.blurInsteadGlass)
+            }
+        }
+    }
     var disableCompactNumbers: Bool { get { storage.namelessBool(NamelessSettingsKey.disableCompactNumbers) } set { storage.set(newValue, forKey: NamelessSettingsKey.disableCompactNumbers) } }
     var disableZalgoText: Bool { get { storage.namelessBool(NamelessSettingsKey.disableZalgoText) } set { storage.set(newValue, forKey: NamelessSettingsKey.disableZalgoText) } }
     var chatExportEnabled: Bool { get { storage.namelessBool(NamelessSettingsKey.chatExportEnabled) } set { storage.set(newValue, forKey: NamelessSettingsKey.chatExportEnabled) } }
@@ -381,6 +440,152 @@ public extension SGSimpleSettings {
     var emojiDownloaderEnabled: Bool { get { storage.namelessBool(NamelessSettingsKey.emojiDownloaderEnabled) } set { storage.set(newValue, forKey: NamelessSettingsKey.emojiDownloaderEnabled) } }
     var feelRichEnabled: Bool { get { storage.namelessBool(NamelessSettingsKey.feelRichEnabled, default: true) } set { storage.set(newValue, forKey: NamelessSettingsKey.feelRichEnabled) } }
     var feelRichStarsAmount: String { get { storage.namelessString(NamelessSettingsKey.feelRichStarsAmount, default: "1598") } set { storage.set(newValue, forKey: NamelessSettingsKey.feelRichStarsAmount) } }
+
+    /// Custom device model reported to Telegram (initConnection, active sessions,
+    /// login-code emails). Empty string means "use the real hardware model".
+    var deviceModelSpoof: String {
+        get { storage.namelessString(NamelessSettingsKey.deviceModelSpoof, default: "") }
+        set { storage.set(newValue, forKey: NamelessSettingsKey.deviceModelSpoof) }
+    }
+
+    /// Hide the greeting sticker on empty chats.
+    var hideNewChatSticker: Bool {
+        get { storage.namelessBool(NamelessSettingsKey.hideNewChatSticker) }
+        set { storage.set(newValue, forKey: NamelessSettingsKey.hideNewChatSticker) }
+    }
+
+    /// Hide the "bot manages this chat" panel that appears at the top of chats delegated
+    /// to a Telegram Business assistant bot.
+    var hideBusinessChats: Bool {
+        get { storage.namelessBool(NamelessSettingsKey.hideBusinessChats) }
+        set { storage.set(newValue, forKey: NamelessSettingsKey.hideBusinessChats) }
+    }
+
+    /// Megram — force UIGlassEffect(.clear) everywhere GlassBackgroundView renders `.panel`
+    /// glass. Global switch, on by default so the user sees the see-through look right away
+    /// (navigation, input panel, buttons, sheets, settings pills).
+    /// Draw message bubbles and inline buttons as untinted `UIGlassEffect(.clear)` — pure glass,
+    /// no colour at all.
+    ///
+    /// The trade-off is deliberate and worth knowing: without a tint there is nothing left to
+    /// distinguish an incoming bubble from an outgoing one except its side of the screen and the
+    /// delivery checks. Turning this off brings back a faint tint from the theme's bubble colour.
+    var megramPureClearBubbles: Bool {
+        get { storage.namelessBool(NamelessSettingsKey.megramPureClearBubbles, default: true) }
+        set { storage.set(newValue, forKey: NamelessSettingsKey.megramPureClearBubbles) }
+    }
+
+    /// Ask the server for the complete star-gift catalog instead of "only what changed".
+    ///
+    /// `payments.getStarGifts` takes a hash of the catalog the client already has; when it matches,
+    /// the server answers `starGiftsNotModified` and the client keeps showing its cached list —
+    /// which is why gifts that were sold out or withdrawn quietly stop appearing. Sending hash 0
+    /// makes the answer unconditional, so the full catalog comes back every time.
+    ///
+    /// The cost is real and worth stating: the catalog is re-downloaded on every refresh instead of
+    /// being skipped, so this is a switch rather than unconditional behaviour.
+    var megramFullGiftCatalog: Bool {
+        get { storage.namelessBool(NamelessSettingsKey.megramFullGiftCatalog, default: true) }
+        set { storage.set(newValue, forKey: NamelessSettingsKey.megramFullGiftCatalog) }
+    }
+
+    var megramGlobalClearGlass: Bool {
+        get { storage.namelessBool(NamelessSettingsKey.megramGlobalClearGlass, default: true) }
+        set { storage.set(newValue, forKey: NamelessSettingsKey.megramGlobalClearGlass) }
+    }
+
+    // MARK: Megram — Nextgram parity properties. Every one is a plain Bool with no
+    // downstream consumer; they exist so the settings UI can list the toggle now and the
+    // behaviour can be wired in later without a settings-model change.
+    var nxHideGiftsTab: Bool { get { storage.namelessBool(NamelessSettingsKey.nxHideGiftsTab) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxHideGiftsTab) } }
+    var nxHideContactsTab: Bool { get { storage.namelessBool(NamelessSettingsKey.nxHideContactsTab) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxHideContactsTab) } }
+    var nxHideCallsTab: Bool { get { storage.namelessBool(NamelessSettingsKey.nxHideCallsTab) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxHideCallsTab) } }
+    var nxSearchButtonNearTabBar: Bool { get { storage.namelessBool(NamelessSettingsKey.nxSearchButtonNearTabBar) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxSearchButtonNearTabBar) } }
+    var nxFoldersAtBottom: Bool { get { storage.namelessBool(NamelessSettingsKey.nxFoldersAtBottom) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxFoldersAtBottom) } }
+    var nxRememberLastFolder: Bool { get { storage.namelessBool(NamelessSettingsKey.nxRememberLastFolder) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxRememberLastFolder) } }
+    var nxNewChatListLook: Bool { get { storage.namelessBool(NamelessSettingsKey.nxNewChatListLook) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxNewChatListLook) } }
+    var nxHideChatsTitle: Bool { get { storage.namelessBool(NamelessSettingsKey.nxHideChatsTitle) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxHideChatsTitle) } }
+    var nxRamUnderClock: Bool { get { storage.namelessBool(NamelessSettingsKey.nxRamUnderClock) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxRamUnderClock) } }
+    var nxPremiumBadgeInChatList: Bool { get { storage.namelessBool(NamelessSettingsKey.nxPremiumBadgeInChatList) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxPremiumBadgeInChatList) } }
+    var nxAccountSwitcherInChatList: Bool { get { storage.namelessBool(NamelessSettingsKey.nxAccountSwitcherInChatList) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxAccountSwitcherInChatList) } }
+    var nxPipOnSwipe: Bool { get { storage.namelessBool(NamelessSettingsKey.nxPipOnSwipe) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxPipOnSwipe) } }
+    var nxRoundVideoBackCamera: Bool { get { storage.namelessBool(NamelessSettingsKey.nxRoundVideoBackCamera) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxRoundVideoBackCamera) } }
+    var nxCameraInGallery: Bool { get { storage.namelessBool(NamelessSettingsKey.nxCameraInGallery) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxCameraInGallery) } }
+    var nxStripPhotoMetadata: Bool { get { storage.namelessBool(NamelessSettingsKey.nxStripPhotoMetadata) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxStripPhotoMetadata) } }
+    var nxFormattingPanel: Bool { get { storage.namelessBool(NamelessSettingsKey.nxFormattingPanel) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxFormattingPanel) } }
+    var nxVoiceOneTime: Bool { get { storage.namelessBool(NamelessSettingsKey.nxVoiceOneTime) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxVoiceOneTime) } }
+    var nxTranscribeAppleSpeech: Bool { get { storage.namelessBool(NamelessSettingsKey.nxTranscribeAppleSpeech) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxTranscribeAppleSpeech) } }
+    var nxVoiceMorpherEnabled: Bool { get { storage.namelessBool(NamelessSettingsKey.nxVoiceMorpherEnabled) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxVoiceMorpherEnabled) } }
+    var nxForceTCPCalls: Bool { get { storage.namelessBool(NamelessSettingsKey.nxForceTCPCalls) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxForceTCPCalls) } }
+    var nxMusicCrossfade: Bool { get { storage.namelessBool(NamelessSettingsKey.nxMusicCrossfade) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxMusicCrossfade) } }
+    var nxMusicEqualizer: Bool { get { storage.namelessBool(NamelessSettingsKey.nxMusicEqualizer) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxMusicEqualizer) } }
+    var nxLiveActivityWidget: Bool { get { storage.namelessBool(NamelessSettingsKey.nxLiveActivityWidget) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxLiveActivityWidget) } }
+    var nxWinterSnow: Bool { get { storage.namelessBool(NamelessSettingsKey.nxWinterSnow) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxWinterSnow) } }
+    var nxCustomFontEnabled: Bool { get { storage.namelessBool(NamelessSettingsKey.nxCustomFontEnabled) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxCustomFontEnabled) } }
+    var nxAutoClearCacheOnLaunch: Bool { get { storage.namelessBool(NamelessSettingsKey.nxAutoClearCacheOnLaunch) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxAutoClearCacheOnLaunch) } }
+    var nxHapticsOnUI: Bool { get { storage.namelessBool(NamelessSettingsKey.nxHapticsOnUI) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxHapticsOnUI) } }
+    var nxThermalCalmDown: Bool { get { storage.namelessBool(NamelessSettingsKey.nxThermalCalmDown) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxThermalCalmDown) } }
+
+    /// Open Settings with the avatar already expanded (fills the top of the screen).
+    var settingsBigAvatar: Bool {
+        get { storage.namelessBool(NamelessSettingsKey.settingsBigAvatar) }
+        set { storage.set(newValue, forKey: NamelessSettingsKey.settingsBigAvatar) }
+    }
+
+    /// Confirm-with-cooldown alert when forwarding a message back to its author.
+    var forwardWarnAuthor: Bool {
+        get { storage.namelessBool(NamelessSettingsKey.forwardWarnAuthor, default: true) }
+        set { storage.set(newValue, forKey: NamelessSettingsKey.forwardWarnAuthor) }
+    }
+
+    /// Render the "now playing" card in a peer's profile header.
+    var profileMusicCard: Bool {
+        get { storage.namelessBool(NamelessSettingsKey.profileMusicCard, default: true) }
+        set { storage.set(newValue, forKey: NamelessSettingsKey.profileMusicCard) }
+    }
+
+
+    // MARK: - Local (fake) stars wallet
+    //
+    // `feelRichStarsAmount` is the user-entered top-up; `localStarsSpent` accumulates what
+    // has been "paid" locally. The displayed balance is the difference, so the wallet behaves
+    // like a real one while never touching the server.
+
+    /// Master switch for showing a locally-controlled stars balance instead of the real one.
+    var localStarsEnabled: Bool { get { storage.namelessBool(NamelessSettingsKey.localStarsEnabled) } set { storage.set(newValue, forKey: NamelessSettingsKey.localStarsEnabled) } }
+
+    /// Total amount already spent from the local wallet.
+    var localStarsSpent: Int64 {
+        get { Int64(storage.namelessDouble(NamelessSettingsKey.localStarsSpent, default: 0.0)) }
+        set { storage.set(Double(max(0, newValue)), forKey: NamelessSettingsKey.localStarsSpent) }
+    }
+
+    /// Configured top-up amount, parsed from the free-form text field.
+    var localStarsTopUp: Int64 {
+        return Int64(feelRichStarsAmount.filter { $0.isNumber }) ?? 0
+    }
+
+    /// What the UI should show: top-up minus everything spent, never negative.
+    var localStarsBalance: Int64 {
+        return max(0, localStarsTopUp - localStarsSpent)
+    }
+
+    /// Deducts from the local wallet. Returns false when the balance is insufficient,
+    /// mirroring how a real payment would fail.
+    @discardableResult
+    func spendLocalStars(_ amount: Int64) -> Bool {
+        guard localStarsEnabled, amount > 0 else { return false }
+        guard localStarsBalance >= amount else { return false }
+        localStarsSpent += amount
+        NotificationCenter.default.post(name: .namelessLocalStarsDidChange, object: nil)
+        return true
+    }
+
+    /// Resets the spent counter (a "top-up" of the fake wallet).
+    func resetLocalStarsSpending() {
+        localStarsSpent = 0
+        NotificationCenter.default.post(name: .namelessLocalStarsDidChange, object: nil)
+    }
     var fakeLocationEnabled: Bool { get { storage.namelessBool(NamelessSettingsKey.fakeLocationEnabled) } set { storage.set(newValue, forKey: NamelessSettingsKey.fakeLocationEnabled) } }
     var fakeLatitude: Double { get { storage.namelessDouble(NamelessSettingsKey.fakeLatitude) } set { storage.set(newValue, forKey: NamelessSettingsKey.fakeLatitude) } }
     var fakeLongitude: Double { get { storage.namelessDouble(NamelessSettingsKey.fakeLongitude) } set { storage.set(newValue, forKey: NamelessSettingsKey.fakeLongitude) } }
@@ -388,7 +593,17 @@ public extension SGSimpleSettings {
     var onlineStatusRecordingIntervalMinutes: Int32 { get { storage.namelessInt32(NamelessSettingsKey.onlineStatusRecordingIntervalMinutes, default: 10) } set { storage.set(Int(newValue), forKey: NamelessSettingsKey.onlineStatusRecordingIntervalMinutes) } }
     var ghostModeMessageSendDelaySeconds: Int32 { get { storage.namelessInt32(NamelessSettingsKey.ghostModeMessageSendDelaySeconds) } set { storage.set(Int(newValue), forKey: NamelessSettingsKey.ghostModeMessageSendDelaySeconds) } }
     /// Master ghost mode toggle. Individual switches retain their own values.
-    var ghostModeEnabled: Bool { get { storage.namelessBool(NamelessSettingsKey.ghostModeEnabled) } set { storage.set(newValue, forKey: NamelessSettingsKey.ghostModeEnabled) } }
+    /// Ghost mode hides the online status. Mutually exclusive with `ghostModeAlwaysOnline`, which
+    /// forces the opposite — with both on, whichever wrote last silently won.
+    var ghostModeEnabled: Bool {
+        get { storage.namelessBool(NamelessSettingsKey.ghostModeEnabled) }
+        set {
+            storage.set(newValue, forKey: NamelessSettingsKey.ghostModeEnabled)
+            if newValue {
+                storage.set(false, forKey: NamelessSettingsKey.ghostModeAlwaysOnline)
+            }
+        }
+    }
 
     /// Whether at least one Lead-compatible Ghost Mode subfeature is selected.
     var hasGhostModeSubfeatureEnabled: Bool {
@@ -404,7 +619,15 @@ public extension SGSimpleSettings {
     var ghostModeAutoCleanHistory: Bool { get { storage.namelessBool(NamelessSettingsKey.ghostModeAutoCleanHistory) } set { storage.set(newValue, forKey: NamelessSettingsKey.ghostModeAutoCleanHistory) } }
     var ghostModeAutoCleanDays: Int32 { get { storage.namelessInt32(NamelessSettingsKey.ghostModeAutoCleanDays, default: 30) } set { storage.set(Int(newValue), forKey: NamelessSettingsKey.ghostModeAutoCleanDays) } }
     /// Always show online status (overrides disableOnlineStatus)
-    var ghostModeAlwaysOnline: Bool { get { storage.namelessBool(NamelessSettingsKey.ghostModeAlwaysOnline) } set { storage.set(newValue, forKey: NamelessSettingsKey.ghostModeAlwaysOnline) } }
+    var ghostModeAlwaysOnline: Bool {
+        get { storage.namelessBool(NamelessSettingsKey.ghostModeAlwaysOnline) }
+        set {
+            storage.set(newValue, forKey: NamelessSettingsKey.ghostModeAlwaysOnline)
+            if newValue {
+                storage.set(false, forKey: NamelessSettingsKey.ghostModeEnabled)
+            }
+        }
+    }
 
     /// Changes only the Ghost Mode master switch, preserving individual feature choices.
     func applyGhostModeAll(enabled: Bool) {
@@ -451,12 +674,14 @@ public extension SGSimpleSettings {
     var namelessLiquidGlassPopup: Bool { get { storage.namelessBool(NamelessSettingsKey.liquidGlassPopup, default: true) } set { storage.set(newValue, forKey: NamelessSettingsKey.liquidGlassPopup) } }
     var namelessLiquidGlassContextMenu: Bool { get { storage.namelessBool(NamelessSettingsKey.liquidGlassContextMenu, default: true) } set { storage.set(newValue, forKey: NamelessSettingsKey.liquidGlassContextMenu) } }
     var namelessLiquidGlassSearch: Bool { get { storage.namelessBool(NamelessSettingsKey.liquidGlassSearch, default: true) } set { storage.set(newValue, forKey: NamelessSettingsKey.liquidGlassSearch) } }
-    /// Glass intensity 0.0 (off) … 1.0 (full). Default = 1.0 (max liquid glass)
+    /// Glass intensity 0.0 (thinnest, most see-through glass) … 1.0 (densest). Default = 1.0.
+    /// `namelessDouble` already returns the default when the key was never written, so the
+    /// whole range stays addressable — a stored 0.0 means "as transparent as possible",
+    /// not "unset".
     var namelessLiquidGlassIntensity: Double {
         get {
             let v = storage.namelessDouble(NamelessSettingsKey.liquidGlassIntensity, default: 1.0)
-            // Never allow near-zero unless user explicitly set; clamp tiny leftovers to full
-            return v < 0.05 ? 1.0 : min(1.0, max(0.0, v))
+            return min(1.0, max(0.0, v))
         }
         set { storage.set(newValue, forKey: NamelessSettingsKey.liquidGlassIntensity) }
     }
@@ -474,7 +699,15 @@ public extension SGSimpleSettings {
     var newChatList: Bool { get { storage.namelessBool(NamelessSettingsKey.newChatList) } set { storage.set(newValue, forKey: NamelessSettingsKey.newChatList) } }
     var newChatHeader: Bool { get { storage.namelessBool(NamelessSettingsKey.newChatHeader) } set { storage.set(newValue, forKey: NamelessSettingsKey.newChatHeader) } }
     // Default OFF — official liquid glass, not custom blur
-    var blurInsteadGlass: Bool { get { storage.namelessBool(NamelessSettingsKey.blurInsteadGlass, default: false) } set { storage.set(newValue, forKey: NamelessSettingsKey.blurInsteadGlass) } }
+    var blurInsteadGlass: Bool {
+        get { storage.namelessBool(NamelessSettingsKey.blurInsteadGlass, default: false) }
+        set {
+            storage.set(newValue, forKey: NamelessSettingsKey.blurInsteadGlass)
+            if newValue {
+                storage.set(false, forKey: NamelessSettingsKey.liquidGlassEnabled)
+            }
+        }
+    }
     var oledMode: Bool { get { storage.namelessBool(NamelessSettingsKey.oledMode) } set { storage.set(newValue, forKey: NamelessSettingsKey.oledMode) } }
     var customSettingsIcons: Bool { get { storage.namelessBool(NamelessSettingsKey.customSettingsIcons) } set { storage.set(newValue, forKey: NamelessSettingsKey.customSettingsIcons) } }
     var telegramAppIcons: Bool { get { storage.namelessBool(NamelessSettingsKey.telegramAppIcons, default: true) } set { storage.set(newValue, forKey: NamelessSettingsKey.telegramAppIcons) } }
@@ -494,8 +727,26 @@ public extension SGSimpleSettings {
     var musicAlbumBlur: Bool { get { storage.namelessBool(NamelessSettingsKey.musicAlbumBlur, default: true) } set { storage.set(newValue, forKey: NamelessSettingsKey.musicAlbumBlur) } }
     var musicPlayerEffect: Bool { get { storage.namelessBool(NamelessSettingsKey.musicPlayerEffect, default: true) } set { storage.set(newValue, forKey: NamelessSettingsKey.musicPlayerEffect) } }
     var messageOutline: Bool { get { storage.namelessBool(NamelessSettingsKey.messageOutline) } set { storage.set(newValue, forKey: NamelessSettingsKey.messageOutline) } }
-    var messageTransparent: Bool { get { storage.namelessBool(NamelessSettingsKey.messageTransparent) } set { storage.set(newValue, forKey: NamelessSettingsKey.messageTransparent) } }
-    var messageSemiTransparent: Bool { get { storage.namelessBool(NamelessSettingsKey.messageSemiTransparent) } set { storage.set(newValue, forKey: NamelessSettingsKey.messageSemiTransparent) } }
+    /// Fully transparent bubbles. Mutually exclusive with `messageSemiTransparent` — both set the
+    /// same alpha, and with both on the semi-transparent value was silently ignored.
+    var messageTransparent: Bool {
+        get { storage.namelessBool(NamelessSettingsKey.messageTransparent) }
+        set {
+            storage.set(newValue, forKey: NamelessSettingsKey.messageTransparent)
+            if newValue {
+                storage.set(false, forKey: NamelessSettingsKey.messageSemiTransparent)
+            }
+        }
+    }
+    var messageSemiTransparent: Bool {
+        get { storage.namelessBool(NamelessSettingsKey.messageSemiTransparent) }
+        set {
+            storage.set(newValue, forKey: NamelessSettingsKey.messageSemiTransparent)
+            if newValue {
+                storage.set(false, forKey: NamelessSettingsKey.messageTransparent)
+            }
+        }
+    }
     var messageBlurEffect: Bool { get { storage.namelessBool(NamelessSettingsKey.messageBlurEffect) } set { storage.set(newValue, forKey: NamelessSettingsKey.messageBlurEffect) } }
     var particleEffectEnabled: Bool { get { storage.namelessBool(NamelessSettingsKey.particleEffectEnabled) } set { storage.set(newValue, forKey: NamelessSettingsKey.particleEffectEnabled) } }
     var particleEffectSpeed: Double { get { storage.namelessDouble(NamelessSettingsKey.particleEffectSpeed, default: 0.5) } set { storage.set(newValue, forKey: NamelessSettingsKey.particleEffectSpeed) } }
@@ -542,17 +793,41 @@ public extension SGSimpleSettings {
     // MARK: Camera
     var cameraDefaultBack: Bool { get { storage.namelessBool(NamelessSettingsKey.defaultCameraBack) } set { storage.set(newValue, forKey: NamelessSettingsKey.defaultCameraBack) } }
     var cameraUseDeviceMicrophone: Bool { get { storage.namelessBool(NamelessSettingsKey.useDeviceMicrophone) } set { storage.set(newValue, forKey: NamelessSettingsKey.useDeviceMicrophone) } }
-    var cameraSendHDPhoto: Bool { get { storage.namelessBool(NamelessSettingsKey.sendHDPhoto) } set { storage.set(newValue, forKey: NamelessSettingsKey.sendHDPhoto) } }
+    // MARK: Mutually exclusive switches
+    //
+    // Two switches that answer the same question must never both be on. The rule lives in the
+    // setters rather than in the settings screen, so it holds no matter who writes the value —
+    // a settings row, a plugin, an import, a migration. Each branch only clears when the new
+    // value is `true`, so the cascade terminates after one step and can never recurse.
+
+    /// Send camera photos in HD. Mutually exclusive with `cameraAlwaysSendHD`.
+    var cameraSendHDPhoto: Bool {
+        get { storage.namelessBool(NamelessSettingsKey.sendHDPhoto) }
+        set {
+            storage.set(newValue, forKey: NamelessSettingsKey.sendHDPhoto)
+            if newValue {
+                storage.set(false, forKey: NamelessSettingsKey.alwaysSendHD)
+            }
+        }
+    }
     var cameraJpegQuality: Int32 { get { storage.namelessInt32(NamelessSettingsKey.jpegQuality, default: 70) } set { storage.set(Int(newValue), forKey: NamelessSettingsKey.jpegQuality) } }
     var cameraRememberLast: Bool { get { storage.namelessBool(NamelessSettingsKey.rememberLastCamera) } set { storage.set(newValue, forKey: NamelessSettingsKey.rememberLastCamera) } }
     var cameraStaticZoom: Bool { get { storage.namelessBool(NamelessSettingsKey.staticZoomRecording) } set { storage.set(newValue, forKey: NamelessSettingsKey.staticZoomRecording) } }
-    var cameraAlwaysSendHD: Bool { get { storage.namelessBool(NamelessSettingsKey.alwaysSendHD, default: true) } set { storage.set(newValue, forKey: NamelessSettingsKey.alwaysSendHD) } }
+    /// Always send in HD, regardless of source. Mutually exclusive with `cameraSendHDPhoto`.
+    var cameraAlwaysSendHD: Bool {
+        get { storage.namelessBool(NamelessSettingsKey.alwaysSendHD, default: true) }
+        set {
+            storage.set(newValue, forKey: NamelessSettingsKey.alwaysSendHD)
+            if newValue {
+                storage.set(false, forKey: NamelessSettingsKey.sendHDPhoto)
+            }
+        }
+    }
     // MARK: Info
     var showIdAndDC: Bool { get { storage.namelessBool(NamelessSettingsKey.showIdAndDC, default: true) } set { storage.set(newValue, forKey: NamelessSettingsKey.showIdAndDC) } }
     var showSeconds: Bool { get { storage.namelessBool(NamelessSettingsKey.showSeconds, default: true) } set { storage.set(newValue, forKey: NamelessSettingsKey.showSeconds) } }
     var showFullViews: Bool { get { storage.namelessBool(NamelessSettingsKey.showFullViews, default: true) } set { storage.set(newValue, forKey: NamelessSettingsKey.showFullViews) } }
     var hidePhoneNumber: Bool { get { storage.namelessBool(NamelessSettingsKey.hidePhoneNumber) } set { storage.set(newValue, forKey: NamelessSettingsKey.hidePhoneNumber) } }
-    var visualUsername: Bool { get { storage.namelessBool(NamelessSettingsKey.visualUsername) } set { storage.set(newValue, forKey: NamelessSettingsKey.visualUsername) } }
     var showIfMutualContacts: Bool { get { storage.namelessBool(NamelessSettingsKey.showIfMutualContacts, default: true) } set { storage.set(newValue, forKey: NamelessSettingsKey.showIfMutualContacts) } }
     var showRegistrationDate: Bool { get { storage.namelessBool(NamelessSettingsKey.showRegistrationDate, default: true) } set { storage.set(newValue, forKey: NamelessSettingsKey.showRegistrationDate) } }
     // MARK: Additional
@@ -590,5 +865,14 @@ public extension SGSimpleSettings {
             ids.remove(String(recordId))
         }
         storage.set(Array(ids).sorted(), forKey: NamelessSettingsKey.mutedAccountIds)
+    }
+
+    /// Replace the horizontal '+' attachment tab bar with a compact vertical rounded
+    /// glass sheet floating above the input. Off by default so the classic behaviour
+    /// stays the safety net; toggling this hides the tab bar and shows a stacked
+    /// list of the same buttons.
+    var namelessCompactAttachmentSheet: Bool {
+        get { storage.namelessBool(NamelessSettingsKey.namelessCompactAttachmentSheet) }
+        set { storage.set(newValue, forKey: NamelessSettingsKey.namelessCompactAttachmentSheet) }
     }
 }

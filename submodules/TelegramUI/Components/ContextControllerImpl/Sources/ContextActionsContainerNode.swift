@@ -53,6 +53,14 @@ private enum ContextItemNode {
     case separator(ASDisplayNode)
 }
 
+/// Corner radius of every action menu panel. iOS 26 menus are considerably rounder than the
+/// 14pt the pre-glass design used; 26 matches the system menu and the rest of our chrome.
+private let menuCornerRadius: CGFloat = 26.0
+
+/// Hairlines between items belong to the opaque-menu era. On clear glass they read as dirt on
+/// the material, so items are separated by their own height and the highlight pill instead.
+private let menuShowsItemSeparators = false
+
 private final class InnerActionsContainerNode: ASDisplayNode {
     private let blurBackground: Bool
     private let presentationData: PresentationData
@@ -89,7 +97,7 @@ private final class InnerActionsContainerNode: ASDisplayNode {
         
         self.containerNode = ASDisplayNode()
         self.containerNode.clipsToBounds = true
-        self.containerNode.cornerRadius = 14.0
+        self.containerNode.cornerRadius = menuCornerRadius
         // Never solid white/gray — glass or blur only (long-press white-screen bug)
         self.containerNode.backgroundColor = .clear
 
@@ -107,7 +115,9 @@ private final class InnerActionsContainerNode: ASDisplayNode {
                 itemNodes.append(.custom(itemNode))
             case .separator:
                 let separatorNode = ASDisplayNode()
-                separatorNode.backgroundColor = presentationData.theme.contextMenu.itemSeparatorColor.withAlphaComponent(0.35)
+                separatorNode.backgroundColor = menuShowsItemSeparators
+                    ? presentationData.theme.contextMenu.itemSeparatorColor.withAlphaComponent(0.35)
+                    : .clear
                 itemNodes.append(.separator(separatorNode))
             }
         }
@@ -116,11 +126,13 @@ private final class InnerActionsContainerNode: ASDisplayNode {
         
         super.init()
 
-        // Official Apple liquid glass via GlassBackgroundView (.panel → UIGlassEffect.regular)
+        // Official Apple liquid glass via GlassBackgroundView (.clear → UIGlassEffect.clear):
+        // the menu has to keep the wallpaper and the bubbles behind it visible, which the
+        // `.regular` material destroys.
         if SGLiquidGlassZone.contextMenu.isEnabled {
             let glass = SGLiquidGlassView()
-            glass.cornerRadii = GlassRadii(radius: 14.0)
-            glass.glassKind = .panel
+            glass.cornerRadii = GlassRadii(radius: menuCornerRadius)
+            glass.glassKind = .clear
             glass.tintColorGlass = .clear
             glass.isUserInteractionEnabled = false
             self.containerNode.view.insertSubview(glass, at: 0)
@@ -310,15 +322,19 @@ private final class InnerActionsContainerNode: ASDisplayNode {
             case let .custom(item):
                 item.updateTheme(presentationData: presentationData)
             case let .separator(separator):
-                separator.backgroundColor = presentationData.theme.contextMenu.sectionSeparatorColor.withAlphaComponent(0.35)
+                separator.backgroundColor = menuShowsItemSeparators
+                    ? presentationData.theme.contextMenu.sectionSeparatorColor.withAlphaComponent(0.35)
+                    : .clear
             case let .itemSeparator(itemSeparator):
-                itemSeparator.backgroundColor = presentationData.theme.contextMenu.itemSeparatorColor.withAlphaComponent(0.35)
+                itemSeparator.backgroundColor = menuShowsItemSeparators
+                    ? presentationData.theme.contextMenu.itemSeparatorColor.withAlphaComponent(0.35)
+                    : .clear
             }
         }
-        
+
         // Keep transparent — solid theme.contextMenu.backgroundColor caused white long-press menu
         self.containerNode.backgroundColor = .clear
-        self.liquidGlassView?.glassKind = .panel
+        self.liquidGlassView?.glassKind = .clear
         self.liquidGlassView?.tintColorGlass = .clear
         self.liquidGlassView?.refreshGlass(zone: .contextMenu)
     }

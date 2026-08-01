@@ -3,6 +3,7 @@ import UIKit
 import Display
 import ComponentFlow
 import ComponentDisplayAdapters
+import SGSimpleSettings
 import UIKitRuntimeUtils
 import CoreImage
 import AppBundle
@@ -744,9 +745,19 @@ public class GlassBackgroundView: UIView {
                         
                         if isVisible {
                             let glassEffectValue: UIGlassEffect
+                            // MARK: Megram — global "clear glass everywhere" switch. When on,
+                            // every request for `.panel` glass is served as UIGlassEffect(.clear)
+                            // with a soft dim, matching the see-through iOS 26 chrome the user
+                            // wants across the whole app (navigation, input panel, bubbles,
+                            // settings pills — every consumer of GlassBackgroundView reads its
+                            // Kind through this switch). No consumer needs to change.
+                            let megramForceClear = SGSimpleSettings.shared.megramGlobalClearGlass
                             switch tintColor.kind {
                             case .panel:
-                                if isDark {
+                                if megramForceClear {
+                                    glassEffectValue = UIGlassEffect(style: .clear)
+                                    glassEffectValue.tintColor = UIColor(white: 0.0, alpha: isDark ? 0.22 : 0.08)
+                                } else if isDark {
                                     glassEffectValue = UIGlassEffect(style: .regular)
                                     glassEffectValue.tintColor = UIColor(white: 1.0, alpha: 0.025)
                                 } else {
@@ -756,7 +767,11 @@ public class GlassBackgroundView: UIView {
                             case let .custom(style, color):
                                 switch style {
                                 case .default:
-                                    glassEffectValue = UIGlassEffect(style: .regular)
+                                    // The global clear-glass switch also downgrades `.default`
+                                    // custom surfaces: `.regular` composites an opaque wash that
+                                    // reads as fog, so a caller asking for a tinted panel gets
+                                    // the same tint over see-through glass instead.
+                                    glassEffectValue = UIGlassEffect(style: megramForceClear ? .clear : .regular)
                                     glassEffectValue.tintColor = color
                                 case .clear:
                                     glassEffectValue = UIGlassEffect(style: .clear)

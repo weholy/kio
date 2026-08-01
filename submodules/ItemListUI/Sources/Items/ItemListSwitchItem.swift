@@ -36,14 +36,15 @@ public class ItemListSwitchItem: ListViewItem, ItemListItem {
     let disableLeadingInset: Bool
     let maximumNumberOfLines: Int
     let noCorners: Bool
+    let isolatedCard: Bool
     public let sectionId: ItemListSectionId
     let style: ItemListStyle
     let updated: (Bool) -> Void
     let activatedWhileDisabled: () -> Void
     let action: (() -> Void)?
     public let tag: ItemListItemTag?
-    
-    public init(presentationData: ItemListPresentationData, systemStyle: ItemListSystemStyle = .legacy, icon: UIImage? = nil, title: String, text: String? = nil, textColor: TextColor = .primary, titleBadgeComponent: AnyComponent<Empty>? = nil, value: Bool, type: ItemListSwitchItemNodeType = .regular, enableInteractiveChanges: Bool = true, enabled: Bool = true, displayLocked: Bool = false, disableLeadingInset: Bool = false, maximumNumberOfLines: Int = 1, noCorners: Bool = false, sectionId: ItemListSectionId, style: ItemListStyle, updated: @escaping (Bool) -> Void, activatedWhileDisabled: @escaping () -> Void = {}, action: (() -> Void)? = nil, tag: ItemListItemTag? = nil) {
+
+    public init(presentationData: ItemListPresentationData, systemStyle: ItemListSystemStyle = .legacy, icon: UIImage? = nil, title: String, text: String? = nil, textColor: TextColor = .primary, titleBadgeComponent: AnyComponent<Empty>? = nil, value: Bool, type: ItemListSwitchItemNodeType = .regular, enableInteractiveChanges: Bool = true, enabled: Bool = true, displayLocked: Bool = false, disableLeadingInset: Bool = false, maximumNumberOfLines: Int = 1, noCorners: Bool = false, isolatedCard: Bool = false, sectionId: ItemListSectionId, style: ItemListStyle, updated: @escaping (Bool) -> Void, activatedWhileDisabled: @escaping () -> Void = {}, action: (() -> Void)? = nil, tag: ItemListItemTag? = nil) {
         self.presentationData = presentationData
         self.systemStyle = systemStyle
         self.icon = icon
@@ -59,6 +60,7 @@ public class ItemListSwitchItem: ListViewItem, ItemListItem {
         self.disableLeadingInset = disableLeadingInset
         self.maximumNumberOfLines = maximumNumberOfLines
         self.noCorners = noCorners
+        self.isolatedCard = isolatedCard
         self.sectionId = sectionId
         self.style = style
         self.updated = updated
@@ -284,6 +286,9 @@ public class ItemListSwitchItemNode: ListViewItemNode, ItemListItemNode {
             var insets: UIEdgeInsets
             let separatorHeight = UIScreenPixel
             let separatorRightInset: CGFloat = item.systemStyle == .glass ? 16.0 : 0.0
+            // MARK: Nameless
+            let cardSpacing: CGFloat = item.isolatedCard ? 5.0 : 0.0
+            //
             
             let itemBackgroundColor: UIColor
             let itemSeparatorColor: UIColor
@@ -331,7 +336,10 @@ public class ItemListSwitchItemNode: ListViewItemNode, ItemListItemNode {
                 contentSize.height = 52.0
                 topInset += 4.0
             }
-            
+            if item.isolatedCard {
+                topInset += cardSpacing
+            }
+
             var leftInset = 16.0 + params.leftInset
             if let _ = item.icon {
                 leftInset += 43.0
@@ -420,14 +428,20 @@ public class ItemListSwitchItemNode: ListViewItemNode, ItemListItemNode {
                     }
                     
                     if let currentDisabledOverlayNode = currentDisabledOverlayNode {
+                        let disabledOverlayFrame: CGRect
+                        if item.isolatedCard {
+                            disabledOverlayFrame = CGRect(origin: CGPoint(x: 0.0, y: cardSpacing), size: CGSize(width: layout.contentSize.width, height: max(0.0, layout.contentSize.height - cardSpacing * 2.0 - separatorHeight)))
+                        } else {
+                            disabledOverlayFrame = CGRect(origin: CGPoint(), size: CGSize(width: layout.contentSize.width, height: layout.contentSize.height - separatorHeight))
+                        }
                         if currentDisabledOverlayNode != strongSelf.disabledOverlayNode {
                             strongSelf.disabledOverlayNode = currentDisabledOverlayNode
                             strongSelf.insertSubnode(currentDisabledOverlayNode, belowSubnode: strongSelf.switchGestureNode)
                             currentDisabledOverlayNode.alpha = 0.0
                             transition.updateAlpha(node: currentDisabledOverlayNode, alpha: 1.0)
-                            currentDisabledOverlayNode.frame = CGRect(origin: CGPoint(), size: CGSize(width: layout.contentSize.width, height: layout.contentSize.height - separatorHeight))
+                            currentDisabledOverlayNode.frame = disabledOverlayFrame
                         } else {
-                            transition.updateFrame(node: currentDisabledOverlayNode, frame: CGRect(origin: CGPoint(), size: CGSize(width: layout.contentSize.width, height: layout.contentSize.height - separatorHeight)))
+                            transition.updateFrame(node: currentDisabledOverlayNode, frame: disabledOverlayFrame)
                         }
                         currentDisabledOverlayNode.backgroundColor = itemBackgroundColor.withAlphaComponent(0.6)
                     } else if let disabledOverlayNode = strongSelf.disabledOverlayNode {
@@ -505,7 +519,22 @@ public class ItemListSwitchItemNode: ListViewItemNode, ItemListItemNode {
                                     strongSelf.bottomStripeNode.isHidden = hasCorners
                             }
 
-                            let bgFrame = CGRect(origin: CGPoint(x: 0.0, y: -min(insets.top, separatorHeight)), size: CGSize(width: params.width, height: contentSize.height + min(insets.top, separatorHeight) + min(insets.bottom, separatorHeight)))
+                            // MARK: Nameless
+                            if item.isolatedCard {
+                                hasTopCorners = true
+                                hasBottomCorners = true
+                                isMiddleOfSection = false
+                                strongSelf.topStripeNode.isHidden = true
+                                strongSelf.bottomStripeNode.isHidden = true
+                            }
+                            //
+
+                            let bgFrame: CGRect
+                            if item.isolatedCard {
+                                bgFrame = CGRect(origin: CGPoint(x: 0.0, y: cardSpacing), size: CGSize(width: params.width, height: max(0.0, contentSize.height - cardSpacing * 2.0)))
+                            } else {
+                                bgFrame = CGRect(origin: CGPoint(x: 0.0, y: -min(insets.top, separatorHeight)), size: CGSize(width: params.width, height: contentSize.height + min(insets.top, separatorHeight) + min(insets.bottom, separatorHeight)))
+                            }
                             if SGLiquidGlassZone.settings.isEnabled {
                                 strongSelf.backgroundNode.backgroundColor = .clear
                                 NamelessItemListGlass.apply(

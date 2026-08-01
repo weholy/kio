@@ -26,6 +26,7 @@ import UndoUI
 import LottieComponent
 import ButtonComponent
 import ContextUI
+import MGLocalGifts
 
 final class GiftsListView: UIView {
     private let context: AccountContext
@@ -69,6 +70,8 @@ final class GiftsListView: UIView {
             
     private var starsProducts: [ProfileGiftsContext.State.StarGift]?
     private var starsItems: [AnyHashable: (StarGiftReference?, ComponentView<Empty>)] = [:]
+    /// Cards for locally bought gifts, keyed by gift id. Recycled the same way `starsItems` are.
+    private var localGiftViews: [String: UIView] = [:]
 
     private(set) var resultsAreEmpty = false
     private var filteredResultsAreEmpty = false
@@ -761,9 +764,112 @@ final class GiftsListView: UIView {
         for id in removeIds {
             self.starsItems.removeValue(forKey: id)
         }
-        
+
+        // MARK: Megram — locally bought gifts.
+        //
+        // These never existed on the server, so they cannot come through `profileGifts`. They are
+        // drawn after the real ones as their own cards, visually distinct enough that a local gift
+        // is never mistaken for one the sender can actually see.
+        let localPeerId = "\(self.peerId.id._internalGetInt64Value())"
+        let localGifts = MGLocalGiftStore.shared.gifts(forPeerId: localPeerId)
+        var validLocalIds = Set<String>()
+        let localCardHeight: CGFloat = 76.0
+        let localCardSpacing: CGFloat = 10.0
+
+        if !localGifts.isEmpty {
+            var localFrame = CGRect(
+                x: itemsSideInset,
+                y: itemFrame.origin.y + (starsProducts.isEmpty ? 0.0 : starsOptionSize.height + optionSpacing),
+                width: params.size.width - itemsSideInset * 2.0,
+                height: localCardHeight
+            )
+
+            for gift in localGifts {
+                guard let kind = MGLocalGiftCatalog.kind(id: gift.kindId) else {
+                    continue
+                }
+                validLocalIds.insert(gift.id)
+
+                let view: UIView
+                if let current = self.localGiftViews[gift.id] {
+                    view = current
+                } else {
+                    view = UIView()
+                    view.layer.cornerRadius = 20.0
+                    view.layer.cornerCurve = .continuous
+                    view.layer.masksToBounds = true
+
+                    let gradientLayer = CAGradientLayer()
+                    gradientLayer.name = "backdrop"
+                    view.layer.insertSublayer(gradientLayer, at: 0)
+
+                    let emojiLabel = UILabel()
+                    emojiLabel.tag = 201
+                    emojiLabel.font = Font.regular(34.0)
+                    emojiLabel.textAlignment = .center
+                    view.addSubview(emojiLabel)
+
+                    let titleLabel = UILabel()
+                    titleLabel.tag = 202
+                    titleLabel.font = Font.semibold(17.0)
+                    titleLabel.textColor = .white
+                    view.addSubview(titleLabel)
+
+                    let subtitleLabel = UILabel()
+                    subtitleLabel.tag = 203
+                    subtitleLabel.font = Font.regular(13.0)
+                    subtitleLabel.textColor = UIColor(white: 1.0, alpha: 0.75)
+                    view.addSubview(subtitleLabel)
+
+                    self.addSubview(view)
+                    self.localGiftViews[gift.id] = view
+                }
+
+                if let gradientLayer = view.layer.sublayers?.first(where: { $0.name == "backdrop" }) as? CAGradientLayer {
+                    gradientLayer.frame = CGRect(origin: CGPoint(), size: localFrame.size)
+                    gradientLayer.colors = [
+                        UIColor(rgb: kind.backdropTop).cgColor,
+                        UIColor(rgb: kind.backdropBottom).cgColor
+                    ]
+                    gradientLayer.startPoint = CGPoint(x: 0.0, y: 0.0)
+                    gradientLayer.endPoint = CGPoint(x: 1.0, y: 1.0)
+                }
+                if let emojiLabel = view.viewWithTag(201) as? UILabel {
+                    emojiLabel.text = kind.emoji
+                    emojiLabel.frame = CGRect(x: 14.0, y: 18.0, width: 44.0, height: 40.0)
+                }
+                if let titleLabel = view.viewWithTag(202) as? UILabel {
+                    titleLabel.text = kind.title
+                    titleLabel.frame = CGRect(x: 70.0, y: 18.0, width: localFrame.width - 86.0, height: 20.0)
+                }
+                if let subtitleLabel = view.viewWithTag(203) as? UILabel {
+                    if let serial = gift.serial, let supply = kind.supply {
+                        subtitleLabel.text = "\(serial) из \(supply) · только у вас"
+                    } else {
+                        subtitleLabel.text = "\(kind.price) ⭐ · только у вас"
+                    }
+                    subtitleLabel.frame = CGRect(x: 70.0, y: 40.0, width: localFrame.width - 86.0, height: 18.0)
+                }
+
+                transition.setFrame(view: view, frame: localFrame)
+                localFrame.origin.y += localCardHeight + localCardSpacing
+            }
+        }
+
+        var removeLocalIds: [String] = []
+        for (id, view) in self.localGiftViews where !validLocalIds.contains(id) {
+            view.removeFromSuperview()
+            removeLocalIds.append(id)
+        }
+        for id in removeLocalIds {
+            self.localGiftViews.removeValue(forKey: id)
+        }
+
         var contentHeight = ceil(CGFloat(starsProducts.count) / CGFloat(defaultItemsInRow)) * (starsOptionSize.height + optionSpacing) - optionSpacing + topInset + 16.0
-        
+        if !localGifts.isEmpty {
+            contentHeight += CGFloat(localGifts.count) * (localCardHeight + localCardSpacing)
+        }
+
         let size = params.size
         let sideInset = params.sideInset
         let bottomInset = params.bottomInset

@@ -1,0 +1,442 @@
+// @name        Megram Notifications+
+// @version     1.0
+// @author      Megram
+// @description Уведомления о входящих, пока приложение свёрнуто. С настройками, фильтрами и статистикой.
+
+// @readme_start
+// <h2>🔔 Megram Notifications+</h2>
+// <p>Локальные уведомления о входящих сообщениях, пока приложение свёрнуто.
+// Пока Megram открыт — молчит: вы и так всё видите.</p>
+// <h3>Что умеет</h3>
+// <ul>
+//   <li>Пропускает чаты в mute и собственные сообщения</li>
+//   <li>Только активный аккаунт (переключается в настройках)</li>
+//   <li>Не дублирует одно и то же сообщение</li>
+//   <li>Тап по уведомлению открывает нужный чат</li>
+//   <li>Статистика и управление — в настройках nameless</li>
+// </ul>
+// @readme_end
+
+(function () {
+    "use strict";
+
+    var STORAGE_CONFIG = "config_v1";
+    var STORAGE_STATS = "stats_v1";
+    var STORAGE_DEDUP = "dedup_v1";
+
+    var DEFAULT_CONFIG = {
+        enabled: true,
+        skipMutedChats: true,
+        skipSelfMessages: true,
+        onlyActiveAccount: true,
+        sound: true,
+        delay: 1,
+        maxTitleLength: 64,
+        maxBodyLength: 160,
+        dedupTtlMs: 5 * 60 * 1000,
+        dedupMaxItems: 400
+    };
+
+    var config = clone(DEFAULT_CONFIG);
+    var stats = emptyStats();
+    var dedup = {};
+
+    // true  = приложение открыто, уведомления не нужны
+    // false = свёрнуто, уведомления имеют смысл
+    var inForeground = true;
+    var permissionGranted = false;
+
+    function clone(source) {
+        var out = {};
+        for (var key in source) {
+            if (Object.prototype.hasOwnProperty.call(source, key)) {
+                out[key] = source[key];
+            }
+        }
+        return out;
+    }
+
+    function emptyStats() {
+        return {
+            sent: 0,
+            skippedForeground: 0,
+            skippedMuted: 0,
+            skippedOutgoing: 0,
+            skippedOtherAccount: 0,
+            skippedDuplicate: 0,
+            taps: 0
+        };
+    }
+
+    function now() {
+        return Date.now ? Date.now() : new Date().getTime();
+    }
+
+    function isBlank(value) {
+        return value === undefined || value === null || value === "";
+    }
+
+    function text(value, fallback) {
+        if (isBlank(value)) {
+            return fallback || "";
+        }
+        var s = String(value).replace(/^\s+|\s+$/g, "");
+        return s.length > 0 ? s : (fallback || "");
+    }
+
+    function crop(value, maxLength, fallback) {
+        var s = text(value, fallback);
+        if (!maxLength || s.length <= maxLength) {
+            return s;
+        }
+        return s.substring(0, maxLength - 1) + "…";
+    }
+
+    function readJSON(key, fallback) {
+        var raw = mg.getStorage(key);
+        if (!raw) {
+            return fallback;
+        }
+        try {
+            return JSON.parse(raw);
+        } catch (e) {
+            return fallback;
+        }
+    }
+
+    function writeJSON(key, value) {
+        try {
+            mg.setStorage(key, JSON.stringify(value));
+        } catch (e) {
+            mg.log("не удалось сохранить " + key);
+        }
+    }
+
+    function loadState() {
+        var saved = readJSON(STORAGE_CONFIG, null);
+        if (saved) {
+            for (var key in DEFAULT_CONFIG) {
+                if (Object.prototype.hasOwnProperty.call(saved, key)) {
+                    config[key] = saved[key];
+                }
+            }
+        }
+        if (config.delay < 1) {
+            config.delay = 1;
+        }
+
+        var savedStats = readJSON(STORAGE_STATS, null);
+        if (savedStats) {
+            var base = emptyStats();
+            for (var statKey in base) {
+                if (Object.prototype.hasOwnProperty.call(base, statKey)) {
+                    stats[statKey] = savedStats[statKey] || 0;
+                }
+            }
+        }
+
+        dedup = readJSON(STORAGE_DEDUP, {}) || {};
+    }
+
+    function saveConfig() {
+        writeJSON(STORAGE_CONFIG, config);
+    }
+
+    function saveStats() {
+        writeJSON(STORAGE_STATS, stats);
+    }
+
+    function saveDedup() {
+        writeJSON(STORAGE_DEDUP, dedup);
+    }
+
+    // Сначала выкидываем всё, что старше TTL, затем подрезаем самые старые до лимита.
+    // Без этого карта дедупликации растёт бесконечно на активном аккаунте.
+    function pruneDedup() {
+        var current = now();
+        var entries = [];
+
+        for (var key in dedup) {
+            if (!Object.prototype.hasOwnProperty.call(dedup, key)) {
+                continue;
+            }
+            var stamp = dedup[key] || 0;
+            if ((current - stamp) > config.dedupTtlMs) {
+                delete dedup[key];
+            } else {
+                entries.push({ key: key, stamp: stamp });
+            }
+        }
+
+        if (entries.length > config.dedupMaxItems) {
+            entries.sort(function (a, b) { return a.stamp - b.stamp; });
+            var excess = entries.length - config.dedupMaxItems;
+            for (var i = 0; i < excess; i++) {
+                delete dedup[entries[i].key];
+            }
+        }
+    }
+
+    function isDuplicate(message) {
+        pruneDedup();
+        var key = message.peerId + ":" + message.messageId;
+        var stamp = dedup[key];
+        if (stamp && (now() - stamp) < config.dedupTtlMs) {
+            return true;
+        }
+        dedup[key] = now();
+        return false;
+    }
+
+    function skipReason(message) {
+        if (!config.enabled) {
+            return "disabled";
+        }
+        if (inForeground) {
+            stats.skippedForeground++;
+            return "foreground";
+        }
+        if (isBlank(message.peerId) || isBlank(message.messageId)) {
+            return "invalid";
+        }
+        if (config.skipSelfMessages && message.isOutgoing) {
+            stats.skippedOutgoing++;
+            return "outgoing";
+        }
+        if (config.skipMutedChats && message.isMuted) {
+            stats.skippedMuted++;
+            return "muted";
+        }
+        if (config.onlyActiveAccount && !isBlank(message.accountId)) {
+            var active = mg.getAccountId();
+            if (active && String(message.accountId) !== String(active)) {
+                stats.skippedOtherAccount++;
+                return "other_account";
+            }
+        }
+        if (isDuplicate(message)) {
+            stats.skippedDuplicate++;
+            return "duplicate";
+        }
+        return "";
+    }
+
+    // peerId едет внутри идентификатора уведомления, чтобы тап открыл чат
+    // без хранения состояния между запусками.
+    function notificationId(message) {
+        return "mgn|" + encodeURIComponent(message.peerId) + "|" + encodeURIComponent(message.messageId);
+    }
+
+    function peerIdFromNotificationId(value) {
+        var parts = String(value || "").split("|");
+        if (parts.length < 3 || parts[0] !== "mgn") {
+            return "";
+        }
+        try {
+            return decodeURIComponent(parts[1]);
+        } catch (e) {
+            return parts[1];
+        }
+    }
+
+    function buildTitle(message) {
+        var title = text(message.senderName, "");
+        if (!title) {
+            title = text(message.chatName, "");
+        }
+        return crop(title, config.maxTitleLength, "Новое сообщение");
+    }
+
+    function buildBody(message) {
+        var body = text(message.text, "");
+        if (!body && !isBlank(message.mediaType)) {
+            body = "[" + message.mediaType + "]";
+        }
+        return crop(body, config.maxBodyLength, "Новое сообщение");
+    }
+
+    // --- Настройки -------------------------------------------------------------------------
+
+    function renderSettings() {
+        mg.addSettingsRow({
+            id: "mgn_info",
+            title: "🔔 Megram Notifications+",
+            subtitle: "Отправлено: " + stats.sent + " · пропущено в приложении: " + stats.skippedForeground,
+            hookName: "onMGN_info"
+        });
+        mg.addSettingsRow({
+            id: "mgn_toggle",
+            title: config.enabled ? "🟢 Уведомления включены" : "🔴 Уведомления выключены",
+            subtitle: "Тап — переключить",
+            hookName: "onMGN_toggle"
+        });
+        mg.addSettingsRow({
+            id: "mgn_muted",
+            title: config.skipMutedChats ? "🔇 Mute-чаты пропускаются" : "🔊 Mute-чаты уведомляют",
+            subtitle: "Фильтр по isMuted",
+            hookName: "onMGN_muted"
+        });
+        mg.addSettingsRow({
+            id: "mgn_self",
+            title: config.skipSelfMessages ? "↩️ Свои сообщения игнорируются" : "↪️ Свои сообщения уведомляют",
+            subtitle: "Фильтр по isOutgoing",
+            hookName: "onMGN_self"
+        });
+        mg.addSettingsRow({
+            id: "mgn_account",
+            title: config.onlyActiveAccount ? "👤 Только активный аккаунт" : "👥 Все аккаунты",
+            subtitle: "Фильтр по accountId",
+            hookName: "onMGN_account"
+        });
+        mg.addSettingsRow({
+            id: "mgn_sound",
+            title: config.sound ? "🔔 Звук включён" : "🔕 Звук выключен",
+            subtitle: "Звук уведомления",
+            hookName: "onMGN_sound"
+        });
+        mg.addSettingsRow({
+            id: "mgn_pending",
+            title: "📋 Запланированные",
+            subtitle: "Показать ещё не доставленные",
+            hookName: "onMGN_pending"
+        });
+        mg.addSettingsRow({
+            id: "mgn_reset",
+            title: "♻️ Сбросить статистику",
+            subtitle: "Обнулить счётчики",
+            hookName: "onMGN_reset"
+        });
+    }
+
+    function toggle(key, onText, offText) {
+        config[key] = !config[key];
+        saveConfig();
+        renderSettings();
+        mg.toast(config[key] ? onText : offText);
+    }
+
+    // --- Хуки ------------------------------------------------------------------------------
+
+    mg.on("onAppStart", function () {
+        inForeground = true;
+        loadState();
+        renderSettings();
+        mg.notifications.requestPermission(function (granted) {
+            permissionGranted = !!granted;
+            if (!granted) {
+                mg.toast("Megram Notifications+: нет разрешения на уведомления");
+            }
+        });
+    });
+
+    mg.on("onAppForeground", function () {
+        inForeground = true;
+        renderSettings();
+    });
+
+    mg.on("onAppBackground", function () {
+        inForeground = false;
+        saveConfig();
+        saveStats();
+        saveDedup();
+    });
+
+    mg.on("onMessageReceive", function (message) {
+        if (!message || !permissionGranted) {
+            return;
+        }
+        if (skipReason(message)) {
+            return;
+        }
+        mg.notifications.schedule({
+            id: notificationId(message),
+            title: buildTitle(message),
+            body: buildBody(message),
+            delay: config.delay,
+            repeating: false,
+            sound: config.sound
+        });
+        stats.sent++;
+        if (stats.sent % 10 === 0) {
+            saveStats();
+        }
+    });
+
+    mg.on("onNotificationTap", function (notification) {
+        inForeground = true;
+        stats.taps++;
+        saveStats();
+        var peerId = peerIdFromNotificationId(notification && notification.id);
+        if (peerId) {
+            mg.openChat(peerId);
+        }
+    });
+
+    mg.on("onMGN_info", function () {
+        mg.alert(
+            "Megram Notifications+",
+            "Статус: " + (config.enabled ? "включён" : "выключен") + "\n" +
+            "Приложение: " + (inForeground ? "открыто, уведомления молчат" : "свёрнуто, уведомления активны") + "\n" +
+            "Разрешение: " + (permissionGranted ? "получено" : "нет") + "\n\n" +
+            "Отправлено: " + stats.sent + "\n" +
+            "В приложении: " + stats.skippedForeground + "\n" +
+            "Mute: " + stats.skippedMuted + "\n" +
+            "Свои: " + stats.skippedOutgoing + "\n" +
+            "Другой аккаунт: " + stats.skippedOtherAccount + "\n" +
+            "Дубли: " + stats.skippedDuplicate + "\n" +
+            "Тапов: " + stats.taps + "\n\n" +
+            "После полной выгрузки приложения iOS не будит плагин — уведомления приходят, пока Megram жив в памяти."
+        );
+    });
+
+    mg.on("onMGN_toggle", function () {
+        toggle("enabled", "Уведомления включены", "Уведомления выключены");
+    });
+
+    mg.on("onMGN_muted", function () {
+        toggle("skipMutedChats", "Mute-чаты пропускаются", "Mute-чаты уведомляют");
+    });
+
+    mg.on("onMGN_self", function () {
+        toggle("skipSelfMessages", "Свои сообщения игнорируются", "Свои сообщения уведомляют");
+    });
+
+    mg.on("onMGN_account", function () {
+        toggle("onlyActiveAccount", "Только активный аккаунт", "Все аккаунты");
+    });
+
+    mg.on("onMGN_sound", function () {
+        toggle("sound", "Звук включён", "Звук выключен");
+    });
+
+    mg.on("onMGN_pending", function () {
+        mg.notifications.list(function (items) {
+            if (!items || items.length === 0) {
+                mg.alert("Запланированные", "Пусто.");
+                return;
+            }
+            var body = "Всего: " + items.length + "\n\n";
+            var limit = Math.min(items.length, 12);
+            for (var i = 0; i < limit; i++) {
+                body += "• " + text(items[i].title, "Без заголовка") + " — " + text(items[i].body, "") + "\n";
+            }
+            if (items.length > limit) {
+                body += "\n…и ещё " + (items.length - limit);
+            }
+            mg.alert("Запланированные", body);
+        });
+    });
+
+    mg.on("onMGN_reset", function () {
+        stats = emptyStats();
+        dedup = {};
+        saveStats();
+        saveDedup();
+        renderSettings();
+        mg.toast("Статистика сброшена");
+    });
+
+    loadState();
+    renderSettings();
+    mg.log("загружен");
+})();

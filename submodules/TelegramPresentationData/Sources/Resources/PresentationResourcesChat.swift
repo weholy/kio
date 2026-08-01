@@ -4,6 +4,25 @@ import Display
 import TelegramCore
 import AppBundle
 
+// MARK: Nameless — plus icon for the attachment button, drawn in code so we don't need to
+// ship a new asset just to swap the paperclip for a `+`. Matches the paperclip's visual
+// weight (~24pt, 2pt strokes) so the layout doesn't jump.
+public func generateNamelessPlusIcon(color: UIColor) -> UIImage? {
+    return generateImage(CGSize(width: 24.0, height: 24.0), rotatedContext: { size, context in
+        context.clear(CGRect(origin: .zero, size: size))
+        context.setStrokeColor(color.cgColor)
+        context.setLineWidth(2.0)
+        context.setLineCap(.round)
+        let center = CGPoint(x: size.width / 2.0, y: size.height / 2.0)
+        let armLength: CGFloat = 6.5
+        context.move(to: CGPoint(x: center.x - armLength, y: center.y))
+        context.addLine(to: CGPoint(x: center.x + armLength, y: center.y))
+        context.move(to: CGPoint(x: center.x, y: center.y - armLength))
+        context.addLine(to: CGPoint(x: center.x, y: center.y + armLength))
+        context.strokePath()
+    })
+}
+
 private func generateLineImage(color: UIColor) -> UIImage? {
     return generateImage(CGSize(width: 2.0, height: 3.0), contextGenerator: { size, context in
         context.clear(CGRect(origin: CGPoint(), size: size))
@@ -508,7 +527,7 @@ public struct PresentationResourcesChat {
     
     public static func chatInputPanelAttachmentButtonImage(_ theme: PresentationTheme) -> UIImage? {
         return theme.image(PresentationResourceKey.chatInputPanelAttachmentButtonImage.rawValue, { theme in
-            return generateTintedImage(image: UIImage(bundleImageName: "Chat/Input/Text/IconAttachment"), color: .white)?.withRenderingMode(.alwaysTemplate)
+            return generateNamelessPlusIcon(color: .white)?.withRenderingMode(.alwaysTemplate)
         })
     }
     

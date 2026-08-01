@@ -207,7 +207,8 @@ final class PeerInfoListPaneNode: ASDisplayNode, PeerInfoPaneNode {
         
         var topPanelHeight: CGFloat = 0.0
         if let (item, previousItem, nextItem, order, type, _) = self.playlistStateAndType {
-            let panelHeight = MediaNavigationAccessoryHeaderNode.minimizedHeight
+            // MARK: Nameless — profile media pane shows the player as a compact card, not a thin strip
+            let panelHeight = MediaNavigationAccessoryHeaderNode.compactCardHeight
             topPanelHeight = floor(panelHeight * expandProgress)
             let panelFrame = CGRect(origin: CGPoint(x: 0.0, y: topPanelHeight - panelHeight), size: CGSize(width: size.width, height: panelHeight))
             if let (mediaAccessoryPanel, mediaType) = self.mediaAccessoryPanel, mediaType == type {
@@ -254,7 +255,7 @@ final class PeerInfoListPaneNode: ASDisplayNode, PeerInfoPaneNode {
                     })
                 }
                 
-                let mediaAccessoryPanel = MediaNavigationAccessoryPanel(context: self.context, presentationData: self.context.sharedContext.currentPresentationData.with { $0 }, displayBackground: true)
+                let mediaAccessoryPanel = MediaNavigationAccessoryPanel(context: self.context, presentationData: self.context.sharedContext.currentPresentationData.with { $0 }, displayBackground: true, compactCard: true)
                 mediaAccessoryPanel.containerNode.headerNode.displayScrubber = item.playbackData?.type != .instantVideo
                 mediaAccessoryPanel.getController = { [weak self] in
                     return self?.parentController
@@ -463,7 +464,7 @@ final class PeerInfoListPaneNode: ASDisplayNode, PeerInfoPaneNode {
             })
         }
         
-        transition.updateFrame(node: self.mediaAccessoryPanelContainer, frame: CGRect(origin: CGPoint(x: 0.0, y: topInset), size: CGSize(width: size.width, height: MediaNavigationAccessoryHeaderNode.minimizedHeight)))
+        transition.updateFrame(node: self.mediaAccessoryPanelContainer, frame: CGRect(origin: CGPoint(x: 0.0, y: topInset), size: CGSize(width: size.width, height: MediaNavigationAccessoryHeaderNode.compactCardHeight)))
         
         transition.updateFrame(node: self.listNode, frame: CGRect(origin: CGPoint(), size: size))
         let (duration, curve) = listViewAnimationDurationAndCurve(transition: transition)

@@ -62,8 +62,8 @@ private enum NAEntry: ItemListNodeEntry {
                 }
             })
         case .developerLink:
-            return ItemListActionItem(presentationData: presentationData, title: "Разработчик noheya", kind: .generic, alignment: .natural, sectionId: self.section, style: .blocks, action: {
-                if let url = URL(string: "https://t.me/noheya") {
+            return ItemListActionItem(presentationData: presentationData, title: "👑 Разработчик @weholy", kind: .generic, alignment: .natural, sectionId: self.section, style: .blocks, action: {
+                if let url = URL(string: "https://t.me/weholy") {
                     UIApplication.shared.open(url)
                 }
             })
@@ -74,7 +74,7 @@ private enum NAEntry: ItemListNodeEntry {
                 }
             })
         case .infoText:
-            return ItemListTextItem(presentationData: presentationData, text: .plain("nameless — кастомный iOS-клиент Telegram с Liquid Glass, режимом призрака и расширенными функциями."), sectionId: self.section)
+            return ItemListTextItem(presentationData: presentationData, text: .plain("Megram — кастомный iOS-клиент Telegram с Liquid Glass, режимом призрака и расширенными функциями."), sectionId: self.section)
         }
     }
 }

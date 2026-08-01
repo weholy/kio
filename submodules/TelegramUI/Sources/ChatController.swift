@@ -533,7 +533,13 @@ public final class ChatControllerImpl: TelegramBaseController, ChatController, G
     var chatLocationContextHolder: Atomic<ChatLocationContextHolder?>
     
     weak var attachmentController: AttachmentController?
-    
+
+    /// Source picked in the glass attachment menu, consumed by the next `presentAttachmentMenu`
+    /// pass. The menu re-enters the same flow instead of duplicating the ~200 lines that build
+    /// and wire up `AttachmentController`; this flag is what tells the second pass to skip the
+    /// menu and open the picked source directly. Always nil outside that hand-off.
+    var attachmentMenuPendingButton: AttachmentButtonType?
+
     weak var currentImportMessageTooltip: UndoOverlayController?
     
     public var customNavigationBarContentNode: NavigationBarContentNode?

@@ -7,6 +7,8 @@ import Display
 import TelegramPresentationData
 import ComponentFlow
 import LottieComponent
+import SGSimpleSettings
+import GlassBackgroundComponent
 
 enum PeerInfoHeaderButtonKey: Hashable {
     case message
@@ -54,19 +56,26 @@ final class PeerInfoHeaderButtonNode: HighlightableButtonNode {
     
     let backgroundContainerView: UIView
     let backgroundView: UIView
-    
+    // MARK: Nameless — real Liquid Glass fill for the round-button mode. The classic pill
+    // buttons keep their existing tinted-mask fill; only round circles get UIGlassEffect.
+    private let namelessGlassBackgroundView: GlassBackgroundView
+
     init(key: PeerInfoHeaderButtonKey, action: @escaping (PeerInfoHeaderButtonNode, ContextGesture?) -> Void) {
         self.key = key
         self.action = action
-        
+
         self.referenceNode = ContextReferenceContentNode()
         self.containerNode = ContextControllerSourceNode()
         self.containerNode.animateScale = false
-        
+
         self.backgroundContainerView = UIView()
         self.backgroundView = UIView()
         self.backgroundView.backgroundColor = .white
         self.backgroundContainerView.addSubview(self.backgroundView)
+
+        self.namelessGlassBackgroundView = GlassBackgroundView()
+        self.namelessGlassBackgroundView.isUserInteractionEnabled = false
+        self.namelessGlassBackgroundView.isHidden = true
         
         /*self.backgroundNode = NavigationBackgroundNode(color: UIColor(white: 1.0, alpha: 0.2), enableBlur: true, enableSaturation: false)
         self.backgroundNode.isUserInteractionEnabled = false*/
@@ -89,6 +98,8 @@ final class PeerInfoHeaderButtonNode: HighlightableButtonNode {
         
         self.containerNode.addSubnode(self.referenceNode)
         //self.referenceNode.addSubnode(self.backgroundNode)
+        // Glass sits below content so the icon stays visible on top.
+        self.referenceNode.view.addSubview(self.namelessGlassBackgroundView)
         self.referenceNode.addSubnode(self.contentNode)
         self.contentNode.addSubnode(self.iconNode)
         self.addSubnode(self.containerNode)
@@ -258,32 +269,70 @@ final class PeerInfoHeaderButtonNode: HighlightableButtonNode {
             alphaTransition.updateAlpha(node: self.textNode, alpha: isActive ? 1.0 : 0.3)
         }
         
-        self.textNode.attributedText = NSAttributedString(string: text.lowercased(), font: Font.regular(11.0), textColor: .white)
+        // MARK: Nameless — "Круглые вкладки": icon-only circular buttons in profile header
+        let iconOnlyRoundButton = SGSimpleSettings.shared.roundTabs
+
         self.accessibilityLabel = text
-        let titleSize = self.textNode.updateLayout(CGSize(width: 120.0, height: .greatestFiniteMagnitude))
-        
+        let titleSize: CGSize
+        if iconOnlyRoundButton {
+            self.textNode.attributedText = nil
+            titleSize = .zero
+        } else {
+            self.textNode.attributedText = NSAttributedString(string: text.lowercased(), font: Font.regular(11.0), textColor: .white)
+            titleSize = self.textNode.updateLayout(CGSize(width: 120.0, height: .greatestFiniteMagnitude))
+        }
+
         transition.updateFrame(node: self.containerNode, frame: CGRect(origin: CGPoint(), size: size))
         transition.updateFrame(node: self.contentNode, frame: CGRect(origin: CGPoint(x: 0.0, y: size.height * 0.5 * (1.0 - fraction)), size: size))
         transition.updateAlpha(node: self.contentNode, alpha: fraction)
-        
+
         let backgroundY = size.height * (1.0 - fraction)
         let backgroundFrame = CGRect(origin: CGPoint(x: 0.0, y: backgroundY), size: CGSize(width: size.width, height: max(0.0, size.height - backgroundY)))
         //transition.updateFrame(node: self.backgroundNode, frame: backgroundFrame)
         transition.updateFrame(view: self.backgroundView, frame: backgroundFrame)
-        
+
         transition.updateSublayerTransformScale(node: self.contentNode, scale: 1.0 * fraction + 0.001 * (1.0 - fraction))
-        
-        transition.updateCornerRadius(layer: self.backgroundView.layer, cornerRadius: min(16.0, backgroundFrame.height * 0.5))
+
+        if iconOnlyRoundButton {
+            transition.updateCornerRadius(layer: self.backgroundView.layer, cornerRadius: backgroundFrame.height * 0.5)
+            // MARK: Nameless — real UIGlassEffect fill for round buttons. The classic pill
+            // fill (`backgroundView`) gets hidden; on iOS 26 the glass layer replaces it,
+            // on older iOS `GlassBackgroundView` falls back to its own blur so the button
+            // still shows something instead of being empty.
+            self.backgroundView.isHidden = true
+            self.namelessGlassBackgroundView.isHidden = false
+            self.namelessGlassBackgroundView.frame = CGRect(origin: .zero, size: size)
+            // MARK: Megram — round circles use UIGlassEffect(.clear), matching the
+            // reference iOS 26 chrome look (see-through wallpaper behind, only the
+            // rim refraction remains). Older API path still gets its own blur.
+            self.namelessGlassBackgroundView.update(
+                size: size,
+                cornerRadius: size.height * 0.5,
+                isDark: true,
+                tintColor: .init(kind: .clear),
+                isInteractive: false,
+                isVisible: true,
+                transition: .immediate
+            )
+        } else {
+            transition.updateCornerRadius(layer: self.backgroundView.layer, cornerRadius: min(16.0, backgroundFrame.height * 0.5))
+            self.backgroundView.isHidden = false
+            self.namelessGlassBackgroundView.isHidden = true
+        }
         //self.backgroundNode.update(size: backgroundFrame.size, cornerRadius: min(11.0, backgroundFrame.height * 0.5), transition: transition)
         //self.backgroundNode.updateColor(color: backgroundColor, transition: transition)
-        let iconY: CGFloat = 1.0
+        let iconY: CGFloat = iconOnlyRoundButton ? floor((size.height - iconSize.height) / 2.0) : 1.0
         transition.updateFrame(node: self.iconNode, frame: CGRect(origin: CGPoint(x: floor((size.width - iconSize.width) / 2.0), y: iconY), size: iconSize))
         if let animatedIconView = self.animatedIcon?.view {
             transition.updateFrame(view: animatedIconView, frame: CGRect(origin: CGPoint(x: floor((size.width - iconSize.width) / 2.0), y: iconY), size: iconSize))
         }
-        transition.updateAlpha(node: self.textNode, alpha: 1.0)
-        transition.updateFrameAdditiveToCenter(node: self.textNode, frame: CGRect(origin: CGPoint(x: floor((size.width - titleSize.width) / 2.0), y: size.height - titleSize.height - 9.0), size: titleSize))
-        
+        if iconOnlyRoundButton {
+            transition.updateAlpha(node: self.textNode, alpha: 0.0)
+        } else {
+            transition.updateAlpha(node: self.textNode, alpha: 1.0)
+            transition.updateFrameAdditiveToCenter(node: self.textNode, frame: CGRect(origin: CGPoint(x: floor((size.width - titleSize.width) / 2.0), y: size.height - titleSize.height - 9.0), size: titleSize))
+        }
+
         self.referenceNode.frame = self.containerNode.bounds
     }
 }

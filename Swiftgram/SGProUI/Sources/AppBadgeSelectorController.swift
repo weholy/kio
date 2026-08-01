@@ -17,7 +17,8 @@ struct AppBadge: Identifiable, Hashable {
 
 func getAvailableAppBadges() -> [AppBadge] {
     return [
-        .init(displayName: "nameless", assetName: "NamelessAppBadge")
+        .init(displayName: "Megram", assetName: "NamelessAppBadge"),
+        .init(displayName: "Megram Alt", assetName: "MegramAppBadgeAlt")
     ]
 }
     

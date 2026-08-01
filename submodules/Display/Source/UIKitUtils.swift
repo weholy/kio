@@ -26,29 +26,33 @@ public func makeCustomZoomBlurEffect(isLight: Bool) -> UIBlurEffect? {
 
 // MARK: - Official Apple Liquid Glass (UIGlassEffect) — never custom gaussian blur
 
+/// Readability dim layered over clear glass.
+///
+/// `UIGlassEffect(style: .regular)` is *not* what a see-through iOS 26 surface looks like: it
+/// composites a near-opaque wash that turns every panel into flat milky fog and hides the
+/// wallpaper, bubbles and photos behind it. `.clear` keeps the refraction and lets the backdrop
+/// through; the only thing it needs on top is a light dim so label text keeps contrast over a
+/// bright wallpaper. On light appearance the material already lifts the backdrop enough, so no
+/// tint at all is applied there.
+private func liquidGlassDimTint(isDark: Bool) -> UIColor? {
+    return isDark ? UIColor(white: 0.0, alpha: 0.24) : nil
+}
+
 /// Creates official Apple liquid glass as `UIVisualEffectView`.
-/// iOS 26+: `UIGlassEffect(style: .regular)` (true liquid glass).
+/// iOS 26+: `UIGlassEffect(style: .clear)` (true see-through liquid glass).
 /// Older: thin material fallback only (pre-liquid-glass OS).
 public func makeOfficialLiquidGlassEffectView(isDark: Bool = true, interactive: Bool = false) -> UIVisualEffectView {
-    if #available(iOS 26.0, *) {
-        let glass = UIGlassEffect(style: .regular)
-        glass.isInteractive = interactive
-        let view = UIVisualEffectView(effect: glass)
-        view.backgroundColor = .clear
-        return view
-    } else {
-        let style: UIBlurEffect.Style = isDark ? .systemUltraThinMaterialDark : .systemUltraThinMaterialLight
-        let view = UIVisualEffectView(effect: UIBlurEffect(style: style))
-        view.backgroundColor = .clear
-        return view
-    }
+    let view = UIVisualEffectView(effect: makeOfficialLiquidGlassEffect(isDark: isDark, interactive: interactive))
+    view.backgroundColor = .clear
+    return view
 }
 
 /// Official Apple liquid glass effect value for assigning to an existing UIVisualEffectView.
 public func makeOfficialLiquidGlassEffect(isDark: Bool = true, interactive: Bool = false) -> UIVisualEffect {
     if #available(iOS 26.0, *) {
-        let glass = UIGlassEffect(style: .regular)
+        let glass = UIGlassEffect(style: .clear)
         glass.isInteractive = interactive
+        glass.tintColor = liquidGlassDimTint(isDark: isDark)
         return glass
     } else {
         return UIBlurEffect(style: isDark ? .systemUltraThinMaterialDark : .systemUltraThinMaterialLight)

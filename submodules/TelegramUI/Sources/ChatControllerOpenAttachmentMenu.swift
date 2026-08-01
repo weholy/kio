@@ -52,6 +52,11 @@ extension ChatControllerImpl {
         let context = self.context
         let inputIsActive = self.presentationInterfaceState.inputMode == .text
 
+        // Consumed exactly once: this pass either opens the source the glass menu picked, or —
+        // when nothing is pending — offers the menu itself.
+        let pendingMenuButton = self.attachmentMenuPendingButton
+        self.attachmentMenuPendingButton = nil
+
         self.chatDisplayNode.dismissInput()
 
         let canByPassRestrictions = canBypassRestrictions(chatPresentationInterfaceState: self.presentationInterfaceState)
@@ -301,6 +306,18 @@ extension ChatControllerImpl {
                 return
             }
 
+            // MARK: Megram — glass attachment menu. Unless the user already picked a source in
+            // it (or the menu is off / not applicable), "+" opens the source list first and this
+            // pass ends here; the pick re-enters with `attachmentMenuPendingButton` set.
+            let effectiveInitialButton: AttachmentButtonType
+            if let pendingMenuButton, buttons.contains(pendingMenuButton) {
+                effectiveInitialButton = pendingMenuButton
+            } else if strongSelf.presentAttachmentGlassMenu(buttons: buttons, subject: subject) {
+                return
+            } else {
+                effectiveInitialButton = initialButton
+            }
+
             let inputText = strongSelf.presentationInterfaceState.interfaceState.effectiveInputState.inputText
 
             let currentMediaController = Atomic<MediaPickerScreenImpl?>(value: nil)
@@ -310,7 +327,7 @@ extension ChatControllerImpl {
 
             strongSelf.canReadHistory.set(false)
 
-            let attachmentController = AttachmentController(context: strongSelf.context, updatedPresentationData: strongSelf.updatedPresentationData, style: .glass, chatLocation: strongSelf.chatLocation, isScheduledMessages: isScheduledMessages, buttons: buttons, initialButton: initialButton, customEmojiAvailable: strongSelf.presentationInterfaceState.customEmojiAvailable)
+            let attachmentController = AttachmentController(context: strongSelf.context, updatedPresentationData: strongSelf.updatedPresentationData, style: .glass, chatLocation: strongSelf.chatLocation, isScheduledMessages: isScheduledMessages, buttons: buttons, initialButton: effectiveInitialButton, customEmojiAvailable: strongSelf.presentationInterfaceState.customEmojiAvailable)
             attachmentController.attachmentButton = strongSelf.chatDisplayNode.getAttachmentButton()
             attachmentController.shouldMinimizeOnSwipe = { [weak attachmentController] button in
                 if case .app = button {
