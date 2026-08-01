@@ -21,7 +21,9 @@ private final class ChatMessageActionsRowButtonNode: HighlightTrackingButtonNode
     let item: ContextMenuActionItem
 
     private let iconNode: ASImageNode
-    private let titleNode: ImmediateTextNode
+    /// Named `labelNode` rather than `titleNode`: `HighlightTrackingButtonNode` already declares a
+    /// `titleNode`, and a stored property of the same name shadows it instead of overriding it.
+    private let labelNode: ImmediateTextNode
 
     private let performAction: (ContextMenuActionItem) -> Void
 
@@ -35,16 +37,16 @@ private final class ChatMessageActionsRowButtonNode: HighlightTrackingButtonNode
         self.iconNode.isUserInteractionEnabled = false
         self.iconNode.contentMode = .scaleAspectFit
 
-        self.titleNode = ImmediateTextNode()
-        self.titleNode.maximumNumberOfLines = 1
-        self.titleNode.isUserInteractionEnabled = false
-        self.titleNode.displaysAsynchronously = false
-        self.titleNode.textAlignment = .center
+        self.labelNode = ImmediateTextNode()
+        self.labelNode.maximumNumberOfLines = 1
+        self.labelNode.isUserInteractionEnabled = false
+        self.labelNode.displaysAsynchronously = false
+        self.labelNode.textAlignment = .center
 
         super.init()
 
         self.addSubnode(self.iconNode)
-        self.addSubnode(self.titleNode)
+        self.addSubnode(self.labelNode)
 
         self.updateTheme(presentationData: presentationData)
 
@@ -54,7 +56,7 @@ private final class ChatMessageActionsRowButtonNode: HighlightTrackingButtonNode
             }
             let alpha: CGFloat = highlighted ? 0.4 : 1.0
             self.iconNode.alpha = alpha
-            self.titleNode.alpha = alpha
+            self.labelNode.alpha = alpha
         }
         self.addTarget(self, action: #selector(self.pressed), forControlEvents: .touchUpInside)
     }
@@ -74,7 +76,7 @@ private final class ChatMessageActionsRowButtonNode: HighlightTrackingButtonNode
             color = presentationData.theme.contextMenu.primaryColor
         }
 
-        self.titleNode.attributedText = NSAttributedString(string: self.item.text, font: actionRowTitleFont, textColor: color)
+        self.labelNode.attributedText = NSAttributedString(string: self.item.text, font: actionRowTitleFont, textColor: color)
         // Menu icons ship as templates tinted at draw time, so the row tints them the same way
         // the list rows do — including the red for a destructive action.
         self.iconNode.image = self.item.icon(presentationData.theme).flatMap { image in
@@ -86,7 +88,7 @@ private final class ChatMessageActionsRowButtonNode: HighlightTrackingButtonNode
     func updateLayout(size: CGSize) {
         let iconSize = CGSize(width: 24.0, height: 24.0)
         let spacing: CGFloat = 6.0
-        let titleSize = self.titleNode.updateLayout(CGSize(width: size.width - 4.0, height: 100.0))
+        let titleSize = self.labelNode.updateLayout(CGSize(width: size.width - 4.0, height: 100.0))
 
         let contentHeight = iconSize.height + spacing + titleSize.height
         let contentTop = floorToScreenPixels((size.height - contentHeight) / 2.0)
@@ -95,7 +97,7 @@ private final class ChatMessageActionsRowButtonNode: HighlightTrackingButtonNode
             origin: CGPoint(x: floorToScreenPixels((size.width - iconSize.width) / 2.0), y: contentTop),
             size: iconSize
         )
-        self.titleNode.frame = CGRect(
+        self.labelNode.frame = CGRect(
             origin: CGPoint(x: floorToScreenPixels((size.width - titleSize.width) / 2.0), y: contentTop + iconSize.height + spacing),
             size: titleSize
         )
@@ -103,7 +105,7 @@ private final class ChatMessageActionsRowButtonNode: HighlightTrackingButtonNode
 
     /// Widest this button wants to be — used to size the row so no label is clipped.
     func intrinsicWidth() -> CGFloat {
-        let titleSize = self.titleNode.updateLayout(CGSize(width: 200.0, height: 100.0))
+        let titleSize = self.labelNode.updateLayout(CGSize(width: 200.0, height: 100.0))
         return max(64.0, titleSize.width + 16.0)
     }
 }
