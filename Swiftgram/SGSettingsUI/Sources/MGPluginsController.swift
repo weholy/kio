@@ -11,16 +11,17 @@ import MGPluginKit
 
 // MARK: - Plugins screen
 //
-// Lists what the user installed and nothing else: built-in plugins are part of the client and
-// never appear here. "+" opens the system file browser; a plugin can also arrive by tapping a
-// `.plugin` file in a chat, which routes to the same installer.
+// Deliberately just an inventory: name, author, description, on/off, remove. A plugin's own
+// controls live inside the plugin, not here — this screen answers "what is installed and is it
+// running", and nothing else.
+//
+// Built-in plugins are part of the client and never appear. "+" opens the system file browser; a
+// plugin can also arrive by tapping a `.plugin` file in a chat, which routes to the same installer.
 
 private enum MGPluginsEntry: ItemListNodeEntry {
     case empty(id: Int, text: String)
     case pluginSwitch(id: Int, section: Int, name: String, detail: String?, isEnabled: Bool, pluginId: String)
     case pluginRemove(id: Int, section: Int, pluginId: String)
-    case rowsHeader(id: Int, text: String)
-    case pluginRow(id: Int, title: String, subtitle: String, row: MGPluginSettingsRow)
 
     var section: ItemListSectionId {
         switch self {
@@ -28,10 +29,6 @@ private enum MGPluginsEntry: ItemListNodeEntry {
             return 0
         case let .pluginSwitch(_, section, _, _, _, _), let .pluginRemove(_, section, _):
             return ItemListSectionId(section)
-        case .rowsHeader, .pluginRow:
-            // Contributed rows always sit in their own trailing section, whatever the plugin
-            // count, so adding a plugin never renumbers them.
-            return 1000
         }
     }
 
@@ -39,9 +36,7 @@ private enum MGPluginsEntry: ItemListNodeEntry {
         switch self {
         case let .empty(id, _),
              let .pluginSwitch(id, _, _, _, _, _),
-             let .pluginRemove(id, _, _),
-             let .rowsHeader(id, _),
-             let .pluginRow(id, _, _, _):
+             let .pluginRemove(id, _, _):
             return id
         }
     }
@@ -58,10 +53,6 @@ private enum MGPluginsEntry: ItemListNodeEntry {
             return a == b && s1 == s2 && n1 == n2 && d1 == d2 && e1 == e2 && p1 == p2
         case let (.pluginRemove(a, s1, p1), .pluginRemove(b, s2, p2)):
             return a == b && s1 == s2 && p1 == p2
-        case let (.rowsHeader(a, t1), .rowsHeader(b, t2)):
-            return a == b && t1 == t2
-        case let (.pluginRow(a, t1, s1, r1), .pluginRow(b, t2, s2, r2)):
-            return a == b && t1 == t2 && s1 == s2 && r1 == r2
         default:
             return false
         }
@@ -98,22 +89,6 @@ private enum MGPluginsEntry: ItemListNodeEntry {
                     arguments.remove(pluginId)
                 }
             )
-        case let .rowsHeader(_, text):
-            return ItemListSectionHeaderItem(presentationData: presentationData, text: text, sectionId: self.section)
-        case let .pluginRow(_, title, subtitle, row):
-            return ItemListDisclosureItem(
-                presentationData: presentationData,
-                systemStyle: .glass,
-                title: title,
-                label: subtitle,
-                labelStyle: .detailText,
-                sectionId: self.section,
-                style: .blocks,
-                disclosureStyle: .none,
-                action: {
-                    arguments.performRow(row)
-                }
-            )
         }
     }
 }
@@ -121,20 +96,14 @@ private enum MGPluginsEntry: ItemListNodeEntry {
 private final class MGPluginsArguments {
     let setEnabled: (String, Bool) -> Void
     let remove: (String) -> Void
-    let performRow: (MGPluginSettingsRow) -> Void
 
-    init(
-        setEnabled: @escaping (String, Bool) -> Void,
-        remove: @escaping (String) -> Void,
-        performRow: @escaping (MGPluginSettingsRow) -> Void
-    ) {
+    init(setEnabled: @escaping (String, Bool) -> Void, remove: @escaping (String) -> Void) {
         self.setEnabled = setEnabled
         self.remove = remove
-        self.performRow = performRow
     }
 }
 
-private func mgPluginsEntries(plugins: [MGInstalledPlugin], rows: [MGPluginSettingsRow]) -> [MGPluginsEntry] {
+private func mgPluginsEntries(plugins: [MGInstalledPlugin]) -> [MGPluginsEntry] {
     var entries: [MGPluginsEntry] = []
     var id = 0
 
@@ -169,16 +138,6 @@ private func mgPluginsEntries(plugins: [MGInstalledPlugin], rows: [MGPluginSetti
         id += 1
         entries.append(.pluginRemove(id: id, section: section, pluginId: plugin.id))
         id += 1
-    }
-
-    // Rows the plugins themselves contributed via `mg.addSettingsRow`.
-    if !rows.isEmpty {
-        entries.append(.rowsHeader(id: id, text: "НАСТРОЙКИ ПЛАГИНОВ"))
-        id += 1
-        for row in rows {
-            entries.append(.pluginRow(id: id, title: row.title, subtitle: row.subtitle, row: row))
-            id += 1
-        }
     }
 
     return entries
@@ -222,12 +181,6 @@ public func mgPluginsController(context: AccountContext) -> ViewController {
         },
         remove: { pluginId in
             MGPluginManager.shared.remove(pluginId: pluginId)
-            reloadPromise.set(true)
-        },
-        performRow: { row in
-            // The plugin usually rewrites its own rows in response, which posts
-            // `.megramPluginsDidChange` and refreshes this list.
-            MGPluginManager.shared.performSettingsRow(row)
             reloadPromise.set(true)
         }
     )
@@ -289,13 +242,12 @@ public func mgPluginsController(context: AccountContext) -> ViewController {
     }
 
     let pluginsSignal = combineLatest(reloadPromise.get(), externalChanges)
-    |> map { _, _ -> ([MGInstalledPlugin], [MGPluginSettingsRow]) in
-        return (MGPluginManager.shared.visiblePlugins(), MGPluginManager.shared.settingsRows())
+    |> map { _, _ -> [MGInstalledPlugin] in
+        return MGPluginManager.shared.visiblePlugins()
     }
 
     let signal = combineLatest(pluginsSignal, context.sharedContext.presentationData)
-    |> map { pluginsAndRows, presentationData -> (ItemListControllerState, (ItemListNodeState, MGPluginsArguments)) in
-        let (plugins, rows) = pluginsAndRows
+    |> map { plugins, presentationData -> (ItemListControllerState, (ItemListNodeState, MGPluginsArguments)) in
         let controllerState = ItemListControllerState(
             presentationData: ItemListPresentationData(presentationData),
             title: .text("Плагины"),
@@ -312,7 +264,7 @@ public func mgPluginsController(context: AccountContext) -> ViewController {
         )
         let listState = ItemListNodeState(
             presentationData: ItemListPresentationData(presentationData),
-            entries: mgPluginsEntries(plugins: plugins, rows: rows),
+            entries: mgPluginsEntries(plugins: plugins),
             style: .blocks,
             ensureVisibleItemTag: nil,
             initialScrollToItem: nil

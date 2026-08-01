@@ -720,9 +720,8 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
     // bar), the top search input (only the bottom one is kept), and the Export / Import /
     // Reset actions from the hub root per user request.
     if !searching, state.hubCategory == nil {
-        // MARK: Nameless — quick account switcher right in the hub root. One tap → action
-        // sheet with every logged-in account, another tap → switched.
-        entries.append(.disclosureDetail(id: id.count, section: .hero, link: .accountSwitcher, text: "🔁 Переключить аккаунт", detail: "Быстрое переключение между аккаунтами"))
+        // The quick account switcher used to sit here. Telegram's own switcher is one tap away in
+        // the settings header, so a second one only made the hub root longer.
         for cat in NLHubCategory.rootCategories {
             entries.append(.disclosureDetail(
                 id: id.count,
