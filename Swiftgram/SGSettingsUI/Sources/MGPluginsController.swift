@@ -265,7 +265,8 @@ public func mgPluginsController(context: AccountContext) -> ViewController {
         // `.mgplugin` have no registered UTI, so a filtered picker would grey out exactly the
         // files the user came for. The installer validates and explains instead.
         let picker = UIDocumentPickerViewController(forOpeningContentTypes: [.item], asCopy: true)
-        picker.delegate = MGPluginDocumentPickerDelegate(onPick: install)
+        let delegate = MGPluginDocumentPickerDelegate(onPick: install)
+        picker.delegate = delegate
         picker.allowsMultipleSelection = false
         presentPickerImpl?(picker)
     }
