@@ -371,7 +371,7 @@ public final class AuthorizationSequencePhoneEntryController: ViewController, MF
             let minimumRequiredMegramVersion = "12.9"
             let currentVersion = (Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String) ?? ""
             if namelessIsVersionOlder(currentVersion, than: minimumRequiredMegramVersion) {
-                let title = "Обновите MEGRAM"
+                let title = "Обновите Megram"
                 let text = "Данная версия устарела. Скачайте новейшую версию в нашем канале, чтобы пользоваться клиентом."
                 let alert = UIAlertController(title: title, message: text, preferredStyle: .alert)
                 alert.addAction(UIAlertAction(title: "Открыть канал", style: .default, handler: { _ in

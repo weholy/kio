@@ -1696,7 +1696,7 @@ public func luxGramSettingsController(context: AccountContext) -> ViewController
         SGSimpleSettings.shared.currentAccountPeerId = "\(context.account.peerId.id._internalGetInt64Value())"
         let controllerState = ItemListControllerState(
             presentationData: ItemListPresentationData(presentationData),
-            title: .text("nameless"),
+            title: .text("Megram"),
             leftNavigationButton: nil,
             rightNavigationButton: nil,
             backNavigationButton: ItemListBackButton(title: presentationData.strings.Common_Back)

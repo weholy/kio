@@ -14,7 +14,7 @@ public enum MGLocalGiftPurchaseError: LocalizedError {
     public var errorDescription: String? {
         switch self {
         case .walletDisabled:
-            return "Локальные звёзды выключены. Включите их в настройках nameless."
+            return "Локальные звёзды выключены. Включите их в настройках Megram."
         case let .insufficientBalance(price, balance):
             return "Не хватает звёзд: нужно \(price), на балансе \(balance)."
         case .unknownKind:

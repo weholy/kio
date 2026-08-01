@@ -74,7 +74,7 @@ private enum NAEntry: ItemListNodeEntry {
                 }
             })
         case .infoText:
-            return ItemListTextItem(presentationData: presentationData, text: .plain("MEGRAM — кастомный iOS-клиент Telegram с Liquid Glass, режимом призрака и расширенными функциями."), sectionId: self.section)
+            return ItemListTextItem(presentationData: presentationData, text: .plain("Megram — кастомный iOS-клиент Telegram с Liquid Glass, режимом призрака и расширенными функциями."), sectionId: self.section)
         }
     }
 }

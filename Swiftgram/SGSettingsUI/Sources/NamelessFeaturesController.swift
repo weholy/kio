@@ -1735,7 +1735,7 @@ private func namelessFeaturesControllerImpl(context: AccountContext, initialCate
     |> map { _, state, presentationData -> (ItemListControllerState, (ItemListNodeState, NLArguments)) in
         let entries = nlBuildEntries(presentationData: presentationData, state: state, simpleUpdated: true)
         let title = state.hubCategory?.titleRu ?? ""
-        let cs = ItemListControllerState(presentationData: ItemListPresentationData(presentationData), title: .text(title.isEmpty ? "MEGRAM" : title), leftNavigationButton: nil, rightNavigationButton: nil, backNavigationButton: ItemListBackButton(title: presentationData.strings.Common_Back))
+        let cs = ItemListControllerState(presentationData: ItemListPresentationData(presentationData), title: .text(title.isEmpty ? "Megram" : title), leftNavigationButton: nil, rightNavigationButton: nil, backNavigationButton: ItemListBackButton(title: presentationData.strings.Common_Back))
         let ls = ItemListNodeState(presentationData: ItemListPresentationData(presentationData), entries: entries, style: .blocks)
         return (cs, (ls, arguments))
     }
