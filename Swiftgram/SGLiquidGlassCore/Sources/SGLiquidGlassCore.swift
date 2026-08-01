@@ -133,7 +133,11 @@ public final class SGLiquidGlassCoordinator {
 
     private var observers: [ObjectIdentifier: Observer] = [:]
     private var notificationObserver: NSObjectProtocol?
-    private let queue = DispatchQueue(label: "nameless.liquidglass.coordinator")
+    /// Registration happens from node initialisers, which ASDisplayKit may run off the main
+    /// thread, so the table still needs guarding — but with a lock rather than a serial queue.
+    /// `DispatchQueue.sync` costs a thread hop on every register/unregister, and surfaces come and
+    /// go constantly while a chat scrolls; an uncontended `NSLock` is orders of magnitude cheaper.
+    private let lock = NSLock()
 
     private init() {
         self.notificationObserver = NotificationCenter.default.addObserver(
@@ -149,17 +153,25 @@ public final class SGLiquidGlassCoordinator {
 
     public func register(node: AnyObject, zone: SGLiquidGlassZone) {
         let id = ObjectIdentifier(node)
-        queue.sync { self.observers[id] = Observer(node: node, zone: zone) }
+        self.lock.lock()
+        self.observers[id] = Observer(node: node, zone: zone)
+        self.lock.unlock()
     }
 
     public func unregister(node: AnyObject) {
         let id = ObjectIdentifier(node)
-        queue.sync { _ = self.observers.removeValue(forKey: id) }
+        self.lock.lock()
+        self.observers.removeValue(forKey: id)
+        self.lock.unlock()
     }
 
     public func refreshAll() {
-        var snapshot: [Observer] = []
-        queue.sync { snapshot = Array(self.observers.values) }
+        self.lock.lock()
+        // Deregistered surfaces leave nil entries behind; drop them here rather than growing the
+        // table forever, since nothing else ever walks it.
+        self.observers = self.observers.filter { $0.value.node != nil }
+        let snapshot = Array(self.observers.values)
+        self.lock.unlock()
         for obs in snapshot {
             if let n = obs.node as? SGLiquidGlassContainer {
                 n.refreshGlass(zone: obs.zone)

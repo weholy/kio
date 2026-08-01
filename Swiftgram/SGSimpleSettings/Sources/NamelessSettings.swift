@@ -417,7 +417,17 @@ public extension SGSimpleSettings {
     var disableScreenshotDetection: Bool { get { storage.namelessBool(NamelessSettingsKey.disableScreenshotDetection) } set { storage.set(newValue, forKey: NamelessSettingsKey.disableScreenshotDetection) } }
     var disableSecretChatBlurOnScreenshot: Bool { get { storage.namelessBool(NamelessSettingsKey.disableSecretChatBlurOnScreenshot) } set { storage.set(newValue, forKey: NamelessSettingsKey.disableSecretChatBlurOnScreenshot) } }
     var enableLocalPremium: Bool { get { storage.namelessBool(NamelessSettingsKey.enableLocalPremium, default: true) } set { storage.set(newValue, forKey: NamelessSettingsKey.enableLocalPremium) } }
-    var liquidGlassEnabled: Bool { get { storage.namelessBool(NamelessSettingsKey.liquidGlassEnabled, default: true) } set { storage.set(newValue, forKey: NamelessSettingsKey.liquidGlassEnabled) } }
+    /// Apple liquid glass on every surface. Mutually exclusive with `blurInsteadGlass`, which is
+    /// literally the request to render those surfaces with a plain blur instead.
+    var liquidGlassEnabled: Bool {
+        get { storage.namelessBool(NamelessSettingsKey.liquidGlassEnabled, default: true) }
+        set {
+            storage.set(newValue, forKey: NamelessSettingsKey.liquidGlassEnabled)
+            if newValue {
+                storage.set(false, forKey: NamelessSettingsKey.blurInsteadGlass)
+            }
+        }
+    }
     var disableCompactNumbers: Bool { get { storage.namelessBool(NamelessSettingsKey.disableCompactNumbers) } set { storage.set(newValue, forKey: NamelessSettingsKey.disableCompactNumbers) } }
     var disableZalgoText: Bool { get { storage.namelessBool(NamelessSettingsKey.disableZalgoText) } set { storage.set(newValue, forKey: NamelessSettingsKey.disableZalgoText) } }
     var chatExportEnabled: Bool { get { storage.namelessBool(NamelessSettingsKey.chatExportEnabled) } set { storage.set(newValue, forKey: NamelessSettingsKey.chatExportEnabled) } }
@@ -556,7 +566,17 @@ public extension SGSimpleSettings {
     var onlineStatusRecordingIntervalMinutes: Int32 { get { storage.namelessInt32(NamelessSettingsKey.onlineStatusRecordingIntervalMinutes, default: 10) } set { storage.set(Int(newValue), forKey: NamelessSettingsKey.onlineStatusRecordingIntervalMinutes) } }
     var ghostModeMessageSendDelaySeconds: Int32 { get { storage.namelessInt32(NamelessSettingsKey.ghostModeMessageSendDelaySeconds) } set { storage.set(Int(newValue), forKey: NamelessSettingsKey.ghostModeMessageSendDelaySeconds) } }
     /// Master ghost mode toggle. Individual switches retain their own values.
-    var ghostModeEnabled: Bool { get { storage.namelessBool(NamelessSettingsKey.ghostModeEnabled) } set { storage.set(newValue, forKey: NamelessSettingsKey.ghostModeEnabled) } }
+    /// Ghost mode hides the online status. Mutually exclusive with `ghostModeAlwaysOnline`, which
+    /// forces the opposite — with both on, whichever wrote last silently won.
+    var ghostModeEnabled: Bool {
+        get { storage.namelessBool(NamelessSettingsKey.ghostModeEnabled) }
+        set {
+            storage.set(newValue, forKey: NamelessSettingsKey.ghostModeEnabled)
+            if newValue {
+                storage.set(false, forKey: NamelessSettingsKey.ghostModeAlwaysOnline)
+            }
+        }
+    }
 
     /// Whether at least one Lead-compatible Ghost Mode subfeature is selected.
     var hasGhostModeSubfeatureEnabled: Bool {
@@ -572,7 +592,15 @@ public extension SGSimpleSettings {
     var ghostModeAutoCleanHistory: Bool { get { storage.namelessBool(NamelessSettingsKey.ghostModeAutoCleanHistory) } set { storage.set(newValue, forKey: NamelessSettingsKey.ghostModeAutoCleanHistory) } }
     var ghostModeAutoCleanDays: Int32 { get { storage.namelessInt32(NamelessSettingsKey.ghostModeAutoCleanDays, default: 30) } set { storage.set(Int(newValue), forKey: NamelessSettingsKey.ghostModeAutoCleanDays) } }
     /// Always show online status (overrides disableOnlineStatus)
-    var ghostModeAlwaysOnline: Bool { get { storage.namelessBool(NamelessSettingsKey.ghostModeAlwaysOnline) } set { storage.set(newValue, forKey: NamelessSettingsKey.ghostModeAlwaysOnline) } }
+    var ghostModeAlwaysOnline: Bool {
+        get { storage.namelessBool(NamelessSettingsKey.ghostModeAlwaysOnline) }
+        set {
+            storage.set(newValue, forKey: NamelessSettingsKey.ghostModeAlwaysOnline)
+            if newValue {
+                storage.set(false, forKey: NamelessSettingsKey.ghostModeEnabled)
+            }
+        }
+    }
 
     /// Changes only the Ghost Mode master switch, preserving individual feature choices.
     func applyGhostModeAll(enabled: Bool) {
@@ -644,7 +672,15 @@ public extension SGSimpleSettings {
     var newChatList: Bool { get { storage.namelessBool(NamelessSettingsKey.newChatList) } set { storage.set(newValue, forKey: NamelessSettingsKey.newChatList) } }
     var newChatHeader: Bool { get { storage.namelessBool(NamelessSettingsKey.newChatHeader) } set { storage.set(newValue, forKey: NamelessSettingsKey.newChatHeader) } }
     // Default OFF — official liquid glass, not custom blur
-    var blurInsteadGlass: Bool { get { storage.namelessBool(NamelessSettingsKey.blurInsteadGlass, default: false) } set { storage.set(newValue, forKey: NamelessSettingsKey.blurInsteadGlass) } }
+    var blurInsteadGlass: Bool {
+        get { storage.namelessBool(NamelessSettingsKey.blurInsteadGlass, default: false) }
+        set {
+            storage.set(newValue, forKey: NamelessSettingsKey.blurInsteadGlass)
+            if newValue {
+                storage.set(false, forKey: NamelessSettingsKey.liquidGlassEnabled)
+            }
+        }
+    }
     var oledMode: Bool { get { storage.namelessBool(NamelessSettingsKey.oledMode) } set { storage.set(newValue, forKey: NamelessSettingsKey.oledMode) } }
     var customSettingsIcons: Bool { get { storage.namelessBool(NamelessSettingsKey.customSettingsIcons) } set { storage.set(newValue, forKey: NamelessSettingsKey.customSettingsIcons) } }
     var telegramAppIcons: Bool { get { storage.namelessBool(NamelessSettingsKey.telegramAppIcons, default: true) } set { storage.set(newValue, forKey: NamelessSettingsKey.telegramAppIcons) } }
@@ -664,8 +700,26 @@ public extension SGSimpleSettings {
     var musicAlbumBlur: Bool { get { storage.namelessBool(NamelessSettingsKey.musicAlbumBlur, default: true) } set { storage.set(newValue, forKey: NamelessSettingsKey.musicAlbumBlur) } }
     var musicPlayerEffect: Bool { get { storage.namelessBool(NamelessSettingsKey.musicPlayerEffect, default: true) } set { storage.set(newValue, forKey: NamelessSettingsKey.musicPlayerEffect) } }
     var messageOutline: Bool { get { storage.namelessBool(NamelessSettingsKey.messageOutline) } set { storage.set(newValue, forKey: NamelessSettingsKey.messageOutline) } }
-    var messageTransparent: Bool { get { storage.namelessBool(NamelessSettingsKey.messageTransparent) } set { storage.set(newValue, forKey: NamelessSettingsKey.messageTransparent) } }
-    var messageSemiTransparent: Bool { get { storage.namelessBool(NamelessSettingsKey.messageSemiTransparent) } set { storage.set(newValue, forKey: NamelessSettingsKey.messageSemiTransparent) } }
+    /// Fully transparent bubbles. Mutually exclusive with `messageSemiTransparent` — both set the
+    /// same alpha, and with both on the semi-transparent value was silently ignored.
+    var messageTransparent: Bool {
+        get { storage.namelessBool(NamelessSettingsKey.messageTransparent) }
+        set {
+            storage.set(newValue, forKey: NamelessSettingsKey.messageTransparent)
+            if newValue {
+                storage.set(false, forKey: NamelessSettingsKey.messageSemiTransparent)
+            }
+        }
+    }
+    var messageSemiTransparent: Bool {
+        get { storage.namelessBool(NamelessSettingsKey.messageSemiTransparent) }
+        set {
+            storage.set(newValue, forKey: NamelessSettingsKey.messageSemiTransparent)
+            if newValue {
+                storage.set(false, forKey: NamelessSettingsKey.messageTransparent)
+            }
+        }
+    }
     var messageBlurEffect: Bool { get { storage.namelessBool(NamelessSettingsKey.messageBlurEffect) } set { storage.set(newValue, forKey: NamelessSettingsKey.messageBlurEffect) } }
     var particleEffectEnabled: Bool { get { storage.namelessBool(NamelessSettingsKey.particleEffectEnabled) } set { storage.set(newValue, forKey: NamelessSettingsKey.particleEffectEnabled) } }
     var particleEffectSpeed: Double { get { storage.namelessDouble(NamelessSettingsKey.particleEffectSpeed, default: 0.5) } set { storage.set(newValue, forKey: NamelessSettingsKey.particleEffectSpeed) } }
@@ -712,11 +766,36 @@ public extension SGSimpleSettings {
     // MARK: Camera
     var cameraDefaultBack: Bool { get { storage.namelessBool(NamelessSettingsKey.defaultCameraBack) } set { storage.set(newValue, forKey: NamelessSettingsKey.defaultCameraBack) } }
     var cameraUseDeviceMicrophone: Bool { get { storage.namelessBool(NamelessSettingsKey.useDeviceMicrophone) } set { storage.set(newValue, forKey: NamelessSettingsKey.useDeviceMicrophone) } }
-    var cameraSendHDPhoto: Bool { get { storage.namelessBool(NamelessSettingsKey.sendHDPhoto) } set { storage.set(newValue, forKey: NamelessSettingsKey.sendHDPhoto) } }
+    // MARK: Mutually exclusive switches
+    //
+    // Two switches that answer the same question must never both be on. The rule lives in the
+    // setters rather than in the settings screen, so it holds no matter who writes the value —
+    // a settings row, a plugin, an import, a migration. Each branch only clears when the new
+    // value is `true`, so the cascade terminates after one step and can never recurse.
+
+    /// Send camera photos in HD. Mutually exclusive with `cameraAlwaysSendHD`.
+    var cameraSendHDPhoto: Bool {
+        get { storage.namelessBool(NamelessSettingsKey.sendHDPhoto) }
+        set {
+            storage.set(newValue, forKey: NamelessSettingsKey.sendHDPhoto)
+            if newValue {
+                storage.set(false, forKey: NamelessSettingsKey.alwaysSendHD)
+            }
+        }
+    }
     var cameraJpegQuality: Int32 { get { storage.namelessInt32(NamelessSettingsKey.jpegQuality, default: 70) } set { storage.set(Int(newValue), forKey: NamelessSettingsKey.jpegQuality) } }
     var cameraRememberLast: Bool { get { storage.namelessBool(NamelessSettingsKey.rememberLastCamera) } set { storage.set(newValue, forKey: NamelessSettingsKey.rememberLastCamera) } }
     var cameraStaticZoom: Bool { get { storage.namelessBool(NamelessSettingsKey.staticZoomRecording) } set { storage.set(newValue, forKey: NamelessSettingsKey.staticZoomRecording) } }
-    var cameraAlwaysSendHD: Bool { get { storage.namelessBool(NamelessSettingsKey.alwaysSendHD, default: true) } set { storage.set(newValue, forKey: NamelessSettingsKey.alwaysSendHD) } }
+    /// Always send in HD, regardless of source. Mutually exclusive with `cameraSendHDPhoto`.
+    var cameraAlwaysSendHD: Bool {
+        get { storage.namelessBool(NamelessSettingsKey.alwaysSendHD, default: true) }
+        set {
+            storage.set(newValue, forKey: NamelessSettingsKey.alwaysSendHD)
+            if newValue {
+                storage.set(false, forKey: NamelessSettingsKey.sendHDPhoto)
+            }
+        }
+    }
     // MARK: Info
     var showIdAndDC: Bool { get { storage.namelessBool(NamelessSettingsKey.showIdAndDC, default: true) } set { storage.set(newValue, forKey: NamelessSettingsKey.showIdAndDC) } }
     var showSeconds: Bool { get { storage.namelessBool(NamelessSettingsKey.showSeconds, default: true) } set { storage.set(newValue, forKey: NamelessSettingsKey.showSeconds) } }
