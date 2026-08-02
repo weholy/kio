@@ -16,12 +16,9 @@ import UniversalMediaPlayer
 /// two lines of text reads worse than the plain strip it replaces, so the
 /// caller falls back to that instead.
 final class MegramTrackCardView: UIView {
-    /// The cover appears twice: stretched and blurred as the backdrop, and
-    /// sharp as a small square on the left. Both are fed by the same signal, so
-    /// the artwork is fetched once.
-    private let backdropNode: TransformImageNode
+    /// The cover is a thumbnail on the left and nothing else — the card behind
+    /// it is a plain dark panel.
     private let coverNode: TransformImageNode
-    private let blurView: UIVisualEffectView
     private let scrimView = UIView()
     private let titleLabel = UILabel()
     private let artistLabel = UILabel()
@@ -37,9 +34,7 @@ final class MegramTrackCardView: UIView {
     }
 
     override init(frame: CGRect) {
-        self.backdropNode = TransformImageNode()
         self.coverNode = TransformImageNode()
-        self.blurView = UIVisualEffectView(effect: UIBlurEffect(style: .systemThinMaterialDark))
 
         super.init(frame: frame)
 
@@ -49,14 +44,13 @@ final class MegramTrackCardView: UIView {
             self.layer.cornerCurve = .continuous
         }
 
-        self.backdropNode.contentAnimations = [.subsequentUpdates]
         self.coverNode.contentAnimations = [.subsequentUpdates]
         self.coverNode.view.layer.cornerRadius = 6.0
         self.coverNode.view.layer.masksToBounds = true
 
-        // A dark scrim under the text: a blurred cover alone does not guarantee
-        // enough contrast for white text on a bright album.
-        self.scrimView.backgroundColor = UIColor.black.withAlphaComponent(0.32)
+        // A flat dark panel, not the artwork stretched behind everything: the
+        // reference keeps the cover to its thumbnail and leaves the card plain.
+        self.scrimView.backgroundColor = UIColor.black.withAlphaComponent(0.55)
 
         self.titleLabel.font = Font.semibold(14.0)
         self.titleLabel.textColor = .white
@@ -67,10 +61,6 @@ final class MegramTrackCardView: UIView {
         self.artistLabel.textAlignment = .center
         self.artistLabel.lineBreakMode = .byTruncatingTail
 
-        // Backdrop first, then the scrim, then the sharp thumbnail on top of
-        // both — the thumbnail must not be dimmed by the scrim over it.
-        self.addSubview(self.backdropNode.view)
-        self.addSubview(self.blurView)
         self.addSubview(self.scrimView)
         self.addSubview(self.coverNode.view)
         self.addSubview(self.titleLabel)
@@ -103,25 +93,13 @@ final class MegramTrackCardView: UIView {
         let coverKey = file.previewRepresentations.first?.resource.id.stringRepresentation
         if let coverKey, coverKey != self.appliedCoverKey {
             self.appliedCoverKey = coverKey
-            // Two nodes, one artwork: the signal resolves from the same cached
-            // resource, so the second subscription costs no extra fetch.
-            let signal = playerAlbumArt(
+            self.coverNode.setSignal(playerAlbumArt(
                 engine: context.engine,
                 fileReference: .standalone(media: file),
                 albumArt: nil,
-                thumbnail: false
-            )
-            self.backdropNode.setSignal(signal)
-            self.coverNode.setSignal(signal)
+                thumbnail: true
+            ))
         }
-
-        let backdropSide = max(size.width, size.height)
-        self.backdropNode.asyncLayout()(TransformImageArguments(
-            corners: ImageCorners(),
-            imageSize: CGSize(width: backdropSide, height: backdropSide),
-            boundingSize: CGSize(width: backdropSide, height: backdropSide),
-            intrinsicInsets: UIEdgeInsets()
-        ))()
 
         let thumbSide = max(0.0, size.height - MegramTrackCardView.verticalInset * 2.0)
         self.coverNode.asyncLayout()(TransformImageArguments(
@@ -141,16 +119,6 @@ final class MegramTrackCardView: UIView {
         super.layoutSubviews()
         let bounds = self.bounds
 
-        // The backdrop is square and fills the card by its longest side, so it
-        // never letterboxes behind the blur.
-        let backdropSide = max(bounds.width, bounds.height)
-        self.backdropNode.view.frame = CGRect(
-            x: (bounds.width - backdropSide) / 2.0,
-            y: (bounds.height - backdropSide) / 2.0,
-            width: backdropSide,
-            height: backdropSide
-        )
-        self.blurView.frame = bounds
         self.scrimView.frame = bounds
         self.button.frame = bounds
 

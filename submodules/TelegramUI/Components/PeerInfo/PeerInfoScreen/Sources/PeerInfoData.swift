@@ -2508,12 +2508,9 @@ func peerInfoHeaderButtons(peer: EnginePeer?, cachedData: CachedPeerData?, isOpe
             result.append(.stop)
         }
         
-        // MARK: Megram — a lit fire gets its own button, so the streak screen
-        // is one tap away instead of three through the overflow menu.
-        if MegramFireStore.isActive(peerId: user.id.toInt64()) {
-            result.append(.megramFire)
-        }
-
+        // MARK: Megram — the fire button lives in the chat header beside the
+        // online status, not here: the profile row was already crowded and the
+        // streak is something you reach from the conversation.
         if (isSecretChat && !isContact) || user.flags.contains(.isSupport) {
         } else {
             result.append(.more)

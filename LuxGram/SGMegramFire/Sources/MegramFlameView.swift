@@ -262,8 +262,17 @@ public final class MegramFireBadgeView: UIView {
     private let flameView: MegramFlameView
     private let label = UILabel()
     private let backgroundView = UIView()
+    private let button = UIButton(type: .custom)
 
     public private(set) var days: Int = 0
+
+    /// Set to make the badge open the fire screen. While nil the badge stays
+    /// decorative and lets touches through to whatever is underneath.
+    public var pressed: (() -> Void)? {
+        didSet {
+            self.isUserInteractionEnabled = self.pressed != nil
+        }
+    }
 
     public init() {
         self.flameView = MegramFlameView(level: .ember)
@@ -282,6 +291,13 @@ public final class MegramFireBadgeView: UIView {
         self.addSubview(self.backgroundView)
         self.addSubview(self.flameView)
         self.addSubview(self.label)
+        self.addSubview(self.button)
+
+        self.button.addTarget(self, action: #selector(self.buttonPressed), for: .touchUpInside)
+    }
+
+    @objc private func buttonPressed() {
+        self.pressed?()
     }
 
     required public init?(coder: NSCoder) {
@@ -312,5 +328,8 @@ public final class MegramFireBadgeView: UIView {
         self.backgroundView.frame = bounds
         self.flameView.frame = CGRect(x: 2.0, y: (bounds.height - 14.0) / 2.0, width: 12.0, height: 14.0)
         self.label.frame = CGRect(x: 14.0, y: 0.0, width: max(0.0, bounds.width - 16.0), height: bounds.height)
+        // Padded outwards: the pill is small, and an 18pt tap target is hard to
+        // hit in a navigation bar.
+        self.button.frame = bounds.insetBy(dx: -6.0, dy: -6.0)
     }
 }

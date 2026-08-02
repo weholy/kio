@@ -144,8 +144,10 @@ class SliderPercentageItemNode: ListViewItemNode {
         let sliderView = TGPhotoEditorSliderView()
         sliderView.enableEdgeTap = true
         sliderView.enablePanHandling = true
-        sliderView.trackCornerRadius = 1.0
-        sliderView.lineSize = 4.0
+        // MARK: Megram — a thick fully-rounded track instead of the 4pt hairline
+        // with square ends. Half the line size is what makes the caps circular.
+        sliderView.lineSize = 8.0
+        sliderView.trackCornerRadius = 4.0
         sliderView.minimumValue = 0.0
         sliderView.startValue = 0.0
         sliderView.maximumValue = 1.0

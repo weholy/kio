@@ -37,6 +37,8 @@ public final class ChatAvatarNavigationNode: ASDisplayNode {
     
     private var megramFireBadgeView: MegramFireBadgeView?
     private let megramFireDisposable = MetaDisposable()
+    /// Invoked when the streak pill beside the avatar is tapped.
+    public var megramFirePressed: (() -> Void)?
 
     private var cachedDataDisposable = MetaDisposable()
     private var hierarchyTrackingLayer: HierarchyTrackingLayer?
@@ -113,6 +115,9 @@ public final class ChatAvatarNavigationNode: ASDisplayNode {
             badgeView = current
         } else {
             badgeView = MegramFireBadgeView()
+            badgeView.pressed = { [weak self] in
+                self?.megramFirePressed?()
+            }
             self.megramFireBadgeView = badgeView
             self.containerNode.view.addSubview(badgeView)
         }

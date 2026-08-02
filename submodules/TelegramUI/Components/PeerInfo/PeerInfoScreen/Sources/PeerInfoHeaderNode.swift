@@ -2724,10 +2724,10 @@ final class PeerInfoHeaderNode: ASDisplayNode {
                 }
             }
 
-            // Lower and wider than the strip it replaces, matching the
-            // reference: the artwork carries the height, not the text.
+            // Nearly edge to edge, as in the reference — the previous 10pt
+            // margin still read as a narrow pill rather than a panel.
             let cardHeight: CGFloat = 48.0
-            let cardInset: CGFloat = 10.0
+            let cardInset: CGFloat = 4.0
             let cardSize = CGSize(width: max(0.0, backgroundFrame.width - cardInset * 2.0), height: cardHeight)
             cardView.update(context: self.context, file: currentSavedMusic, title: track ?? "", artist: artist, size: cardSize)
 

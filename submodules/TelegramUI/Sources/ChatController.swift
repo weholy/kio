@@ -5873,6 +5873,12 @@ public final class ChatControllerImpl: TelegramBaseController, ChatController, G
         switch chatLocation {
         case .peer, .replyThread:
             let avatarNode = ChatAvatarNavigationNode()
+            // MARK: Megram — the streak pill beside the avatar opens the peer's
+            // profile, where the fire screen is one row away. Presenting the
+            // screen from here would need the peer plumbed into the nav node.
+            avatarNode.megramFirePressed = { [weak self] in
+                self?.navigationButtonAction(.openChatInfo(expandAvatar: false, section: nil))
+            }
             avatarNode.contextAction = { [weak self] node, gesture in
                 guard let strongSelf = self, let peer = strongSelf.presentationInterfaceState.renderedPeer?.chatMainPeer else {
                     return
