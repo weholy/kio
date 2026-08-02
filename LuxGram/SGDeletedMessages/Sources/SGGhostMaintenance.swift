@@ -56,12 +56,15 @@ public enum SGGhostMaintenance {
         self.lastPruneTimestamp = now
 
         let cutoff = Int32(Date().timeIntervalSince1970) - Int32(days) * 24 * 60 * 60
+        // The archive's namespace is private to SGDeletedMessages, so it is
+        // restated here rather than widened; both must stay in step.
+        let archiveNamespace: Int32 = 1338
         return postbox.transaction { transaction -> Void in
             var expired: [MessageId] = []
             // The archive lives in its own namespace, so this walks only
             // Megram's saved copies and can never reach the real conversation.
             for peerId in transaction.chatListGetAllPeerIds() {
-                transaction.scanMessageAttributes(peerId: peerId, namespace: messageNamespaceSavedDeleted, limit: Int.max) { messageId, _ in
+                transaction.scanMessageAttributes(peerId: peerId, namespace: archiveNamespace, limit: Int.max) { messageId, _ in
                     if let message = transaction.getMessage(messageId), message.timestamp < cutoff {
                         expired.append(messageId)
                     }
