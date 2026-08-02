@@ -616,7 +616,7 @@ final class PeerInfoHeaderNode: ASDisplayNode {
         // reserve its own room or the buttons below it get clipped.
         let megramTrackCardIsUsed = SGSimpleSettings.shared.profileTrackCard
             && currentSavedMusic.flatMap({ MegramTrackCardView.hasCover(file: $0) }) == true
-        let bottomInset: CGFloat = currentSavedMusic != nil ? (megramTrackCardIsUsed ? 60.0 : musicHeight) : 0.0
+        let bottomInset: CGFloat = currentSavedMusic != nil ? (megramTrackCardIsUsed ? 54.0 : musicHeight) : 0.0
         
         let isLandscape = containerInset > 16.0
         
@@ -2724,8 +2724,10 @@ final class PeerInfoHeaderNode: ASDisplayNode {
                 }
             }
 
-            let cardHeight: CGFloat = 54.0
-            let cardInset: CGFloat = 16.0
+            // Lower and wider than the strip it replaces, matching the
+            // reference: the artwork carries the height, not the text.
+            let cardHeight: CGFloat = 48.0
+            let cardInset: CGFloat = 10.0
             let cardSize = CGSize(width: max(0.0, backgroundFrame.width - cardInset * 2.0), height: cardHeight)
             cardView.update(context: self.context, file: currentSavedMusic, title: track ?? "", artist: artist, size: cardSize)
 
