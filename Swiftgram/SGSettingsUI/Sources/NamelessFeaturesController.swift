@@ -303,6 +303,33 @@ private enum NLBoolSetting: String {
     case hideMenuCopyProtection
     case hideMenuClearHistory
     case hideMenuBlock
+    // Megram tabs
+    case hideBottomTabPanel
+    case hideContactsTab
+    case hideCallsTab
+    case tabBarSearchNearBottom
+    case hideProfileGiftsTab
+    case deviceModelSpoofEnabled
+    // Megram settings sections
+    case hideSettingsFavorites
+    case hideSettingsDevices
+    case hideSettingsChatFolders
+    case hideSettingsPowerSaving
+    case hideSettingsLanguage
+    case hideSettingsNotifications
+    case hideSettingsPrivacy
+    case hideSettingsDataAndStorage
+    case hideSettingsAppearance
+    case hideSettingsProxy
+    case hideSettingsMyProfile
+    case hideSettingsRecentCalls
+    case hideSettingsPremium
+    case hideSettingsStars
+    case hideSettingsBusiness
+    case hideSettingsSupport
+    case hideSettingsFaq
+    case hideSettingsTips
+    case hideSettingsSendGift
 }
 
 private enum NLSliderSetting: String {
@@ -313,6 +340,8 @@ private enum NLSliderSetting: String {
     case cameraJpegQuality
     case particleEffectSpeed
     case particleEffectDensity
+    case tabBarHeight
+    case tabBarWidth
 }
 
 private enum NLOneFromManySetting: String {
@@ -1057,16 +1086,62 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
     entries.append(.toggle(id: id.count, section: sec, settingName: .showDC, value: s.showDC, text: "Показывать DC", enabled: true))
     entries.append(.toggle(id: id.count, section: sec, settingName: .disableCompactNumbers, value: !s.disableCompactNumbers, text: "Компактные числа", enabled: true))
 
-    // MEGRAM · ПРОФИЛЬ
-    entries.append(.header(id: id.count, section: sec, text: "MEGRAM · ПРОФИЛЬ", badge: nil))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .profileTrackCard, value: s.profileTrackCard, text: "Карточка трека", enabled: true))
-    entries.append(.notice(id: id.count, section: sec, text: "Прикреплённая музыка рисуется карточкой с размытой обложкой вместо плоской строки. Без обложки карточка не показывается."))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .profileIdChips, value: s.profileIdChips, text: "ID и DC кнопками", enabled: true))
-    entries.append(.notice(id: id.count, section: sec, text: "Круглые кнопки под юзернеймом вместо строк списка. Нажатие копирует значение."))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .hideProfileEmojiStatus, value: s.hideProfileEmojiStatus, text: "Скрыть «Установить эмодзи-статус»", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .hideProfileColorRow, value: s.hideProfileColorRow, text: "Скрыть «Изменить цвет профиля»", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .hideProfilePhotoRow, value: s.hideProfilePhotoRow, text: "Скрыть «Изменить фотографию»", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .hideProfileIdRow, value: s.hideProfileIdRow, text: "Скрыть строку ID", enabled: true))
+    // MARK: Megram — раздел «Профиль» ровно по заданному списку.
+    entries.append(.header(id: id.count, section: sec, text: "ПРОФИЛЬ", badge: nil))
+    megramFeature(.showProfileId, s.showProfileId, "Отображать ID аккаунта в профиле", "Добавляет в профиль числовой идентификатор аккаунта, который можно скопировать нажатием.")
+    megramFeature(.showDC, s.showDC, "Отображать DC аккаунта в профиле", "Показывает дата-центр Telegram, где хранится аккаунт, и при наличии страну номера.")
+    megramFeature(.hidePhoneNumber, s.hidePhoneNumber, "Скрыть номер телефона", "Скрывает номер телефона и в настройках, и в профиле.")
+    megramFeature(.hideProfileGiftsTab, s.hideProfileGiftsTab, "Скрыть вкладку «Подарки»", "Убирает вкладку с подарками из профиля.")
+    megramFeature(.showIfMutualContacts, s.showIfMutualContacts, "Значок взаимного контакта", "Добавляет значок, если вы и собеседник сохранили друг друга.")
+    megramFeature(.showCreationDate, s.showCreationDate, "Отображать дату создания чата", "Показывает, когда переписка или канал были созданы.")
+    megramFeature(.showSeconds, s.showSeconds, "Точное время захода в сеть", "Рядом с «был в сети» показывается точное время до секунд.")
+    megramFeature(.profileTrackCard, s.profileTrackCard, "Карточка трека", "Прикреплённая музыка рисуется карточкой с размытой обложкой вместо плоской строки. Без обложки карточка не показывается.")
+    megramFeature(.profileIdChips, s.profileIdChips, "ID и DC кнопками", "Круглые кнопки под юзернеймом вместо строк списка. Нажатие копирует значение.")
+    megramFeature(.hideProfileEmojiStatus, s.hideProfileEmojiStatus, "Скрыть «Установить эмодзи-статус»", "Убирает строку из своего профиля.")
+    megramFeature(.hideProfileColorRow, s.hideProfileColorRow, "Скрыть «Изменить цвет профиля»", "Убирает строку из своего профиля.")
+    megramFeature(.hideProfilePhotoRow, s.hideProfilePhotoRow, "Скрыть «Изменить фотографию»", "Убирает строку из своего профиля.")
+    megramFeature(.hideProfileIdRow, s.hideProfileIdRow, "Скрыть строку ID", "Убирает строку с идентификатором из своего профиля.")
+
+    // MARK: Megram — раздел «Вкладки».
+    entries.append(.header(id: id.count, section: sec, text: "ВКЛАДКИ", badge: nil))
+    megramFeature(.hideBottomTabPanel, s.hideTabBar, "Скрыть панель вкладок", "Нижняя панель убирается полностью, переключение — свайпом и через поиск.")
+    megramFeature(.hideContactsTab, s.hideContactsTab, "Скрыть вкладку «Контакты»", "Убирает контакты из нижней панели.", enabled: !s.hideTabBar)
+    megramFeature(.hideCallsTab, s.hideCallsTab, "Скрыть вкладку «Звонки»", "Убирает звонки из нижней панели.", enabled: !s.hideTabBar)
+    megramFeature(.tabBarSearchNearBottom, s.tabBarSearchEnabled, "Кнопка поиска у панели", "Круглая кнопка поиска встаёт рядом с нижней панелью.", enabled: !s.hideTabBar)
+
+    let tabHeightSection = featureSections.take()
+    entries.append(.percentageSlider(id: id.count, section: tabHeightSection, settingName: .tabBarHeight, value: s.tabBarHeightScale))
+    entries.append(.notice(id: id.count, section: tabHeightSection, text: "Высота нижней панели в процентах от стандартной."))
+    let tabWidthSection = featureSections.take()
+    entries.append(.percentageSlider(id: id.count, section: tabWidthSection, settingName: .tabBarWidth, value: s.tabBarWidthScale))
+    entries.append(.notice(id: id.count, section: tabWidthSection, text: "Ширина нижней панели в процентах от стандартной."))
+
+    // MARK: Megram — раздел «Разделы настроек»: каждый переключатель прячет
+    // одноимённый пункт с главного экрана настроек.
+    entries.append(.header(id: id.count, section: sec, text: "РАЗДЕЛЫ НАСТРОЕК", badge: nil))
+    entries.append(.notice(id: id.count, section: sec, text: "Включённый переключатель скрывает соответствующий пункт из настроек."))
+    megramFeature(.hideSettingsFavorites, s.hideSettingsSavedMessages, "Избранное", "")
+    megramFeature(.hideSettingsDevices, s.hideSettingsDevices, "Устройства", "")
+    megramFeature(.hideSettingsChatFolders, s.hideSettingsChatFolders, "Папки с чатами", "")
+    megramFeature(.hideSettingsPowerSaving, s.hideSettingsPowerSaving, "Энергосбережение", "")
+    megramFeature(.hideSettingsLanguage, s.hideSettingsLanguage, "Язык", "")
+    megramFeature(.hideSettingsNotifications, s.hideSettingsNotifications, "Уведомления", "")
+    megramFeature(.hideSettingsPrivacy, s.hideSettingsPrivacy, "Конфиденциальность", "")
+    megramFeature(.hideSettingsDataAndStorage, s.hideSettingsDataAndStorage, "Данные и память", "")
+    megramFeature(.hideSettingsAppearance, s.hideSettingsAppearance, "Оформление", "")
+    megramFeature(.hideSettingsProxy, s.hideSettingsProxy, "Прокси", "")
+    megramFeature(.hideSettingsMyProfile, s.hideSettingsMyProfile, "Мой профиль", "")
+    megramFeature(.hideSettingsRecentCalls, s.hideSettingsRecentCalls, "Недавние звонки", "")
+    megramFeature(.hideSettingsPremium, s.hideSettingsPremium, "Premium", "")
+    megramFeature(.hideSettingsStars, s.hideSettingsStars, "Звёзды", "")
+    megramFeature(.hideSettingsBusiness, s.hideSettingsBusiness, "Бизнес", "")
+    megramFeature(.hideSettingsSupport, s.hideSettingsSupport, "Поддержка", "")
+    megramFeature(.hideSettingsFaq, s.hideSettingsFaq, "Вопросы и ответы", "")
+    megramFeature(.hideSettingsTips, s.hideSettingsTips, "Советы", "")
+    megramFeature(.hideSettingsSendGift, s.hideSettingsSendGift, "Отправить подарок", "")
+    megramFeature(.hideProfileEmojiStatus, s.hideProfileEmojiStatus, "Установить статус-эмодзи", "")
+    megramFeature(.hideProfileColorRow, s.hideProfileColorRow, "Изменить цвет профиля", "")
+    megramFeature(.hideProfilePhotoRow, s.hideProfilePhotoRow, "Изменить фотографию", "")
 
     }
     } // end ghost
@@ -1104,29 +1179,41 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
     entries.append(.toggle(id: id.count, section: sec, settingName: .contextShowJson, value: s.contextShowJson, text: "JSON", enabled: true))
 
     // ЛОКАЛЬНЫЙ ПРЕМИУМ И ЗВЁЗДЫ
-    entries.append(.header(id: id.count, section: sec, text: "ЛОКАЛЬНЫЙ ПРЕМИУМ И ЗВЁЗДЫ", badge: nil))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .enableLocalPremium, value: s.enableLocalPremium, text: "Локальный премиум", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .localStarsEnabled, value: s.localStarsEnabled, text: "Локальные звёзды", enabled: true))
-    entries.append(.disclosureDetail(id: id.count, section: sec, link: .localStarsAmount, text: "Баланс звёзд", detail: "\(s.localStarsBalance) ⭐ из \(s.localStarsTopUp)"))
-    entries.append(.disclosureDetail(id: id.count, section: sec, link: .localGiftsShop, text: "Локальные подарки", detail: "Каталог и покупка за локальные звёзды"))
-    if s.localStarsSpent > 0 {
-        entries.append(.action(id: id.count, section: sec, actionType: .resetLocalStars, text: "Пополнить (сбросить траты: \(s.localStarsSpent) ⭐)", kind: .generic))
+    megramFeature(.enableLocalPremium, s.enableLocalPremium, "Локальный премиум", "Премиум-функции включаются на этом устройстве. Собеседники значка не увидят.")
+    // Баланс появляется только вместе с включёнными звёздами: строка ввода без
+    // самой функции ведёт в никуда.
+    let starsSection = featureSections.take()
+    entries.append(.toggle(id: id.count, section: starsSection, settingName: .localStarsEnabled, value: s.localStarsEnabled, text: "Локальные звёзды", enabled: true))
+    if s.localStarsEnabled {
+        entries.append(.disclosureDetail(id: id.count, section: starsSection, link: .localStarsAmount, text: "Баланс звёзд", detail: "\(s.localStarsBalance) ⭐"))
     } else {
         id.increment(1)
     }
-    entries.append(.notice(id: id.count, section: sec, text: "Баланс виден только вам и не связан с сервером. При отправке подарков и платных реакций сумма списывается локально."))
+    entries.append(.notice(id: id.count, section: starsSection, text: "Баланс виден только вам и не связан с сервером. При отправке платных реакций сумма списывается локально."))
 
-    // УСТРОЙСТВО
-    entries.append(.header(id: id.count, section: sec, text: "УСТРОЙСТВО", badge: nil))
-    entries.append(.disclosureDetail(id: id.count, section: sec, link: .deviceModelSpoof, text: "Название устройства", detail: s.deviceModelSpoof.isEmpty ? "Реальное (по умолчанию)" : s.deviceModelSpoof))
-    entries.append(.notice(id: id.count, section: sec, text: "Отображается в списке активных сессий и в письмах о входе. Меняется при следующем подключении."))
+    // УСТРОЙСТВО — поле раскрывается вместе со своим переключателем.
+    let deviceSection = featureSections.take()
+    entries.append(.toggle(id: id.count, section: deviceSection, settingName: .deviceModelSpoofEnabled, value: s.deviceModelSpoofEnabled, text: "Своё название устройства", enabled: true))
+    if s.deviceModelSpoofEnabled {
+        entries.append(.disclosureDetail(id: id.count, section: deviceSection, link: .deviceModelSpoof, text: "Название устройства", detail: s.deviceModelSpoof.isEmpty ? "Не задано" : s.deviceModelSpoof))
+    } else {
+        id.increment(1)
+    }
+    entries.append(.notice(id: id.count, section: deviceSection, text: "Отображается в списке активных сессий и в письмах о входе. Меняется при следующем подключении."))
 
     // ДОПОЛНИТЕЛЬНО
     entries.append(.header(id: id.count, section: sec, text: "ДОПОЛНИТЕЛЬНО", badge: nil))
     entries.append(.toggle(id: id.count, section: sec, settingName: .quickTranslateButton, value: s.quickTranslateButton, text: "Кнопка «Перевести»", enabled: true))
     entries.append(.toggle(id: id.count, section: sec, settingName: .disableZalgoText, value: s.disableZalgoText, text: "Zalgo-фильтр", enabled: true))
     entries.append(.toggle(id: id.count, section: sec, settingName: .uploadSpeedBoost, value: s.uploadSpeedBoost, text: "Ускорение отправки", enabled: true))
-    entries.append(.oneFromManySelector(id: id.count, section: sec, settingName: .downloadSpeedBoost, text: "Ускорение загрузки", value: s.downloadSpeedBoost, enabled: true))
+    // Megram: the stored value is an English key; the row shows it translated.
+    let downloadBoostTitle: String
+    switch s.downloadSpeedBoost {
+    case "medium": downloadBoostTitle = "Среднее"
+    case "maximum": downloadBoostTitle = "Максимальное"
+    default: downloadBoostTitle = "Выключено"
+    }
+    entries.append(.oneFromManySelector(id: id.count, section: sec, settingName: .downloadSpeedBoost, text: "Ускорение загрузки", value: downloadBoostTitle, enabled: true))
     entries.append(.toggle(id: id.count, section: sec, settingName: .unlimitedFavoriteStickers, value: s.unlimitedFavoriteStickers, text: "Безлимитные избранные стикеры", enabled: true))
 
     // СТИКЕРЫ
@@ -1540,6 +1627,31 @@ private func namelessFeaturesControllerImpl(context: AccountContext, initialCate
             case .hideMenuCopyProtection: s.hideMenuCopyProtection = value
             case .hideMenuClearHistory: s.hideMenuClearHistory = value
             case .hideMenuBlock: s.hideMenuBlock = value
+            case .hideBottomTabPanel: s.hideTabBar = value; simplePromise.set(true); askForRestart?()
+            case .hideContactsTab: s.hideContactsTab = value; simplePromise.set(true); askForRestart?()
+            case .hideCallsTab: s.hideCallsTab = value; simplePromise.set(true); askForRestart?()
+            case .tabBarSearchNearBottom: s.tabBarSearchEnabled = value; simplePromise.set(true)
+            case .hideProfileGiftsTab: s.hideProfileGiftsTab = value; simplePromise.set(true)
+            case .deviceModelSpoofEnabled: s.deviceModelSpoofEnabled = value; simplePromise.set(true)
+            case .hideSettingsFavorites: s.hideSettingsSavedMessages = value; simplePromise.set(true)
+            case .hideSettingsDevices: s.hideSettingsDevices = value; simplePromise.set(true)
+            case .hideSettingsChatFolders: s.hideSettingsChatFolders = value; simplePromise.set(true)
+            case .hideSettingsPowerSaving: s.hideSettingsPowerSaving = value; simplePromise.set(true)
+            case .hideSettingsLanguage: s.hideSettingsLanguage = value; simplePromise.set(true)
+            case .hideSettingsNotifications: s.hideSettingsNotifications = value; simplePromise.set(true)
+            case .hideSettingsPrivacy: s.hideSettingsPrivacy = value; simplePromise.set(true)
+            case .hideSettingsDataAndStorage: s.hideSettingsDataAndStorage = value; simplePromise.set(true)
+            case .hideSettingsAppearance: s.hideSettingsAppearance = value; simplePromise.set(true)
+            case .hideSettingsProxy: s.hideSettingsProxy = value; simplePromise.set(true)
+            case .hideSettingsMyProfile: s.hideSettingsMyProfile = value; simplePromise.set(true)
+            case .hideSettingsRecentCalls: s.hideSettingsRecentCalls = value; simplePromise.set(true)
+            case .hideSettingsPremium: s.hideSettingsPremium = value; simplePromise.set(true)
+            case .hideSettingsStars: s.hideSettingsStars = value; simplePromise.set(true)
+            case .hideSettingsBusiness: s.hideSettingsBusiness = value; simplePromise.set(true)
+            case .hideSettingsSupport: s.hideSettingsSupport = value; simplePromise.set(true)
+            case .hideSettingsFaq: s.hideSettingsFaq = value; simplePromise.set(true)
+            case .hideSettingsTips: s.hideSettingsTips = value; simplePromise.set(true)
+            case .hideSettingsSendGift: s.hideSettingsSendGift = value; simplePromise.set(true)
             case .enableVideoToCircleOrVoice: s.enableVideoToCircleOrVoice = value
             case .namelessVideoBackgroundEnabled: s.namelessVideoBackgroundEnabled = value
             case .squareAvatars: s.squareAvatars = value; simplePromise.set(true)
@@ -1638,6 +1750,13 @@ private func namelessFeaturesControllerImpl(context: AccountContext, initialCate
             switch slider {
             case .outgoingPhotoQuality: if s.outgoingPhotoQuality != value { s.outgoingPhotoQuality = value; simplePromise.set(true) }
             case .stickerSize: if s.stickerSize != value { s.stickerSize = value; simplePromise.set(true) }
+            // Clamped so the tab bar cannot collapse to nothing or swallow the screen.
+            case .tabBarHeight:
+                let clamped = max(50, min(150, value))
+                if s.tabBarHeightScale != clamped { s.tabBarHeightScale = clamped; simplePromise.set(true) }
+            case .tabBarWidth:
+                let clamped = max(50, min(150, value))
+                if s.tabBarWidthScale != clamped { s.tabBarWidthScale = clamped; simplePromise.set(true) }
             case .accountColorsSaturation: if s.accountColorsSaturation != value { s.accountColorsSaturation = value; simplePromise.set(true) }
             case .liquidGlassIntensity:
                 let newIntensity = Double(value) / 100.0
@@ -1676,7 +1795,15 @@ private func namelessFeaturesControllerImpl(context: AccountContext, initialCate
                     })
                 }
                 for value in SGSimpleSettings.DownloadSpeedBoostValues.allCases {
-                    items.append(ActionSheetButtonItem(title: value.rawValue, color: .accent, action: { [weak actionSheet] in
+                    // Megram: the raw values are English keys, so the sheet
+                    // shows translated titles instead of none/medium/maximum.
+                    let title: String
+                    switch value.rawValue {
+                    case "medium": title = "Среднее"
+                    case "maximum": title = "Максимальное"
+                    default: title = "Выключено"
+                    }
+                    items.append(ActionSheetButtonItem(title: title, color: .accent, action: { [weak actionSheet] in
                         actionSheet?.dismissAnimated()
                         setAction(value.rawValue)
                     }))

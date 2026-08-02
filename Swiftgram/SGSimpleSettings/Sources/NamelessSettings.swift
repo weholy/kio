@@ -308,6 +308,35 @@ private enum NamelessSettingsKey {
     static let hideMenuCopyProtection = "nameless.peerMenu.hideCopyProtection"
     static let hideMenuClearHistory = "nameless.peerMenu.hideClearHistory"
     static let hideMenuBlock = "nameless.peerMenu.hideBlock"
+
+    // MARK: - Megram tabs and profile extras
+    static let deviceModelSpoofEnabled = "nameless.deviceModelSpoofEnabled"
+    static let hideProfileGiftsTab = "nameless.profile.hideGiftsTab"
+    static let hideContactsTab = "nameless.tabs.hideContacts"
+    static let hideCallsTab = "nameless.tabs.hideCalls"
+    static let tabBarHeightScale = "nameless.tabs.heightScale"
+    static let tabBarWidthScale = "nameless.tabs.widthScale"
+
+    // MARK: - Megram settings sections
+    static let hideSettingsSavedMessages = "nameless.settingsSection.savedMessages"
+    static let hideSettingsDevices = "nameless.settingsSection.devices"
+    static let hideSettingsChatFolders = "nameless.settingsSection.chatFolders"
+    static let hideSettingsPowerSaving = "nameless.settingsSection.powerSaving"
+    static let hideSettingsLanguage = "nameless.settingsSection.language"
+    static let hideSettingsNotifications = "nameless.settingsSection.notifications"
+    static let hideSettingsPrivacy = "nameless.settingsSection.privacy"
+    static let hideSettingsDataAndStorage = "nameless.settingsSection.dataAndStorage"
+    static let hideSettingsAppearance = "nameless.settingsSection.appearance"
+    static let hideSettingsProxy = "nameless.settingsSection.proxy"
+    static let hideSettingsMyProfile = "nameless.settingsSection.myProfile"
+    static let hideSettingsRecentCalls = "nameless.settingsSection.recentCalls"
+    static let hideSettingsPremium = "nameless.settingsSection.premium"
+    static let hideSettingsStars = "nameless.settingsSection.stars"
+    static let hideSettingsBusiness = "nameless.settingsSection.business"
+    static let hideSettingsSupport = "nameless.settingsSection.support"
+    static let hideSettingsFaq = "nameless.settingsSection.faq"
+    static let hideSettingsTips = "nameless.settingsSection.tips"
+    static let hideSettingsSendGift = "nameless.settingsSection.sendGift"
 }
 
 private enum NamelessRollbackStorage {
@@ -883,6 +912,49 @@ public extension SGSimpleSettings {
     var hideMenuCopyProtection: Bool { get { storage.namelessBool(NamelessSettingsKey.hideMenuCopyProtection) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideMenuCopyProtection) } }
     var hideMenuClearHistory: Bool { get { storage.namelessBool(NamelessSettingsKey.hideMenuClearHistory) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideMenuClearHistory) } }
     var hideMenuBlock: Bool { get { storage.namelessBool(NamelessSettingsKey.hideMenuBlock) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideMenuBlock) } }
+
+    // MARK: Megram tabs and profile extras
+    var deviceModelSpoofEnabled: Bool { get { storage.namelessBool(NamelessSettingsKey.deviceModelSpoofEnabled) } set { storage.set(newValue, forKey: NamelessSettingsKey.deviceModelSpoofEnabled) } }
+    var hideProfileGiftsTab: Bool { get { storage.namelessBool(NamelessSettingsKey.hideProfileGiftsTab) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideProfileGiftsTab) } }
+    var hideContactsTab: Bool { get { storage.namelessBool(NamelessSettingsKey.hideContactsTab) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideContactsTab) } }
+    var hideCallsTab: Bool { get { storage.namelessBool(NamelessSettingsKey.hideCallsTab) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideCallsTab) } }
+    /// Percent of the standard tab bar metric, 50...150. Stored as Int32 so it
+    /// can drive the same percentage slider the other size settings use.
+    var tabBarHeightScale: Int32 {
+        get {
+            let value = storage.namelessInt32(NamelessSettingsKey.tabBarHeightScale, default: 100)
+            return value == 0 ? 100 : value
+        }
+        set { storage.set(newValue, forKey: NamelessSettingsKey.tabBarHeightScale) }
+    }
+    var tabBarWidthScale: Int32 {
+        get {
+            let value = storage.namelessInt32(NamelessSettingsKey.tabBarWidthScale, default: 100)
+            return value == 0 ? 100 : value
+        }
+        set { storage.set(newValue, forKey: NamelessSettingsKey.tabBarWidthScale) }
+    }
+
+    // MARK: Megram settings sections
+    var hideSettingsSavedMessages: Bool { get { storage.namelessBool(NamelessSettingsKey.hideSettingsSavedMessages) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideSettingsSavedMessages) } }
+    var hideSettingsDevices: Bool { get { storage.namelessBool(NamelessSettingsKey.hideSettingsDevices) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideSettingsDevices) } }
+    var hideSettingsChatFolders: Bool { get { storage.namelessBool(NamelessSettingsKey.hideSettingsChatFolders) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideSettingsChatFolders) } }
+    var hideSettingsPowerSaving: Bool { get { storage.namelessBool(NamelessSettingsKey.hideSettingsPowerSaving) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideSettingsPowerSaving) } }
+    var hideSettingsLanguage: Bool { get { storage.namelessBool(NamelessSettingsKey.hideSettingsLanguage) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideSettingsLanguage) } }
+    var hideSettingsNotifications: Bool { get { storage.namelessBool(NamelessSettingsKey.hideSettingsNotifications) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideSettingsNotifications) } }
+    var hideSettingsPrivacy: Bool { get { storage.namelessBool(NamelessSettingsKey.hideSettingsPrivacy) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideSettingsPrivacy) } }
+    var hideSettingsDataAndStorage: Bool { get { storage.namelessBool(NamelessSettingsKey.hideSettingsDataAndStorage) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideSettingsDataAndStorage) } }
+    var hideSettingsAppearance: Bool { get { storage.namelessBool(NamelessSettingsKey.hideSettingsAppearance) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideSettingsAppearance) } }
+    var hideSettingsProxy: Bool { get { storage.namelessBool(NamelessSettingsKey.hideSettingsProxy) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideSettingsProxy) } }
+    var hideSettingsMyProfile: Bool { get { storage.namelessBool(NamelessSettingsKey.hideSettingsMyProfile) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideSettingsMyProfile) } }
+    var hideSettingsRecentCalls: Bool { get { storage.namelessBool(NamelessSettingsKey.hideSettingsRecentCalls) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideSettingsRecentCalls) } }
+    var hideSettingsPremium: Bool { get { storage.namelessBool(NamelessSettingsKey.hideSettingsPremium) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideSettingsPremium) } }
+    var hideSettingsStars: Bool { get { storage.namelessBool(NamelessSettingsKey.hideSettingsStars) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideSettingsStars) } }
+    var hideSettingsBusiness: Bool { get { storage.namelessBool(NamelessSettingsKey.hideSettingsBusiness) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideSettingsBusiness) } }
+    var hideSettingsSupport: Bool { get { storage.namelessBool(NamelessSettingsKey.hideSettingsSupport) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideSettingsSupport) } }
+    var hideSettingsFaq: Bool { get { storage.namelessBool(NamelessSettingsKey.hideSettingsFaq) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideSettingsFaq) } }
+    var hideSettingsTips: Bool { get { storage.namelessBool(NamelessSettingsKey.hideSettingsTips) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideSettingsTips) } }
+    var hideSettingsSendGift: Bool { get { storage.namelessBool(NamelessSettingsKey.hideSettingsSendGift) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideSettingsSendGift) } }
 
     func updateGatedFeatures(_ features: [(key: String, deeplinkPath: String)]) {
         storage.set(features.map(\.key), forKey: NamelessSettingsKey.gatedFeatureKeys)
