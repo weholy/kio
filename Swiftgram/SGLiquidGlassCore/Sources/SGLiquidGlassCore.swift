@@ -28,9 +28,10 @@ public enum SGLiquidGlassZone: Int, CaseIterable {
 
     /// MARK: Megram — glass is always on.
     ///
-    /// The per-zone flags have no rows in the rebuilt settings tabs, so a
-    /// single stale value from an older build would silently drop whole
-    /// screens back to flat grey with no way to reach the switch and undo it.
+    /// The per-zone flags and the master switch are gone from the settings UI,
+    /// and a switch nobody can reach is worse than no switch: a single stale
+    /// value left over from an older build would silently drop whole screens
+    /// back to flat grey with no way to notice or undo it.
     public var isEnabled: Bool {
         return true
     }

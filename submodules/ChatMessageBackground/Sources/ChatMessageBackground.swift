@@ -538,7 +538,10 @@ public final class ChatMessageBubbleBackdrop: ASDisplayNode, SGLiquidGlassContai
     /// `glassView` because that one is the Liquid Glass surface and is mutually exclusive
     /// with the classic (non-glass) bubble rendering path.
     private var namelessBlurView: UIVisualEffectView?
-    
+    /// Size the glass surface was last built for, so `layout` can tell a real
+    /// resize from the dozens of no-op layout passes a scrolling history runs.
+    private var lastGlassLayoutSize: CGSize?
+
     public var overrideMask: Bool = false {
         didSet {
             self.maskView?.image = nil
@@ -580,6 +583,44 @@ public final class ChatMessageBubbleBackdrop: ASDisplayNode, SGLiquidGlassContai
         super.init()
 
         self.clipsToBounds = true
+    }
+
+    /// MARK: Megram — builds the glass surface once the bubble has a real size.
+    ///
+    /// `setType` was the only thing that ever called `updateGlass`, and it runs
+    /// in the layout apply pass — before the parent assigns this node its frame.
+    /// At that moment the bounds are still zero, `updateGlass` rejects the size
+    /// as too small, hides the glass and puts the flat wallpaper fill back. The
+    /// real size arrives afterwards through paths that write the layer's frame
+    /// directly, so nothing came back to finish the job and no bubble in the app
+    /// was ever actually glass.
+    ///
+    /// `layout` is the right hook precisely because it fires for every one of
+    /// those paths: the view's own layout pass runs whether the frame was set on
+    /// the node, the layer, or by an animator.
+    override public func layout() {
+        super.layout()
+
+        let size = self.bounds.size
+        if self.lastGlassLayoutSize != size {
+            self.lastGlassLayoutSize = size
+            self.reapplyGlassForCurrentBounds()
+        }
+    }
+
+    /// Re-runs the glass pass for whatever type and theme are already applied.
+    private func reapplyGlassForCurrentBounds() {
+        guard let type = self.currentType, let theme = self.theme else {
+            return
+        }
+        let zone: SGLiquidGlassZone
+        switch type {
+        case .outgoing:
+            zone = .outgoingMessages
+        default:
+            zone = .messages
+        }
+        self.updateGlass(size: self.bounds.size, isDark: theme.theme.overallDarkAppearance, zone: zone)
     }
 
     /// Creates the glass surface the first time a bubble actually shows one.
@@ -752,8 +793,9 @@ public final class ChatMessageBubbleBackdrop: ASDisplayNode, SGLiquidGlassContai
     }
 
     public func refreshGlass(zone: SGLiquidGlassZone) {
-        // A settings change is exactly the case the memo must not swallow.
+        // A settings change is exactly the case the memos must not swallow.
         self.appliedGlassState = nil
+        self.lastGlassLayoutSize = nil
         self.updateGlass(size: self.bounds.size, isDark: self.theme?.theme.overallDarkAppearance ?? false, zone: zone)
     }
     

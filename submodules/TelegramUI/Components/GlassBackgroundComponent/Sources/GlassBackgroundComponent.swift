@@ -1260,7 +1260,11 @@ public extension GlassBackgroundView {
                 let lineWidth: CGFloat = (isDark ? 0.8 : 0.8) * borderWidthFactor
                 let strokeColor: UIColor
                 let blendMode: CGBlendMode
-                let baseAlpha: CGFloat = isDark ? 0.3 : 0.6
+                // MARK: Megram — "Убрать полоску". Every glass surface below
+                // iOS 26 draws its edge through this renderer, so zeroing the
+                // alpha here removes the hairline from the context menu, the
+                // settings cards and the pills together.
+                let baseAlpha: CGFloat = SGSimpleSettings.shared.megramHideGlassBorder ? 0.0 : (isDark ? 0.3 : 0.6)
                 
                 if s == 0.0 && abs(a - 0.7) < 0.1 && !isDark {
                     blendMode = .normal
@@ -1381,7 +1385,8 @@ public extension GlassBackgroundView {
             let lineWidth: CGFloat = (isDark ? 0.8 : 0.8) * borderWidthFactor
             let strokeColor: UIColor
             let blendMode: CGBlendMode
-            let baseAlpha: CGFloat = isDark ? 0.3 : 0.6
+            // MARK: Megram — see the note on the size-based overload above.
+            let baseAlpha: CGFloat = SGSimpleSettings.shared.megramHideGlassBorder ? 0.0 : (isDark ? 0.3 : 0.6)
 
             if s == 0.0 && abs(a - 0.7) < 0.1 && !isDark {
                 blendMode = .normal

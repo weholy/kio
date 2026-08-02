@@ -58,6 +58,7 @@ import TelegramVoip
 import InviteLinksUI
 import UndoUI
 import MediaResources
+import SGAppearance
 import HashtagSearchUI
 import ActionSheetPeerItem
 import TelegramCallsUI
@@ -243,6 +244,13 @@ final class PeerInfoScreenNode: ViewControllerTracingNode, PeerInfoScreenNodePro
     let edgeEffectView: EdgeEffectView
     
     let headerNode: PeerInfoHeaderNode
+    /// Megram's profile wallpaper, pinned behind everything on this screen.
+    private var megramWallpaperView: MegramBackgroundView?
+    /// The blurred copy of the peer's photo that fills the screen under the
+    /// header. Sits above the wallpaper — a wallpaper the user picked by hand
+    /// should win over an automatic backdrop, so the backdrop is skipped
+    /// entirely while one is set.
+    private var megramAvatarBackdrop: MegramAvatarBackdrop?
     var underHeaderContentsAlpha: CGFloat = 1.0
     var regularSections: [AnyHashable: PeerInfoScreenItemSectionContainerNode] = [:]
     var editingSections: [AnyHashable: PeerInfoScreenItemSectionContainerNode] = [:]
@@ -1322,7 +1330,30 @@ final class PeerInfoScreenNode: ViewControllerTracingNode, PeerInfoScreenNodePro
         })
         
         self.backgroundColor = self.presentationData.theme.list.blocksBackgroundColor
-        
+
+        // MARK: Megram — profile wallpaper sits behind the whole screen. The
+        // node's own fill is dropped while it is on, otherwise it would cover
+        // the image it is meant to sit on.
+        if MegramAppearanceStore.isEnabled(.profileWallpaper) {
+            let wallpaperView = MegramBackgroundView(slot: .profileWallpaper)
+            wallpaperView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+            self.view.insertSubview(wallpaperView, at: 0)
+            self.megramWallpaperView = wallpaperView
+            self.backgroundColor = nil
+        } else {
+            // MARK: Megram — the blurred-avatar backdrop. Built here rather than
+            // when the photo arrives so it is already behind the scroll node;
+            // inserting it later would put it over the content.
+            let backdrop = MegramAvatarBackdrop()
+            backdrop.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+            backdrop.frame = self.view.bounds
+            self.view.insertSubview(backdrop, at: 0)
+            self.megramAvatarBackdrop = backdrop
+            // The theme fill stays until a photo actually arrives — the backdrop
+            // starts empty, and clearing the fill now would show a transparent
+            // profile for as long as the data takes.
+        }
+
         self.scrollNode.view.showsVerticalScrollIndicator = false
         if #available(iOS 11.0, *) {
             self.scrollNode.view.contentInsetAdjustmentBehavior = .never
@@ -2772,6 +2803,25 @@ final class PeerInfoScreenNode: ViewControllerTracingNode, PeerInfoScreenNodePro
             }
         }
         self.data = data
+
+        // MARK: Megram — the big avatar and the backdrop behind it.
+        //
+        // This is the earliest point where the peer's photo is known: the header
+        // is built before the data arrives, so it cannot decide for itself at
+        // init. The layout pass below picks the new state up, which is why this
+        // sits above it rather than after.
+        var isLandscape = false
+        if let (layout, _) = self.validLayout, layout.size.width > layout.size.height {
+            isLandscape = true
+        }
+        if self.megramKeepsAvatarExpanded(isLandscape: isLandscape) {
+            if !self.headerNode.isAvatarExpanded {
+                self.headerNode.updateIsAvatarExpanded(true, transition: .immediate)
+                self.updateNavigationExpansionPresentation(isExpanded: true, animated: false)
+            }
+        }
+        self.updateMegramAvatarBackdrop(peer: data.peer)
+
         if previousData?.members?.membersContext !== data.members?.membersContext {
             if let peer = data.peer, let _ = data.members {
                 self.groupMembersSearchContext = GroupMembersSearchContext(context: self.context, peerId: peer.id)
@@ -5849,6 +5899,14 @@ final class PeerInfoScreenNode: ViewControllerTracingNode, PeerInfoScreenNodePro
     }
     
     private func updateBackgroundColor() {
+        // MARK: Megram — the backdrop is the background while it has a photo, so
+        // this must not paint over it. Every other caller of this method assumes
+        // an opaque fill, which is why the guard lives here rather than at each
+        // call site.
+        if let backdrop = self.megramAvatarBackdrop, !backdrop.isHidden {
+            self.backgroundColor = nil
+            return
+        }
         let color: UIColor
         if self.paneContainerNode.currentPaneKey == .gifts {
             color = self.presentationData.theme.list.blocksBackgroundColor
@@ -6045,7 +6103,43 @@ final class PeerInfoScreenNode: ViewControllerTracingNode, PeerInfoScreenNodePro
     private var canAddVelocity: Bool = false
     
     private var canOpenAvatarByDragging = false
-    
+
+    /// MARK: Megram — points the backdrop at the peer's current photo.
+    ///
+    /// The screen's own fill has to come back when there is no photo: it was
+    /// dropped so the backdrop could show through, and leaving it dropped over
+    /// an empty backdrop makes the whole profile transparent.
+    private func updateMegramAvatarBackdrop(peer: EnginePeer?) {
+        guard let backdrop = self.megramAvatarBackdrop else {
+            return
+        }
+        backdrop.update(context: self.context, peer: peer, isDark: self.presentationData.theme.overallDarkAppearance)
+        self.updateBackgroundColor()
+    }
+
+    /// MARK: Megram — whether this screen keeps the avatar permanently expanded.
+    ///
+    /// Only when there is a photo to show. With no photo the expanded header is
+    /// a blank coloured slab the size of the screen, and there would be no way
+    /// to scroll past it to the list — which is exactly how an earlier attempt
+    /// at this broke the profile.
+    func megramKeepsAvatarExpanded(isLandscape: Bool) -> Bool {
+        if isLandscape {
+            return false
+        }
+        if self.state.isEditing || self.state.updatingAvatar != nil {
+            return false
+        }
+        if self.chatLocation.threadId != nil {
+            return false
+        }
+        guard let peer = self.data?.peer, peer.smallProfileImage != nil else {
+            return false
+        }
+        return true
+    }
+
+
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         guard !self.ignoreScrolling else {
             return
@@ -6068,13 +6162,21 @@ final class PeerInfoScreenNode: ViewControllerTracingNode, PeerInfoScreenNodePro
             if let (layout, _) = self.validLayout, layout.size.width > layout.size.height {
                 isLandscape = true
             }
+            // MARK: Megram — the avatar is big and stays big.
+            //
+            // Two behaviours are dropped while this holds: the collapse back to
+            // the small circle when the list scrolls up, and the pull-past-the-top
+            // that threw the screen into the avatar gallery. Tapping the avatar
+            // still opens the gallery — that path is untouched.
+            let megramKeepsAvatarExpanded = self.megramKeepsAvatarExpanded(isLandscape: isLandscape)
+
             if offsetY <= -32.0 && scrollView.isDragging && scrollView.isTracking {
                 if let peer = self.data?.peer, self.chatLocation.threadId == nil, peer.smallProfileImage != nil && self.state.updatingAvatar == nil && !isLandscape {
                     shouldBeExpanded = true
-                    
-                    if self.canOpenAvatarByDragging && self.headerNode.isAvatarExpanded && offsetY <= -32.0 {
+
+                    if !megramKeepsAvatarExpanded && self.canOpenAvatarByDragging && self.headerNode.isAvatarExpanded && offsetY <= -32.0 {
                         self.hapticFeedback.impact()
-                        
+
                         self.canOpenAvatarByDragging = false
                         let contentOffset = scrollView.contentOffset.y
                         scrollView.panGestureRecognizer.isEnabled = false
@@ -6087,7 +6189,9 @@ final class PeerInfoScreenNode: ViewControllerTracingNode, PeerInfoScreenNodePro
                     }
                 }
             } else if offsetY >= 1.0 {
-                shouldBeExpanded = false
+                if !megramKeepsAvatarExpanded {
+                    shouldBeExpanded = false
+                }
                 self.canOpenAvatarByDragging = false
             }
             if let shouldBeExpanded = shouldBeExpanded, shouldBeExpanded != self.headerNode.isAvatarExpanded {

@@ -104,6 +104,7 @@ private enum NamelessSettingsKey {
     static let megramGlobalClearGlass = "megram.globalClearGlass"
     static let megramFullGiftCatalog = "megram.fullGiftCatalog"
     static let megramPureClearBubbles = "megram.pureClearBubbles"
+    static let megramHideGlassBorder = "megram.hideGlassBorder"
     // MARK: Megram — Nextgram parity keys (UI-only for now, no consumers)
     static let nxHideGiftsTab = "megram.nx.hideGiftsTab"
     static let nxHideContactsTab = "megram.nx.hideContactsTab"
@@ -534,6 +535,17 @@ public extension SGSimpleSettings {
     var megramPureClearBubbles: Bool {
         get { storage.namelessBool(NamelessSettingsKey.megramPureClearBubbles, default: true) }
         set { storage.set(newValue, forKey: NamelessSettingsKey.megramPureClearBubbles) }
+    }
+
+    /// Drop the light hairline every glass surface draws around its edge.
+    ///
+    /// It is one stroke in the legacy glass renderer, which every glass surface
+    /// below iOS 26 goes through — so this reaches the context menu, the
+    /// settings cards, the hub pills and the panels together. That is the point:
+    /// removing it from one place and not the others looks like a bug.
+    var megramHideGlassBorder: Bool {
+        get { storage.namelessBool(NamelessSettingsKey.megramHideGlassBorder, default: false) }
+        set { storage.set(newValue, forKey: NamelessSettingsKey.megramHideGlassBorder) }
     }
 
     /// Ask the server for the complete star-gift catalog instead of "only what changed".

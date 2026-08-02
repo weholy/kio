@@ -14,6 +14,9 @@ import PresentationDataUtils
 import UndoUI
 import TelegramCore
 import TelegramUIPreferences
+import AlertUI
+import OverlayStatusController
+import SGAppearance
 
 // MARK: - Section
 
@@ -51,12 +54,50 @@ private struct NLSectionId: SGItemListSection, Hashable {
     static let hubPill17 = NLSectionId(rawValue: 27)
     static let hubPill18 = NLSectionId(rawValue: 28)
     static let hubActions = NLSectionId(rawValue: 30)
+    /// Developer links at the foot of the hub — one card each, so the logos sit
+    /// on their own rounded panels rather than in a single stacked block.
+    static let devHeader = NLSectionId(rawValue: 40)
+    static let devChannel = NLSectionId(rawValue: 41)
+    static let devVPN = NLSectionId(rawValue: 42)
+    static let devSupport = NLSectionId(rawValue: 43)
 
     /// One block per feature. The range starts well past the fixed sections so
     /// the two can never collide.
     static func feature(_ index: Int) -> NLSectionId {
         return NLSectionId(rawValue: 100 + Int32(index))
     }
+}
+
+/// MARK: Megram — the tab follows Telegram's own language.
+///
+/// Held as one value rather than threaded through every helper: the category
+/// titles and subtitles live on enums that never see the presentation data, and
+/// passing it to each of them would mean touching every case for one string.
+/// Set once per rebuild, read only on the main thread while the list is built.
+private enum MegramLanguage {
+    static var isRussian: Bool = true
+
+    static func update(_ baseLanguageCode: String) {
+        self.isRussian = baseLanguageCode.hasPrefix("ru")
+    }
+}
+
+/// Picks the Russian or the English string for the current app language.
+/// English is the fallback for every language that has no translation yet.
+private func megramText(_ ru: String, _ en: String) -> String {
+    return MegramLanguage.isRussian ? ru : en
+}
+
+/// Where the developer rows point. Kept in one place so filling in an address
+/// is a single edit; an empty string means the row says so rather than opening
+/// nothing at all.
+private enum MegramDeveloperLinks {
+    // Left blank deliberately: guessing a t.me address would ship a row that
+    // opens somebody else's channel. The row says it is not set up yet until
+    // the real addresses are filled in here.
+    static let channel = ""
+    static let vpn = ""
+    static let support = ""
 }
 
 /// Hands out a fresh section for every switch.
@@ -336,6 +377,13 @@ private enum NLBoolSetting: String {
     // enableSavingSelfDestructingMessages is declared near the top of this enum.
     case dimIncomingWhileReplying
     case saveDeletedMessagesReactions
+    // Megram decoration
+    case globalVideoBackground
+    case globalPhotoBackground
+    case profileWallpaper
+    case profileBannerPhoto
+    case profileBannerVideo
+    case megramHideGlassBorder
 }
 
 private enum NLSliderSetting: String {
@@ -350,6 +398,7 @@ private enum NLSliderSetting: String {
     case tabBarWidth
     case deletedMessageOpacity
     case deletedTrashSize
+    case backgroundOpacity
 }
 
 private enum NLOneFromManySetting: String {
@@ -389,6 +438,18 @@ private enum NLDisclosureLink: String {
     case accountSwitcher
     case pluginsCenter
     case localGiftsShop
+    case hubDecoration
+    // Each opens the picker for its own appearance slot.
+    case pickGlobalVideo
+    case pickGlobalPhoto
+    case pickProfileWallpaper
+    case pickProfileBannerPhoto
+    case pickProfileBannerVideo
+    // Developer links at the foot of the hub. They open Telegram resources, so
+    // they route through the app's own URL handling rather than a browser.
+    case devChannel
+    case devVPN
+    case devSupport
 }
 
 private enum NLAction: Int, CaseIterable {
@@ -421,12 +482,14 @@ private enum NLHubCategory: String, CaseIterable {
     case ghost
     case other
     case plugins
+    case decoration
 
     /// The shelves shown at the hub root, in order. Everything else in this enum still exists as a
     /// destination (deep links, search results) but is deliberately absent from the root: the hub
     /// is a short list of places, not an index of every switch in the client.
     static let rootCategories: [NLHubCategory] = [
         .appearance,
+        .decoration,
         .profiles,
         .ghost,
         .tabs,
@@ -458,6 +521,7 @@ private enum NLHubCategory: String, CaseIterable {
         case .ghost: return "Режим призрака"
         case .other: return "Прочие функции"
         case .plugins: return "Плагины"
+        case .decoration: return "Оформление"
         }
     }
 
@@ -484,6 +548,7 @@ private enum NLHubCategory: String, CaseIterable {
         case .ghost: return "Онлайн, прочтение, приватность, геолокация"
         case .other: return "Контекст, сторис, медиа, экспорт"
         case .plugins: return "Установленные расширения клиента"
+        case .decoration: return "Фоны, обои и баннеры профиля"
         }
     }
 
@@ -510,6 +575,7 @@ private enum NLHubCategory: String, CaseIterable {
         case .ghost: return .hubPill18
         case .other: return .hubActions
         case .plugins: return .hubPill2
+        case .decoration: return .hubPill17
         }
     }
 
@@ -538,6 +604,7 @@ private enum NLHubCategory: String, CaseIterable {
         // Plugins is not a list of toggles, so it links straight to its own screen instead of
         // opening a hub category.
         case .plugins: return .pluginsCenter
+        case .decoration: return .hubDecoration
         }
     }
 
@@ -563,7 +630,10 @@ private enum NLHubCategory: String, CaseIterable {
         case .hubMisc: return .misc
         case .hubGhost: return .ghost
         case .hubOther: return .other
-        case .none, .onlineHistory, .ghostDetailsToggle, .deletedDetailsToggle, .deletedTrashDesigner, .fakeLocationPicker, .localStarsAmount, .deviceModelSpoof, .accountSwitcher, .pluginsCenter, .localGiftsShop: return nil
+        case .hubDecoration: return .decoration
+        case .none, .onlineHistory, .ghostDetailsToggle, .deletedDetailsToggle, .deletedTrashDesigner, .fakeLocationPicker, .localStarsAmount, .deviceModelSpoof, .accountSwitcher, .pluginsCenter, .localGiftsShop,
+             .pickGlobalVideo, .pickGlobalPhoto, .pickProfileWallpaper, .pickProfileBannerPhoto, .pickProfileBannerVideo,
+             .devChannel, .devVPN, .devSupport: return nil
         }
     }
 }
@@ -868,6 +938,7 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
     let s = SGSimpleSettings.shared
     var entries: [NLEntry] = []
     let id = SGItemListCounter()
+    MegramLanguage.update(presentationData.strings.baseLanguageCode)
     let query = (state.searchQuery ?? "").trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
     let searching = !query.isEmpty
 
@@ -889,7 +960,14 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
                 detail: cat.subtitleRu
             ))
         }
-        entries.append(.searchInput(id: id.count, section: .search, title: NSAttributedString(string: "🔍"), text: state.searchQuery ?? "", placeholder: "Поиск настроек"))
+        entries.append(.searchInput(id: id.count, section: .search, title: NSAttributedString(string: "🔍"), text: state.searchQuery ?? "", placeholder: megramText("Поиск настроек", "Search settings")))
+
+        // MARK: Megram — developer links, at the foot of the hub.
+        entries.append(.header(id: id.count, section: .devHeader, text: megramText("РАЗРАБОТЧИК", "DEVELOPER"), badge: nil))
+        entries.append(.disclosureWithIcon(id: id.count, section: .devChannel, link: .devChannel, text: megramText("Канал «Эйай в кармане»", "«AI in your pocket» channel"), iconRef: "MegramDevChannel"))
+        entries.append(.disclosureWithIcon(id: id.count, section: .devVPN, link: .devVPN, text: "NeteVPN", iconRef: "MegramDevVPN"))
+        entries.append(.disclosureWithIcon(id: id.count, section: .devSupport, link: .devSupport, text: megramText("Техническая поддержка", "Technical support"), iconRef: "MegramDevSupport"))
+
         return filterSGItemListUIEntrires(entries: entries, by: state.searchQuery)
     }
 
@@ -946,11 +1024,14 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
     let sec: NLSectionId = .items
     // MARK: Megram — one rounded card per switch, description underneath.
     let featureSections = NLFeatureSections()
-    func megramFeature(_ setting: NLBoolSetting, _ value: Bool, _ text: String, _ description: String, enabled: Bool = true) {
+    func megramFeature(_ setting: NLBoolSetting, _ value: Bool, _ text: String, _ description: String? = nil, enabled: Bool = true) {
         let section = featureSections.take()
         entries.append(.toggle(id: id.count, section: section, settingName: setting, value: value, text: text, enabled: enabled))
-        if !description.isEmpty {
-            entries.append(.notice(id: id.count, section: section, text: description))
+        // Falls back to the shared description table so a switch converted from
+        // a bare row keeps the text it already had, just below the card now.
+        let note = description ?? NamelessToggleDescriptions.text(for: "\(setting)") ?? ""
+        if !note.isEmpty {
+            entries.append(.notice(id: id.count, section: section, text: note))
         }
     }
     let cat = state.hubCategory
@@ -966,6 +1047,7 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
     let showSettingsSections = cat == .settingsSections
     let showGhost = cat == .ghost
     let showOther = cat == .other
+    let showDecoration = cat == .decoration
 
     // ═══════════════════════════════════════════
     // ВНЕШНИЙ ВИД — интерфейс + сообщения + Liquid Glass + камера + медиа + информация
@@ -994,8 +1076,10 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
     megramFeature(.charCounterInput, s.charCounterInput, "Счётчик символов при вводе", "Показывает число набранных символов над полем ввода.")
     megramFeature(.charCounterInChat, s.charCounterInChat, "Счётчик символов в чате", "Показывает длину сообщения рядом со временем отправки.")
     megramFeature(.disableScrollToNextChannel2, !s.disableScrollToNextChannel, "Скролл к следующему каналу", "Прокрутка за конец переписки переходит в следующий непрочитанный канал.")
-    megramFeature(.namelessLiquidGlassMessages, s.namelessLiquidGlassMessages, "Liquid Glass на сообщения", "Пузыри сообщений получают стеклянную заливку, сквозь которую виден фон чата.", enabled: s.liquidGlassEnabled)
+    // Liquid Glass has no switch any more: it is always on, so a row here
+    // would promise control that no longer exists.
     megramFeature(.namelessCompactAttachmentSheet, s.namelessCompactAttachmentSheet, "Стеклянное меню вложения", "Кнопка «+» открывает компактное стеклянное меню вместо стандартной панели.")
+    megramFeature(.megramHideGlassBorder, s.megramHideGlassBorder, "Убрать полоску", "Убирает светлую обводку по краю стеклянных поверхностей — контекстного меню при удержании чата, карточек настроек, таблеток и панелей. Стекло остаётся, исчезает только рамка.")
     // Mutually exclusive: HD on demand and HD always answer the same question,
     // and leaving both on hides which one is in charge.
     megramFeature(.cameraSendHDPhoto, s.cameraSendHDPhoto, "HD-фото при отправке", "Кнопка «HD» в галерее отправляет фото без сжатия.", enabled: !s.cameraAlwaysSendHD)
@@ -1009,11 +1093,56 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
     } // end appearance
 
     // ═══════════════════════════════════════════
+    // ОФОРМЛЕНИЕ — фоны, обои и баннеры из своей галереи
+    // ═══════════════════════════════════════════
+    if showDecoration {
+    entries.append(.header(id: id.count, section: sec, text: "ФОН ПРИЛОЖЕНИЯ", badge: nil))
+
+    // The picker row is always present. It used to appear only once the slot
+    // reported itself enabled — and `isEnabled` is the switch AND a file on
+    // disk, so with nothing picked yet the row never appeared, the switch sprang
+    // straight back off, and there was no way in. The switch is what waits for
+    // the file now, not the other way round.
+    func decorationSlot(
+        _ setting: NLBoolSetting,
+        _ link: NLDisclosureLink,
+        _ slot: MegramAppearanceStore.Slot,
+        _ title: String,
+        _ pickTitle: String,
+        _ description: String
+    ) {
+        let section = featureSections.take()
+        let hasMedia = MegramAppearanceStore.hasMedia(for: slot)
+        entries.append(.toggle(id: id.count, section: section, settingName: setting, value: MegramAppearanceStore.isSwitchedOn(slot), text: title, enabled: hasMedia))
+        entries.append(.disclosureDetail(
+            id: id.count,
+            section: section,
+            link: link,
+            text: hasMedia ? "Заменить или удалить" : pickTitle,
+            detail: hasMedia ? "Файл выбран" : "Файл не выбран"
+        ))
+        entries.append(.notice(id: id.count, section: section, text: description))
+    }
+
+    decorationSlot(.globalVideoBackground, .pickGlobalVideo, .globalVideo, "Видео-фон", "Выбрать видео", "Зацикленное видео без звука за всеми экранами. При выборе видео сжимается до 720p и теряет звуковую дорожку.")
+    decorationSlot(.globalPhotoBackground, .pickGlobalPhoto, .globalPhoto, "Фото-фон", "Выбрать фото", "Неподвижное изображение за всеми экранами. Если включён видео-фон, показывается он.")
+
+    let opacitySection = featureSections.take()
+    entries.append(.percentageSlider(id: id.count, section: opacitySection, settingName: .backgroundOpacity, value: Int32(MegramAppearanceStore.backgroundOpacity * 100.0)))
+    entries.append(.notice(id: id.count, section: opacitySection, text: "Насколько фон просвечивает сквозь интерфейс. Чем выше, тем светлее фон и тем труднее читать текст."))
+
+    entries.append(.header(id: id.count, section: sec, text: "ПРОФИЛЬ", badge: nil))
+    decorationSlot(.profileWallpaper, .pickProfileWallpaper, .profileWallpaper, "Обои профиля", "Выбрать изображение", "Фон экрана профиля — своего и чужих.")
+    decorationSlot(.profileBannerPhoto, .pickProfileBannerPhoto, .profileBannerPhoto, "Фото-баннер", "Выбрать фото", "Полоса от верха экрана до карточки трека в своём профиле. Видна только вам — отправить её собеседнику нельзя.")
+    decorationSlot(.profileBannerVideo, .pickProfileBannerVideo, .profileBannerVideo, "Видео-баннер", "Выбрать видео", "То же место, но зацикленным видео. Если включены оба баннера, показывается видео.")
+    } // end decoration
+
+    // ═══════════════════════════════════════════
     // РЕЖИМ ПРИЗРАКА — статусы + приватность + конфиденциальность + геолокация + информация
     // ═══════════════════════════════════════════
     if showGhost {
     entries.append(.header(id: id.count, section: sec, text: "👻 РЕЖИМ ПРИЗРАКА", badge: nil))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .ghostModeEnabled, value: s.ghostModeEnabled, text: "Режим призрака", enabled: true))
+    megramFeature(.ghostModeEnabled, s.ghostModeEnabled, "Режим призрака", enabled: true)
     entries.append(.disclosureDetail(id: id.count, section: sec, link: .ghostDetailsToggle, text: "Дополнительные настройки", detail: state.ghostModeExpanded ? "Скрыть настройки режима призрака" : "Показать настройки режима призрака"))
 
     // MARK: Megram — «Удалённые сообщения» устроены так же, как призрак:
@@ -1047,54 +1176,54 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
 
     if state.ghostModeExpanded {
     entries.append(.header(id: id.count, section: sec, text: "СКРЫТИЕ СТАТУСОВ", badge: nil))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .ghostModeAlwaysOnline, value: s.ghostModeAlwaysOnline, text: "Всегда онлайн", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .disableOnlineStatus, value: s.disableOnlineStatus, text: "Скрыть онлайн-статус", enabled: !s.ghostModeAlwaysOnline))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .disableTypingStatus, value: s.disableTypingStatus, text: "Скрыть «печатает»", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .disableVCMessageRecordingStatus, value: s.disableVCMessageRecordingStatus, text: "Скрыть запись голосового", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .disableVCMessageUploadingStatus, value: s.disableVCMessageUploadingStatus, text: "Скрыть отправку голосового", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .disableUploadingFileStatus, value: s.disableUploadingFileStatus, text: "Скрыть загрузку файлов", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .disableUploadingPhotoStatus, value: s.disableUploadingPhotoStatus, text: "Скрыть отправку фото", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .disableUploadingVideoStatus, value: s.disableUploadingVideoStatus, text: "Скрыть отправку видео", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .disableRecordingVideoStatus, value: s.disableRecordingVideoStatus, text: "Скрыть запись видео", enabled: true))
+    megramFeature(.ghostModeAlwaysOnline, s.ghostModeAlwaysOnline, "Всегда онлайн", enabled: true)
+    megramFeature(.disableOnlineStatus, s.disableOnlineStatus, "Скрыть онлайн-статус", enabled: !s.ghostModeAlwaysOnline)
+    megramFeature(.disableTypingStatus, s.disableTypingStatus, "Скрыть «печатает»", enabled: true)
+    megramFeature(.disableVCMessageRecordingStatus, s.disableVCMessageRecordingStatus, "Скрыть запись голосового", enabled: true)
+    megramFeature(.disableVCMessageUploadingStatus, s.disableVCMessageUploadingStatus, "Скрыть отправку голосового", enabled: true)
+    megramFeature(.disableUploadingFileStatus, s.disableUploadingFileStatus, "Скрыть загрузку файлов", enabled: true)
+    megramFeature(.disableUploadingPhotoStatus, s.disableUploadingPhotoStatus, "Скрыть отправку фото", enabled: true)
+    megramFeature(.disableUploadingVideoStatus, s.disableUploadingVideoStatus, "Скрыть отправку видео", enabled: true)
+    megramFeature(.disableRecordingVideoStatus, s.disableRecordingVideoStatus, "Скрыть запись видео", enabled: true)
     // "Выбирает локацию" / "выбирает контакт" are not real Telegram activities — there is no
     // such `SendMessageAction`, so no toggle can suppress them. Rows removed rather than left
     // as switches that silently do nothing.
     id.increment(2)
-    entries.append(.toggle(id: id.count, section: sec, settingName: .disablePlayingGameStatus, value: s.disablePlayingGameStatus, text: "Скрыть статус игры", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .disableRecordingRoundVideoStatus, value: s.disableRecordingRoundVideoStatus, text: "Скрыть запись кружка", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .disableUploadingRoundVideoStatus, value: s.disableUploadingRoundVideoStatus, text: "Скрыть отправку кружка", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .disableSpeakingInGroupCallStatus, value: s.disableSpeakingInGroupCallStatus, text: "Скрыть говорение в звонке", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .disableChoosingStickerStatus, value: s.disableChoosingStickerStatus, text: "Скрыть выбор стикера", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .disableEmojiInteractionStatus, value: s.disableEmojiInteractionStatus, text: "Скрыть эмодзи-взаимодействие", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .disableEmojiAcknowledgementStatus, value: s.disableEmojiAcknowledgementStatus, text: "Скрыть эмодзи-подтверждение", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .ghostModeHideVideoWatch, value: s.ghostModeHideVideoWatch, text: "Скрыть просмотр видео/кружка", enabled: true))
+    megramFeature(.disablePlayingGameStatus, s.disablePlayingGameStatus, "Скрыть статус игры", enabled: true)
+    megramFeature(.disableRecordingRoundVideoStatus, s.disableRecordingRoundVideoStatus, "Скрыть запись кружка", enabled: true)
+    megramFeature(.disableUploadingRoundVideoStatus, s.disableUploadingRoundVideoStatus, "Скрыть отправку кружка", enabled: true)
+    megramFeature(.disableSpeakingInGroupCallStatus, s.disableSpeakingInGroupCallStatus, "Скрыть говорение в звонке", enabled: true)
+    megramFeature(.disableChoosingStickerStatus, s.disableChoosingStickerStatus, "Скрыть выбор стикера", enabled: true)
+    megramFeature(.disableEmojiInteractionStatus, s.disableEmojiInteractionStatus, "Скрыть эмодзи-взаимодействие", enabled: true)
+    megramFeature(.disableEmojiAcknowledgementStatus, s.disableEmojiAcknowledgementStatus, "Скрыть эмодзи-подтверждение", enabled: true)
+    megramFeature(.ghostModeHideVideoWatch, s.ghostModeHideVideoWatch, "Скрыть просмотр видео/кружка", enabled: true)
 
     entries.append(.header(id: id.count, section: sec, text: "ПРОЧТЕНИЕ И ПРОСМОТР", badge: nil))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .disableMessageReadReceipt, value: s.disableMessageReadReceipt, text: "Скрыть прочтение (галочки)", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .disableStoryReadReceipt, value: s.disableStoryReadReceipt, text: "Скрыть просмотр сторис", enabled: true))
+    megramFeature(.disableMessageReadReceipt, s.disableMessageReadReceipt, "Скрыть прочтение (галочки)", enabled: true)
+    megramFeature(.disableStoryReadReceipt, s.disableStoryReadReceipt, "Скрыть просмотр сторис", enabled: true)
 
     entries.append(.header(id: id.count, section: sec, text: "ДОПОЛНИТЕЛЬНО", badge: nil))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .ghostModeMessageSendDelay, value: s.ghostModeMessageSendDelaySeconds > 0, text: "Задержка отправки 12 сек", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .ghostModeFakeTyping, value: s.ghostModeFakeTyping, text: "Fake typing (показывать «печатает»)", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .ghostModeAntiSpam, value: s.ghostModeAntiSpam, text: "Анти-спам входящих", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .ghostModeAutoCleanHistory, value: s.ghostModeAutoCleanHistory, text: "Авто-очистка архива удалённых", enabled: true))
+    megramFeature(.ghostModeMessageSendDelay, s.ghostModeMessageSendDelaySeconds > 0, "Задержка отправки 12 сек", enabled: true)
+    megramFeature(.ghostModeFakeTyping, s.ghostModeFakeTyping, "Fake typing (показывать «печатает»)", enabled: true)
+    megramFeature(.ghostModeAntiSpam, s.ghostModeAntiSpam, "Анти-спам входящих", enabled: true)
+    megramFeature(.ghostModeAutoCleanHistory, s.ghostModeAutoCleanHistory, "Авто-очистка архива удалённых", enabled: true)
     entries.append(.notice(id: id.count, section: sec, text: "Сохранённые копии удалённых сообщений старше \(max(1, Int(s.ghostModeAutoCleanDays))) дн. стираются с устройства. Настоящая переписка не трогается."))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .enableOnlineStatusRecording, value: s.enableOnlineStatusRecording, text: "История онлайна собеседников", enabled: true))
+    megramFeature(.enableOnlineStatusRecording, s.enableOnlineStatusRecording, "История онлайна собеседников", enabled: true)
     entries.append(.disclosure(id: id.count, section: sec, link: .onlineHistory, text: "Открыть историю онлайна"))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .fakeLocationEnabled, value: s.fakeLocationEnabled, text: "Подмена геолокации", enabled: true))
+    megramFeature(.fakeLocationEnabled, s.fakeLocationEnabled, "Подмена геолокации", enabled: true)
     entries.append(.disclosure(id: id.count, section: sec, link: .fakeLocationPicker, text: "Выбрать местоположение"))
 
     // КОНФИДЕНЦИАЛЬНОСТЬ (перенесена из отдельной вкладки)
     entries.append(.header(id: id.count, section: sec, text: "КОНФИДЕНЦИАЛЬНОСТЬ", badge: nil))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .bypassProtectedContent, value: s.bypassProtectedContent, text: "Обход защищённого контента", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .removeSpoilersEverywhere, value: s.removeSpoilersEverywhere, text: "Убрать спойлеры везде", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .antiScamEnabled, value: s.antiScamEnabled, text: "Защита от мошенников", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .disableAllAds, value: s.disableAllAds, text: "Отключить рекламу", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .enableSavingProtectedContent, value: s.enableSavingProtectedContent, text: "Сохранять защищённый контент", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .enableSavingSelfDestructingMessages, value: s.enableSavingSelfDestructingMessages, text: "Сохранять самоуничтожающиеся", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .disableScreenshotDetection, value: s.disableScreenshotDetection, text: "Без определения скриншотов", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .disableSecretChatBlurOnScreenshot, value: s.disableSecretChatBlurOnScreenshot, text: "Без размытия при скриншоте", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .hideProxySponsor, value: s.hideProxySponsor, text: "Скрыть спонсора прокси", enabled: true))
+    megramFeature(.bypassProtectedContent, s.bypassProtectedContent, "Обход защищённого контента", enabled: true)
+    megramFeature(.removeSpoilersEverywhere, s.removeSpoilersEverywhere, "Убрать спойлеры везде", enabled: true)
+    megramFeature(.antiScamEnabled, s.antiScamEnabled, "Защита от мошенников", enabled: true)
+    megramFeature(.disableAllAds, s.disableAllAds, "Отключить рекламу", enabled: true)
+    megramFeature(.enableSavingProtectedContent, s.enableSavingProtectedContent, "Сохранять защищённый контент", enabled: true)
+    megramFeature(.enableSavingSelfDestructingMessages, s.enableSavingSelfDestructingMessages, "Сохранять самоуничтожающиеся", enabled: true)
+    megramFeature(.disableScreenshotDetection, s.disableScreenshotDetection, "Без определения скриншотов", enabled: true)
+    megramFeature(.disableSecretChatBlurOnScreenshot, s.disableSecretChatBlurOnScreenshot, "Без размытия при скриншоте", enabled: true)
+    megramFeature(.hideProxySponsor, s.hideProxySponsor, "Скрыть спонсора прокси", enabled: true)
     } // end ghostModeExpanded
     } // end ghost
 
@@ -1180,25 +1309,25 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
     // MEGRAM · МЕНЮ ПРОФИЛЯ — the three-dot menu inside a private chat.
     entries.append(.header(id: id.count, section: sec, text: "MEGRAM · МЕНЮ ПРОФИЛЯ", badge: nil))
     entries.append(.notice(id: id.count, section: sec, text: "Скрывает пункты меню «⋯» в профиле собеседника. Пункт Megram скрыть нельзя."))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .hideMenuWallpaper, value: s.hideMenuWallpaper, text: "Скрыть «Изменить обои»", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .hideMenuSecretChat, value: s.hideMenuSecretChat, text: "Скрыть «Начать секретный чат»", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .hideMenuSendContact, value: s.hideMenuSendContact, text: "Скрыть «Отправить контакт»", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .hideMenuAutoDelete, value: s.hideMenuAutoDelete, text: "Скрыть «Автоудаление»", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .hideMenuCopyProtection, value: s.hideMenuCopyProtection, text: "Скрыть «Запретить копирование»", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .hideMenuClearHistory, value: s.hideMenuClearHistory, text: "Скрыть «Удалить переписку»", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .hideMenuBlock, value: s.hideMenuBlock, text: "Скрыть «Заблокировать»", enabled: true))
+    megramFeature(.hideMenuWallpaper, s.hideMenuWallpaper, "Скрыть «Изменить обои»", enabled: true)
+    megramFeature(.hideMenuSecretChat, s.hideMenuSecretChat, "Скрыть «Начать секретный чат»", enabled: true)
+    megramFeature(.hideMenuSendContact, s.hideMenuSendContact, "Скрыть «Отправить контакт»", enabled: true)
+    megramFeature(.hideMenuAutoDelete, s.hideMenuAutoDelete, "Скрыть «Автоудаление»", enabled: true)
+    megramFeature(.hideMenuCopyProtection, s.hideMenuCopyProtection, "Скрыть «Запретить копирование»", enabled: true)
+    megramFeature(.hideMenuClearHistory, s.hideMenuClearHistory, "Скрыть «Удалить переписку»", enabled: true)
+    megramFeature(.hideMenuBlock, s.hideMenuBlock, "Скрыть «Заблокировать»", enabled: true)
 
     entries.append(.header(id: id.count, section: sec, text: "КОНТЕКСТНОЕ МЕНЮ", badge: nil))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .contextShowSaveToCloud, value: s.contextShowSaveToCloud, text: "Сохранить в облако", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .contextShowHideForwardName, value: s.contextShowHideForwardName, text: "Скрыть имя пересылки", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .contextShowSelectFromUser, value: s.contextShowSelectFromUser, text: "Выбрать от пользователя", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .contextShowRestrict, value: s.contextShowRestrict, text: "Ограничить", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .contextShowReport, value: s.contextShowReport, text: "Пожаловаться", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .contextShowReply, value: s.contextShowReply, text: "Ответить", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .contextShowPin, value: s.contextShowPin, text: "Закрепить", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .contextShowSaveMedia, value: s.contextShowSaveMedia, text: "Сохранить медиа", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .contextShowMessageReplies, value: s.contextShowMessageReplies, text: "Ответы на сообщение", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .contextShowJson, value: s.contextShowJson, text: "JSON", enabled: true))
+    megramFeature(.contextShowSaveToCloud, s.contextShowSaveToCloud, "Сохранить в облако", enabled: true)
+    megramFeature(.contextShowHideForwardName, s.contextShowHideForwardName, "Скрыть имя пересылки", enabled: true)
+    megramFeature(.contextShowSelectFromUser, s.contextShowSelectFromUser, "Выбрать от пользователя", enabled: true)
+    megramFeature(.contextShowRestrict, s.contextShowRestrict, "Ограничить", enabled: true)
+    megramFeature(.contextShowReport, s.contextShowReport, "Пожаловаться", enabled: true)
+    megramFeature(.contextShowReply, s.contextShowReply, "Ответить", enabled: true)
+    megramFeature(.contextShowPin, s.contextShowPin, "Закрепить", enabled: true)
+    megramFeature(.contextShowSaveMedia, s.contextShowSaveMedia, "Сохранить медиа", enabled: true)
+    megramFeature(.contextShowMessageReplies, s.contextShowMessageReplies, "Ответы на сообщение", enabled: true)
+    megramFeature(.contextShowJson, s.contextShowJson, "JSON", enabled: true)
 
     // ЛОКАЛЬНЫЙ ПРЕМИУМ И ЗВЁЗДЫ
     megramFeature(.enableLocalPremium, s.enableLocalPremium, "Локальный премиум", "Премиум-функции включаются на этом устройстве. Собеседники значка не увидят.")
@@ -1225,9 +1354,9 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
 
     // ДОПОЛНИТЕЛЬНО
     entries.append(.header(id: id.count, section: sec, text: "ДОПОЛНИТЕЛЬНО", badge: nil))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .quickTranslateButton, value: s.quickTranslateButton, text: "Кнопка «Перевести»", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .disableZalgoText, value: s.disableZalgoText, text: "Zalgo-фильтр", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .uploadSpeedBoost, value: s.uploadSpeedBoost, text: "Ускорение отправки", enabled: true))
+    megramFeature(.quickTranslateButton, s.quickTranslateButton, "Кнопка «Перевести»", enabled: true)
+    megramFeature(.disableZalgoText, s.disableZalgoText, "Zalgo-фильтр", enabled: true)
+    megramFeature(.uploadSpeedBoost, s.uploadSpeedBoost, "Ускорение отправки", enabled: true)
     // Megram: the stored value is an English key; the row shows it translated.
     let downloadBoostTitle: String
     switch s.downloadSpeedBoost {
@@ -1236,35 +1365,35 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
     default: downloadBoostTitle = "Выключено"
     }
     entries.append(.oneFromManySelector(id: id.count, section: sec, settingName: .downloadSpeedBoost, text: "Ускорение загрузки", value: downloadBoostTitle, enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .unlimitedFavoriteStickers, value: s.unlimitedFavoriteStickers, text: "Безлимитные избранные стикеры", enabled: true))
+    megramFeature(.unlimitedFavoriteStickers, s.unlimitedFavoriteStickers, "Безлимитные избранные стикеры", enabled: true)
 
     // СТИКЕРЫ
     entries.append(.header(id: id.count, section: sec, text: "СТИКЕРЫ", badge: nil))
     entries.append(.percentageSlider(id: id.count, section: sec, settingName: .stickerSize, value: s.stickerSize))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .stickerTimestamp, value: s.stickerTimestamp, text: "Временные метки на стикерах", enabled: true))
+    megramFeature(.stickerTimestamp, s.stickerTimestamp, "Временные метки на стикерах", enabled: true)
 
     // ФОТО
     entries.append(.header(id: id.count, section: sec, text: "ФОТО", badge: nil))
     entries.append(.percentageSlider(id: id.count, section: sec, settingName: .outgoingPhotoQuality, value: s.outgoingPhotoQuality))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .sendLargePhotos, value: s.sendLargePhotos, text: "Отправлять большие фото", enabled: true))
+    megramFeature(.sendLargePhotos, s.sendLargePhotos, "Отправлять большие фото", enabled: true)
 
     // СТОРИС
     entries.append(.header(id: id.count, section: sec, text: "СТОРИС", badge: nil))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .disableSwipeToRecordStory, value: s.disableSwipeToRecordStory, text: "Скрыть свайп для записи сторис", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .warnOnStoriesOpen, value: s.warnOnStoriesOpen, text: "Предупреждение при открытии сторис", enabled: true))
+    megramFeature(.disableSwipeToRecordStory, s.disableSwipeToRecordStory, "Скрыть свайп для записи сторис", enabled: true)
+    megramFeature(.warnOnStoriesOpen, s.warnOnStoriesOpen, "Предупреждение при открытии сторис", enabled: true)
     if s.canUseStealthMode {
-        entries.append(.toggle(id: id.count, section: sec, settingName: .storyStealthMode, value: s.storyStealthMode, text: "Stealth-режим сторис", enabled: true))
+        megramFeature(.storyStealthMode, s.storyStealthMode, "Stealth-режим сторис", enabled: true)
     } else {
         id.increment(1)
     }
-    entries.append(.toggle(id: id.count, section: sec, settingName: .showRepostToStory, value: s.showRepostToStoryV2, text: "Переслать в историю", enabled: true))
+    megramFeature(.showRepostToStory, s.showRepostToStoryV2, "Переслать в историю", enabled: true)
 
     // ПРОЧЕЕ
     entries.append(.header(id: id.count, section: sec, text: "ПРОЧЕЕ", badge: nil))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .forceSystemSharing, value: s.forceSystemSharing, text: "Системный шэринг", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .emojiDownloaderEnabled, value: s.emojiDownloaderEnabled, text: "Скачивание эмодзи", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .swipeForVideoPIP, value: s.videoPIPSwipeDirection == SGSimpleSettings.VideoPIPSwipeDirection.up.rawValue, text: "Свайп для PiP видео", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .forceBuiltInMic, value: s.forceBuiltInMic, text: "Встроенный микрофон", enabled: true))
+    megramFeature(.forceSystemSharing, s.forceSystemSharing, "Системный шэринг", enabled: true)
+    megramFeature(.emojiDownloaderEnabled, s.emojiDownloaderEnabled, "Скачивание эмодзи", enabled: true)
+    megramFeature(.swipeForVideoPIP, s.videoPIPSwipeDirection == SGSimpleSettings.VideoPIPSwipeDirection.up.rawValue, "Свайп для PiP видео", enabled: true)
+    megramFeature(.forceBuiltInMic, s.forceBuiltInMic, "Встроенный микрофон", enabled: true)
 
     } // end other
 
@@ -1296,6 +1425,10 @@ private func namelessFeaturesControllerImpl(context: AccountContext, initialCate
     var presentControllerImpl: ((ViewController, ViewControllerPresentationArguments?) -> Void)?
     var pushControllerImpl: ((ViewController) -> Void)?
     var askForRestart: (() -> Void)?
+    /// PHPicker is a UIKit controller, so it cannot go through the Display
+    /// presentation stack — it needs a real UIViewController to present from.
+    /// Wired to the live controller's own window below.
+    var openDecorationPickerImpl: ((MegramAppearanceStore.Slot) -> Void)?
 
     let initialState = NLControllerState(hubCategory: initialCategory)
     let statePromise = ValuePromise(initialState, ignoreRepeated: true)
@@ -1481,6 +1614,12 @@ private func namelessFeaturesControllerImpl(context: AccountContext, initialCate
                 s.namelessLiquidGlassMessages = value
                 NotificationCenter.default.post(name: .luxgramLiquidGlassDidChange, object: nil)
                 simplePromise.set(true)
+            case .megramHideGlassBorder:
+                s.megramHideGlassBorder = value
+                // Surfaces already drawn keep their edge image until something
+                // asks them to rebuild it, which is what this notification does.
+                NotificationCenter.default.post(name: .luxgramLiquidGlassDidChange, object: nil)
+                simplePromise.set(true)
             case .namelessLiquidGlassOutgoingMessages:
                 s.namelessLiquidGlassOutgoingMessages = value
                 NotificationCenter.default.post(name: .luxgramLiquidGlassDidChange, object: nil)
@@ -1571,6 +1710,13 @@ private func namelessFeaturesControllerImpl(context: AccountContext, initialCate
             case .hideMenuCopyProtection: s.hideMenuCopyProtection = value
             case .hideMenuClearHistory: s.hideMenuClearHistory = value
             case .hideMenuBlock: s.hideMenuBlock = value
+            // Turning a decoration slot off keeps its file, so switching back
+            // on does not require picking the media again.
+            case .globalVideoBackground: MegramAppearanceStore.setEnabled(.globalVideo, value); simplePromise.set(true)
+            case .globalPhotoBackground: MegramAppearanceStore.setEnabled(.globalPhoto, value); simplePromise.set(true)
+            case .profileWallpaper: MegramAppearanceStore.setEnabled(.profileWallpaper, value); simplePromise.set(true)
+            case .profileBannerPhoto: MegramAppearanceStore.setEnabled(.profileBannerPhoto, value); simplePromise.set(true)
+            case .profileBannerVideo: MegramAppearanceStore.setEnabled(.profileBannerVideo, value); simplePromise.set(true)
             case .hideBottomTabPanel: s.hideTabBar = value; simplePromise.set(true); askForRestart?()
             case .hideContactsTab: s.hideContactsTab = value; simplePromise.set(true); askForRestart?()
             case .hideCallsTab: s.hideCallsTab = value; simplePromise.set(true); askForRestart?()
@@ -1708,6 +1854,9 @@ private func namelessFeaturesControllerImpl(context: AccountContext, initialCate
             case .deletedTrashSize:
                 let clamped = max(50, min(200, value))
                 if s.deletedTrashSize != clamped { s.deletedTrashSize = clamped; simplePromise.set(true) }
+            case .backgroundOpacity:
+                MegramAppearanceStore.setBackgroundOpacity(CGFloat(max(10, min(100, value))) / 100.0)
+                simplePromise.set(true)
             case .accountColorsSaturation: if s.accountColorsSaturation != value { s.accountColorsSaturation = value; simplePromise.set(true) }
             case .liquidGlassIntensity:
                 let newIntensity = Double(value) / 100.0
@@ -1776,6 +1925,66 @@ private func namelessFeaturesControllerImpl(context: AccountContext, initialCate
             presentControllerImpl?(actionSheet, ViewControllerPresentationArguments(presentationAnimation: .modalSheet))
         },
         openDisclosureLink: { link in
+            // MARK: Megram — developer links. Opened through the app's own URL
+            // handling so a t.me address resolves inside Telegram instead of
+            // bouncing out to a browser.
+            switch link {
+            case .devChannel, .devVPN, .devSupport:
+                let address: String
+                switch link {
+                case .devChannel: address = MegramDeveloperLinks.channel
+                case .devVPN: address = MegramDeveloperLinks.vpn
+                default: address = MegramDeveloperLinks.support
+                }
+                if address.isEmpty {
+                    let presentationData = context.sharedContext.currentPresentationData.with { $0 }
+                    presentControllerImpl?(textAlertController(context: context, title: nil, text: megramText("Ссылка ещё не настроена.", "This link is not set up yet."), actions: [TextAlertAction(type: .defaultAction, title: presentationData.strings.Common_OK, action: {})]), nil)
+                } else {
+                    context.sharedContext.applicationBindings.openUrl(address)
+                }
+                return
+            default:
+                break
+            }
+
+            // MARK: Megram — appearance pickers. The picker needs a live view
+            // controller to present from, which only the presentation callback
+            // can supply here.
+            let decorationSlot: MegramAppearanceStore.Slot?
+            switch link {
+            case .pickGlobalVideo: decorationSlot = .globalVideo
+            case .pickGlobalPhoto: decorationSlot = .globalPhoto
+            case .pickProfileWallpaper: decorationSlot = .profileWallpaper
+            case .pickProfileBannerPhoto: decorationSlot = .profileBannerPhoto
+            case .pickProfileBannerVideo: decorationSlot = .profileBannerVideo
+            default: decorationSlot = nil
+            }
+            if let decorationSlot {
+                let presentationData = context.sharedContext.currentPresentationData.with { $0 }
+                // A slot that already holds a file offers to swap or drop it
+                // first; going straight to the library would make deleting one
+                // impossible.
+                if MegramAppearanceStore.hasMedia(for: decorationSlot) {
+                    let actionSheet = ActionSheetController(presentationData: presentationData)
+                    actionSheet.setItemGroups([ActionSheetItemGroup(items: [
+                        ActionSheetButtonItem(title: "Выбрать другой файл", color: .accent, action: { [weak actionSheet] in
+                            actionSheet?.dismissAnimated()
+                            openDecorationPickerImpl?(decorationSlot)
+                        }),
+                        ActionSheetButtonItem(title: "Удалить файл", color: .destructive, action: { [weak actionSheet] in
+                            actionSheet?.dismissAnimated()
+                            MegramAppearanceStore.clear(decorationSlot)
+                            simplePromise.set(true)
+                        })
+                    ]), ActionSheetItemGroup(items: [
+                        ActionSheetButtonItem(title: presentationData.strings.Common_Cancel, color: .accent, font: .bold, action: { [weak actionSheet] in
+                            actionSheet?.dismissAnimated()
+                        })
+                    ])])
+                    presentControllerImpl?(actionSheet, ViewControllerPresentationArguments(presentationAnimation: .modalSheet))
+                } else {
+                    openDecorationPickerImpl?(decorationSlot)
+                }
             if link == .deletedDetailsToggle {
                 updateState { current in
                     var updated = current
@@ -1873,8 +2082,11 @@ private func namelessFeaturesControllerImpl(context: AccountContext, initialCate
                 nil
             )
         },
-        boolDescription: { setting in
-            return NamelessToggleDescriptions.text(for: "\(setting)") ?? "Локальная функция Megram. Работает только в этом клиенте и не меняет серверные данные Telegram."
+        boolDescription: { _ in
+            // MARK: Megram — the description belongs under the card, not inside
+            // it. `megramFeature` appends it as a separate notice below the
+            // rounded panel; returning it here as well printed every one twice.
+            return nil
         }
     )
 
@@ -1893,6 +2105,41 @@ private func namelessFeaturesControllerImpl(context: AccountContext, initialCate
     }
     presentControllerImpl = { [weak controller] c, a in
         controller?.present(c, in: .window(.root), with: a)
+    }
+    openDecorationPickerImpl = { [weak controller] slot in
+        let presentationData = context.sharedContext.currentPresentationData.with { $0 }
+        // The library sheet itself is instant; the spinner is for the transcode
+        // that follows a video pick, so it only goes up once that reports work.
+        let progressController = OverlayStatusController(theme: presentationData.theme, type: .loading(cancelled: nil))
+        var progressShown = false
+        let picker = MegramMediaPicker(slot: slot, progress: { _ in
+            if !progressShown {
+                progressShown = true
+                presentControllerImpl?(progressController, nil)
+            }
+        }, completion: { result in
+            if progressShown {
+                progressController.dismiss()
+            }
+            switch result {
+            case .success:
+                simplePromise.set(true)
+            case let .failure(error):
+                if case .cancelled = error {
+                    break
+                }
+                presentControllerImpl?(textAlertController(context: context, title: nil, text: "Не удалось обработать файл. Попробуйте другой.", actions: [TextAlertAction(type: .defaultAction, title: presentationData.strings.Common_OK, action: {})]), nil)
+            }
+        })
+        // The controller's own window root, the way the rest of this codebase
+        // presents UIKit controllers. Walking down the presented chain — what
+        // this used to do — lands on whatever modal happens to be up and can
+        // refuse the presentation outright, which is why nothing opened.
+        guard #available(iOS 14.0, *), let root = controller?.view.window?.rootViewController else {
+            presentControllerImpl?(textAlertController(context: context, title: nil, text: "Не удалось открыть галерею.", actions: [TextAlertAction(type: .defaultAction, title: presentationData.strings.Common_OK, action: {})]), nil)
+            return
+        }
+        picker.present(in: root)
     }
     askForRestart = { [weak context] in
         guard let context = context else { return }

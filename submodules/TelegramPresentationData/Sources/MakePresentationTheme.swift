@@ -16,20 +16,42 @@ public func makeDefaultPresentationTheme(reference: PresentationBuiltinThemeRefe
         case .nightAccent:
             theme = makeDefaultDarkTintedPresentationTheme(extendingThemeReference: extendingThemeReference, preview: preview)
     }
-    return megramApplyingGlass(theme)
+    return megramApplyingGlobalBackground(theme)
 }
 
-/// Grouped rows sit on a translucent panel rather than a solid grey slab.
+/// Lets Megram's app-wide background show through the interface.
 ///
-/// Doing it in the theme reaches every screen at once: each list item paints
-/// itemBlocksBackgroundColor itself, there are well over thirty of them, and
-/// one missed item leaves a grey block among glass ones.
-public func megramApplyingGlass(_ theme: PresentationTheme) -> PresentationTheme {
-    let updatedList = theme.list.withUpdated(
+/// Every list draws an opaque fill, so a background behind the window would
+/// otherwise be invisible. Punching the alpha out of the few colours that
+/// cover the screen is one change that reaches every screen at once —
+/// the alternative is hunting down each controller's background node.
+///
+/// Text, separators and controls keep their colours: only the surfaces they
+/// sit on become translucent.
+public func megramApplyingGlobalBackground(_ theme: PresentationTheme) -> PresentationTheme {
+    // Grouped rows always sit on a translucent panel rather than a solid grey
+    // slab. Doing it here reaches every screen at once — the alternative is
+    // editing dozens of list items that each paint this colour themselves,
+    // and one missed item leaves a grey block among glass ones.
+    var updatedList = theme.list.withUpdated(
         itemBlocksBackgroundColor: theme.list.itemBlocksBackgroundColor.withAlphaComponent(0.55)
     )
+
+    // The page behind those panels only goes translucent when there is
+    // something to reveal; otherwise the panels would dissolve into it.
+    if megramGlobalBackgroundIsActive?() == true {
+        updatedList = updatedList.withUpdated(
+            blocksBackgroundColor: theme.list.blocksBackgroundColor.withAlphaComponent(0.3),
+            plainBackgroundColor: theme.list.plainBackgroundColor.withAlphaComponent(0.3)
+        )
+    }
+
     return theme.withUpdated(list: updatedList)
 }
+
+/// Set by the app layer, which owns the appearance store. Kept as a hook so
+/// TelegramPresentationData does not gain a dependency on it.
+public var megramGlobalBackgroundIsActive: (() -> Bool)?
 
 public func customizePresentationTheme(_ theme: PresentationTheme, editing: Bool, title: String? = nil, accentColor: UIColor?, outgoingAccentColor: UIColor?, backgroundColors: [UInt32], bubbleColors: [UInt32], animateBubbleColors: Bool?, wallpaper: TelegramWallpaper? = nil, baseColor: PresentationThemeBaseColor? = nil) -> PresentationTheme {
     if accentColor == nil && bubbleColors.isEmpty && backgroundColors.isEmpty && wallpaper == nil {

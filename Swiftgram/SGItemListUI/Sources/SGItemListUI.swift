@@ -22,6 +22,43 @@ import AppBundle
 import WebKit
 import PeerNameColorScreen
 
+/// MARK: Megram — bundle image drawn as a rounded square, for the logo rows.
+///
+/// Cached because `item(presentationData:arguments:)` runs on every rebuild of
+/// the list, and redrawing the same logo through a renderer on each keystroke of
+/// the settings search is wasted work.
+private final class MegramIconCache {
+    static let shared = MegramIconCache()
+    private var images: [String: UIImage] = [:]
+    private let lock = NSLock()
+
+    func icon(named name: String) -> UIImage? {
+        self.lock.lock()
+        defer { self.lock.unlock() }
+        if let cached = self.images[name] {
+            return cached
+        }
+        guard let source = UIImage(bundleImageName: name) else {
+            return nil
+        }
+        let side: CGFloat = 29.0
+        let rendered = UIGraphicsImageRenderer(size: CGSize(width: side, height: side)).image { _ in
+            let rect = CGRect(origin: .zero, size: CGSize(width: side, height: side))
+            UIBezierPath(roundedRect: rect, cornerRadius: 8.0).addClip()
+            source.draw(in: rect)
+        }
+        self.images[name] = rendered
+        return rendered
+    }
+}
+
+private func megramRoundedIcon(named name: String) -> UIImage? {
+    if name.isEmpty {
+        return nil
+    }
+    return MegramIconCache.shared.icon(named: name)
+}
+
 public class SGItemListCounter {
     private var _count = 0
     
@@ -263,8 +300,10 @@ public enum SGItemListUIEntry<Section: SGItemListSection, BoolSetting: Hashable,
             ) {
                 arguments.openDisclosureLink(link)
             }
-        case let .disclosureWithIcon(_, _, link, text, _):
-            return ItemListDisclosureItem(presentationData: presentationData, systemStyle: .glass, title: text, label: "", sectionId: self.section, style: .blocks) {
+        case let .disclosureWithIcon(_, _, link, text, iconRef):
+            // MARK: Megram — the icon used to be parsed and then dropped, so
+            // every row built through this case rendered without one.
+            return ItemListDisclosureItem(presentationData: presentationData, systemStyle: .glass, icon: megramRoundedIcon(named: iconRef), title: text, label: "", sectionId: self.section, style: .blocks) {
                 arguments.openDisclosureLink(link)
             }
         case let .percentageSlider(_, _, setting, value):
