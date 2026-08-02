@@ -1985,6 +1985,9 @@ private func namelessFeaturesControllerImpl(context: AccountContext, initialCate
                 } else {
                     openDecorationPickerImpl?(decorationSlot)
                 }
+                return
+            }
+
             if link == .deletedDetailsToggle {
                 updateState { current in
                     var updated = current
