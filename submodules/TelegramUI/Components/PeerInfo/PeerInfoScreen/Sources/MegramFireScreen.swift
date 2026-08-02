@@ -557,7 +557,7 @@ private final class MegramFireScreenNode: ASDisplayNode {
         // Centred on the flame and wide enough to wash across the whole screen.
         let glowSide = size.width * 2.2
         self.glowLayer.frame = CGRect(
-            x: size.midX - glowSide / 2.0,
+            x: size.width / 2.0 - glowSide / 2.0,
             y: topInset + 150.0 - glowSide / 2.0,
             width: glowSide,
             height: glowSide

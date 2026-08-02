@@ -860,7 +860,8 @@ extension PeerInfoScreenNode {
                     }
 
                     items.append(.action(ContextMenuActionItem(text: "Megram", icon: { theme in
-                        generateTintedImage(image: UIImage(bundleImageName: "Chat/Context Menu/Info"), color: theme.contextMenu.primaryColor)
+                        // Megram's own mark, shipped white so it tints with the menu.
+                        generateTintedImage(image: UIImage(bundleImageName: "MegramMenuLogo"), color: theme.contextMenu.primaryColor)
                     }, action: { [weak self] c, _ in
                         guard let self, let c else {
                             return
@@ -1375,7 +1376,7 @@ extension PeerInfoScreenNode {
         let fireDays = MegramFireStore.badgeDays(peerId: peer.id.toInt64())
         let fireTitle = fireDays.flatMap { "Огонёк · \($0)" } ?? "Предложить огонёк"
         items.append(.action(ContextMenuActionItem(text: fireTitle, icon: { theme in
-            return generateTintedImage(image: UIImage(bundleImageName: "Chat/Context Menu/Info"), color: theme.contextMenu.primaryColor)
+            return generateTintedImage(image: UIImage(bundleImageName: "MegramMenuLogo"), color: theme.contextMenu.primaryColor)
         }, action: { [weak self] c, f in
             f(.default)
             c?.dismiss(completion: nil)
