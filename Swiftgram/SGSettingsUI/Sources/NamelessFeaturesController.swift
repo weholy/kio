@@ -954,15 +954,18 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
         }
     }
     let cat = state.hubCategory
-    let appearanceCategories: Set<NLHubCategory> = [.appearance, .liquidGlass, .profiles, .tabs, .folders, .chatList, .stories, .mediaCamera, .inputEmoji, .voice, .calls, .music]
-    let ghostCategories: Set<NLHubCategory> = [.ghost]
-    // Профиль and Вкладки draw from both halves of the builder: their switches are split between
-    // the appearance block and the Nextgram-parity block. Rendering both and then trimming with a
-    // whitelist is what lets a tab's contents be declared in one place.
-    let otherCategories: Set<NLHubCategory> = [.other, .voiceMorph, .network, .settingsSections, .backup, .misc, .profiles, .tabs]
-    let showAppearance = cat == nil || cat.map { appearanceCategories.contains($0) } == true
-    let showGhost = cat == nil || cat.map { ghostCategories.contains($0) } == true
-    let showOther = cat == nil || cat.map { otherCategories.contains($0) } == true
+    // MARK: Megram — each tab draws only its own block.
+    //
+    // Previously several categories shared one blanket flag, so opening Профиль
+    // rendered the whole appearance block and every Nextgram-parity switch
+    // underneath it. Matching the category exactly is what keeps a tab to its
+    // own contents; the hub root (cat == nil) shows nothing but the pills.
+    let showAppearance = cat == .appearance
+    let showProfile = cat == .profiles
+    let showTabs = cat == .tabs
+    let showSettingsSections = cat == .settingsSections
+    let showGhost = cat == .ghost
+    let showOther = cat == .other
 
     // ═══════════════════════════════════════════
     // ВНЕШНИЙ ВИД — интерфейс + сообщения + Liquid Glass + камера + медиа + информация
@@ -998,28 +1001,6 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
     megramFeature(.cameraSendHDPhoto, s.cameraSendHDPhoto, "HD-фото при отправке", "Кнопка «HD» в галерее отправляет фото без сжатия.", enabled: !s.cameraAlwaysSendHD)
     megramFeature(.cameraAlwaysSendHD, s.cameraAlwaysSendHD, "Всегда в HD", "Каждое фото уходит без сжатия. Отключает «HD-фото при отправке».")
 
-    // ЧАТ И ИНТЕРФЕЙС
-    entries.append(.header(id: id.count, section: sec, text: "ЧАТ И ИНТЕРФЕЙС", badge: nil))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .oledMode, value: s.oledMode, text: "OLED-режим (чёрный фон)", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .wideChannelPosts, value: s.wideChannelPosts, text: "Широкие посты в каналах", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .messageOutline, value: s.messageOutline, text: "Обводка сообщений", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .messageTransparent, value: s.messageTransparent, text: "Прозрачные сообщения", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .messageSemiTransparent, value: s.messageSemiTransparent, text: "Полупрозрачные сообщения", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .messageBlurEffect, value: s.messageBlurEffect, text: "Размытие фона сообщений", enabled: true))
-    entries.append(.notice(id: id.count, section: sec, text: "Пузырь становится матовым и размывает обои чата за собой."))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .compactMessagePreview, value: s.chatListLines != SGSimpleSettings.ChatListLines.three.rawValue, text: "Компактный превью", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .showTabNames, value: s.showTabNames, text: "Подписи вкладок", enabled: !s.hideTabBar))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .roundTabs, value: s.roundTabs, text: "Круглые вкладки", enabled: !s.hideTabBar))
-    entries.append(.notice(id: id.count, section: sec, text: "Иконки таббара и кнопки профиля становятся круглыми со стеклом (только на iOS 26)."))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .hideTabBar, value: s.hideTabBar, text: "Скрыть нижний таббар", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .disableChatSwipeOptions, value: !s.disableChatSwipeOptions, text: "Свайп-опции чатов", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .hideRecordingButton, value: !s.hideRecordingButton, text: "Кнопка записи голосовых", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .sendWithReturnKey, value: s.sendWithReturnKey, text: "Отправка по Return", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .secondsInMessages, value: s.secondsInMessages, text: "Секунды в метке времени", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .hideReactions, value: s.hideReactions, text: "Скрыть реакции", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .disableSnapDeletionEffect, value: !s.disableSnapDeletionEffect, text: "Эффект удаления", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .forceEmojiTab, value: s.forceEmojiTab, text: "Вкладка эмодзи первой", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .defaultEmojisFirst, value: s.defaultEmojisFirst, text: "Стандартные эмодзи первыми", enabled: true))
     // Стикеры — ползунок оставлен как единственный размерный параметр вкладки.
     let stickerSection = featureSections.take()
     entries.append(.percentageSlider(id: id.count, section: stickerSection, settingName: .stickerSize, value: s.stickerSize))
@@ -1114,20 +1095,13 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
     entries.append(.toggle(id: id.count, section: sec, settingName: .disableScreenshotDetection, value: s.disableScreenshotDetection, text: "Без определения скриншотов", enabled: true))
     entries.append(.toggle(id: id.count, section: sec, settingName: .disableSecretChatBlurOnScreenshot, value: s.disableSecretChatBlurOnScreenshot, text: "Без размытия при скриншоте", enabled: true))
     entries.append(.toggle(id: id.count, section: sec, settingName: .hideProxySponsor, value: s.hideProxySponsor, text: "Скрыть спонсора прокси", enabled: true))
+    } // end ghostModeExpanded
+    } // end ghost
 
-    // ИНФОРМАЦИЯ (перенесена из отдельной вкладки)
-    entries.append(.header(id: id.count, section: sec, text: "ИНФОРМАЦИЯ", badge: nil))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .showProfileId, value: s.showProfileId, text: "ID и DC в профиле", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .showSeconds, value: s.showSeconds, text: "Секунды в метке времени", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .showFullViews, value: s.showFullViews, text: "Полные просмотры", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .hidePhoneNumber, value: s.hidePhoneNumber, text: "Скрыть номер телефона", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .showCreationDate, value: s.showCreationDate, text: "Дата создания чата/канала", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .showIfMutualContacts, value: s.showIfMutualContacts, text: "Если взаимно в контактах", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .showRegistrationDate, value: s.showRegistrationDate, text: "Дата регистрации аккаунта", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .showDC, value: s.showDC, text: "Показывать DC", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .disableCompactNumbers, value: !s.disableCompactNumbers, text: "Компактные числа", enabled: true))
-
-    // MARK: Megram — раздел «Профиль» ровно по заданному списку.
+    // ═══════════════════════════════════════════
+    // ПРОФИЛЬ
+    // ═══════════════════════════════════════════
+    if showProfile {
     entries.append(.header(id: id.count, section: sec, text: "ПРОФИЛЬ", badge: nil))
     megramFeature(.showProfileId, s.showProfileId, "Отображать ID аккаунта в профиле", "Добавляет в профиль числовой идентификатор аккаунта, который можно скопировать нажатием.")
     megramFeature(.showDC, s.showDC, "Отображать DC аккаунта в профиле", "Показывает дата-центр Telegram, где хранится аккаунт, и при наличии страну номера.")
@@ -1143,7 +1117,12 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
     megramFeature(.hideProfilePhotoRow, s.hideProfilePhotoRow, "Скрыть «Изменить фотографию»", "Убирает строку из своего профиля.")
     megramFeature(.hideProfileIdRow, s.hideProfileIdRow, "Скрыть строку ID", "Убирает строку с идентификатором из своего профиля.")
 
-    // MARK: Megram — раздел «Вкладки».
+    } // end profile
+
+    // ═══════════════════════════════════════════
+    // ВКЛАДКИ
+    // ═══════════════════════════════════════════
+    if showTabs {
     entries.append(.header(id: id.count, section: sec, text: "ВКЛАДКИ", badge: nil))
     megramFeature(.hideBottomTabPanel, s.hideTabBar, "Скрыть панель вкладок", "Нижняя панель убирается полностью, переключение — свайпом и через поиск.")
     megramFeature(.hideContactsTab, s.hideContactsTab, "Скрыть вкладку «Контакты»", "Убирает контакты из нижней панели.", enabled: !s.hideTabBar)
@@ -1157,8 +1136,12 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
     entries.append(.percentageSlider(id: id.count, section: tabWidthSection, settingName: .tabBarWidth, value: s.tabBarWidthScale))
     entries.append(.notice(id: id.count, section: tabWidthSection, text: "Ширина нижней панели в процентах от стандартной."))
 
-    // MARK: Megram — раздел «Разделы настроек»: каждый переключатель прячет
-    // одноимённый пункт с главного экрана настроек.
+    } // end tabs
+
+    // ═══════════════════════════════════════════
+    // РАЗДЕЛЫ НАСТРОЕК — каждый переключатель прячет одноимённый пункт
+    // ═══════════════════════════════════════════
+    if showSettingsSections {
     entries.append(.header(id: id.count, section: sec, text: "РАЗДЕЛЫ НАСТРОЕК", badge: nil))
     entries.append(.notice(id: id.count, section: sec, text: "Включённый переключатель скрывает соответствующий пункт из настроек."))
     megramFeature(.hideSettingsFavorites, s.hideSettingsSavedMessages, "Избранное", "")
@@ -1183,9 +1166,7 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
     megramFeature(.hideProfileEmojiStatus, s.hideProfileEmojiStatus, "Установить статус-эмодзи", "")
     megramFeature(.hideProfileColorRow, s.hideProfileColorRow, "Изменить цвет профиля", "")
     megramFeature(.hideProfilePhotoRow, s.hideProfilePhotoRow, "Изменить фотографию", "")
-
-    }
-    } // end ghost
+    } // end settingsSections
 
     // ═══════════════════════════════════════════
     // ПРОЧИЕ ФУНКЦИИ — контекст, сторис, фото, доп.
@@ -1284,84 +1265,6 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
     entries.append(.toggle(id: id.count, section: sec, settingName: .emojiDownloaderEnabled, value: s.emojiDownloaderEnabled, text: "Скачивание эмодзи", enabled: true))
     entries.append(.toggle(id: id.count, section: sec, settingName: .swipeForVideoPIP, value: s.videoPIPSwipeDirection == SGSimpleSettings.VideoPIPSwipeDirection.up.rawValue, text: "Свайп для PiP видео", enabled: true))
     entries.append(.toggle(id: id.count, section: sec, settingName: .forceBuiltInMic, value: s.forceBuiltInMic, text: "Встроенный микрофон", enabled: true))
-
-    // MARK: Megram — Nextgram parity block. Every row below is UI-only for now
-    // (no behavioural wiring). Layout mirrors the reference screen groups.
-    entries.append(.header(id: id.count, section: sec, text: "NEXTGRAM · ТАББАР", badge: nil))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .nxHideContactsTab, value: s.nxHideContactsTab, text: "Скрыть вкладку «Контакты»", enabled: true))
-    entries.append(.notice(id: id.count, section: sec, text: "Убирает «Контакты» из нижнего таббара, не затрагивая адресную книгу."))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .nxHideCallsTab, value: s.nxHideCallsTab, text: "Скрыть вкладку «Звонки»", enabled: true))
-    entries.append(.notice(id: id.count, section: sec, text: "Убирает «Звонки» из нижнего таббара, сохраняя историю звонков в других разделах."))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .nxSearchButtonNearTabBar, value: s.nxSearchButtonNearTabBar, text: "Кнопка поиска рядом с таббаром", enabled: true))
-    entries.append(.notice(id: id.count, section: sec, text: "Добавляет отдельную кнопку поиска рядом с нижним таббаром для быстрого доступа."))
-
-    entries.append(.header(id: id.count, section: sec, text: "NEXTGRAM · ПАПКИ", badge: nil))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .nxFoldersAtBottom, value: s.nxFoldersAtBottom, text: "Папки снизу", enabled: true))
-    entries.append(.notice(id: id.count, section: sec, text: "Переносит выбор папок чатов к нижним элементам управления для удобства одной рукой."))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .nxRememberLastFolder, value: s.nxRememberLastFolder, text: "Открывать последнюю папку", enabled: true))
-    entries.append(.notice(id: id.count, section: sec, text: "Возвращает последнюю выбранную папку вместо постоянного открытия «Все чаты»."))
-
-    entries.append(.header(id: id.count, section: sec, text: "NEXTGRAM · СПИСОК ЧАТОВ", badge: nil))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .nxNewChatListLook, value: s.nxNewChatListLook, text: "Обновлённый вид списка чатов", enabled: true))
-    entries.append(.notice(id: id.count, section: sec, text: "Применяет к списку диалогов обновлённую компоновку и оформление Megram."))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .nxHideChatsTitle, value: s.nxHideChatsTitle, text: "Убрать надпись «Чаты»", enabled: true))
-    entries.append(.notice(id: id.count, section: sec, text: "Скрывает крупный заголовок «Чаты», освобождая место над списком диалогов."))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .nxRamUnderClock, value: s.nxRamUnderClock, text: "ОЗУ под часами", enabled: true))
-    entries.append(.notice(id: id.count, section: sec, text: "Показывает текущее потребление памяти приложением под часами в статус-баре."))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .nxPremiumBadgeInChatList, value: s.nxPremiumBadgeInChatList, text: "Premium-значок в списке", enabled: true))
-    entries.append(.notice(id: id.count, section: sec, text: "Показывает ваш значок Premium в верхней части списка чатов."))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .nxAccountSwitcherInChatList, value: s.nxAccountSwitcherInChatList, text: "Переключение аккаунтов в списке", enabled: true))
-    entries.append(.notice(id: id.count, section: sec, text: "Добавляет быстрый переход между аккаунтами без открытия настроек."))
-
-    entries.append(.header(id: id.count, section: sec, text: "NEXTGRAM · ПРОФИЛИ", badge: nil))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .nxHideGiftsTab, value: s.nxHideGiftsTab, text: "Скрыть вкладку «Подарки»", enabled: true))
-    entries.append(.notice(id: id.count, section: sec, text: "Скрывает вкладку «Подарки» в профиле."))
-
-    entries.append(.header(id: id.count, section: sec, text: "NEXTGRAM · МЕДИА И КАМЕРА", badge: nil))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .nxPipOnSwipe, value: s.nxPipOnSwipe, text: "Картинка в картинке", enabled: true))
-    entries.append(.notice(id: id.count, section: sec, text: "Свайп видео вверх для перехода в режим PiP."))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .nxRoundVideoBackCamera, value: s.nxRoundVideoBackCamera, text: "Кружок с задней камеры", enabled: true))
-    entries.append(.notice(id: id.count, section: sec, text: "Начинать запись видеосообщений с задней камеры."))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .nxCameraInGallery, value: s.nxCameraInGallery, text: "Камера в галерее", enabled: true))
-    entries.append(.notice(id: id.count, section: sec, text: "Показывать ячейку камеры в медиа-галерее."))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .nxStripPhotoMetadata, value: s.nxStripPhotoMetadata, text: "Очищать метаданные", enabled: true))
-    entries.append(.notice(id: id.count, section: sec, text: "Удаляет EXIF/геолокацию из отправляемых фото."))
-
-    entries.append(.header(id: id.count, section: sec, text: "NEXTGRAM · ВВОД", badge: nil))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .nxFormattingPanel, value: s.nxFormattingPanel, text: "Панель форматирования", enabled: true))
-    entries.append(.notice(id: id.count, section: sec, text: "Добавляет над клавиатурой панель для быстрого применения жирного, курсива, подчёркивания, зачёркивания, моноширинного, спойлера, цитаты и ссылок."))
-
-    entries.append(.header(id: id.count, section: sec, text: "NEXTGRAM · ГОЛОСОВЫЕ", badge: nil))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .nxVoiceOneTime, value: s.nxVoiceOneTime, text: "Записи сразу одноразовые", enabled: true))
-    entries.append(.notice(id: id.count, section: sec, text: "Новые голосовые по умолчанию отправляются как одноразовые."))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .nxTranscribeAppleSpeech, value: s.nxTranscribeAppleSpeech, text: "Транскрипция через Apple Speech", enabled: true))
-    entries.append(.notice(id: id.count, section: sec, text: "Переводит голосовые сообщения и кружки в текст без ограничений и без Premium."))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .nxVoiceMorpherEnabled, value: s.nxVoiceMorpherEnabled, text: "Смена голоса", enabled: true))
-    entries.append(.notice(id: id.count, section: sec, text: "Применяет выбранный эффект к новым голосовым сообщениям и кружкам."))
-
-    entries.append(.header(id: id.count, section: sec, text: "NEXTGRAM · ЗВОНКИ", badge: nil))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .nxForceTCPCalls, value: s.nxForceTCPCalls, text: "Использовать TCP", enabled: true))
-    entries.append(.notice(id: id.count, section: sec, text: "Принудительно использовать TCP для звонков."))
-
-    entries.append(.header(id: id.count, section: sec, text: "NEXTGRAM · МУЗЫКА", badge: nil))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .nxMusicCrossfade, value: s.nxMusicCrossfade, text: "Кроссфейд", enabled: true))
-    entries.append(.notice(id: id.count, section: sec, text: "Плавное переключение треков."))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .nxMusicEqualizer, value: s.nxMusicEqualizer, text: "Эквалайзер", enabled: true))
-    entries.append(.notice(id: id.count, section: sec, text: "Включает встроенный эквалайзер для плеера."))
-
-    entries.append(.header(id: id.count, section: sec, text: "NEXTGRAM · ПРОЧЕЕ", badge: nil))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .nxLiveActivityWidget, value: s.nxLiveActivityWidget, text: "Live Activity виджет", enabled: true))
-    entries.append(.notice(id: id.count, section: sec, text: "Чёрный виджет Megram с иконкой на экране блокировки, показывает входящие уведомления. Требует iOS 16.1+."))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .nxWinterSnow, value: s.nxWinterSnow, text: "Новогодний снег в чате", enabled: true))
-    entries.append(.notice(id: id.count, section: sec, text: "Показывать падающий снег поверх обоев чата и снежинки по краям виджета."))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .nxCustomFontEnabled, value: s.nxCustomFontEnabled, text: "Использовать свой шрифт", enabled: true))
-    entries.append(.notice(id: id.count, section: sec, text: "Позволяет заменить системный шрифт на пользовательский TTF/OTF."))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .nxAutoClearCacheOnLaunch, value: s.nxAutoClearCacheOnLaunch, text: "Автоочистка кэша при входе", enabled: true))
-    entries.append(.notice(id: id.count, section: sec, text: "Проверяет общий размер медиа-кэша при каждом входе и безопасно очищает его в фоне после достижения лимита."))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .nxHapticsOnUI, value: s.nxHapticsOnUI, text: "Вибрация по интерфейсу", enabled: true))
-    entries.append(.notice(id: id.count, section: sec, text: "Добавляет лёгкий отклик при открытии чата, тапах и нарастающую вибрацию при раскрытии панели вложений."))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .nxThermalCalmDown, value: s.nxThermalCalmDown, text: "Успокаивать при нагреве", enabled: true))
-    entries.append(.notice(id: id.count, section: sec, text: "При нагреве устройства Megram упрощает себя: стеклянные сообщения становятся сплошной заливкой, снег останавливается."))
 
     } // end other
 
