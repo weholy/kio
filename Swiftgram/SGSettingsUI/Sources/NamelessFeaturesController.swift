@@ -92,12 +92,12 @@ private func megramText(_ ru: String, _ en: String) -> String {
 /// is a single edit; an empty string means the row says so rather than opening
 /// nothing at all.
 private enum MegramDeveloperLinks {
-    // Left blank deliberately: guessing a t.me address would ship a row that
-    // opens somebody else's channel. The row says it is not set up yet until
-    // the real addresses are filled in here.
-    static let channel = ""
+    static let channel = "https://t.me/entwil"
+    static let support = "https://t.me/entwilsupport"
+    // Left blank until the address is known: guessing a t.me handle would ship
+    // a row that opens somebody else's channel. The row says it is not set up
+    // yet while this is empty.
     static let vpn = ""
-    static let support = ""
 }
 
 /// Hands out a fresh section for every switch.
@@ -1429,6 +1429,9 @@ private func namelessFeaturesControllerImpl(context: AccountContext, initialCate
     /// presentation stack — it needs a real UIViewController to present from.
     /// Wired to the live controller's own window below.
     var openDecorationPickerImpl: ((MegramAppearanceStore.Slot) -> Void)?
+    /// The stack this screen sits in, so a resolved t.me link can push the chat
+    /// onto it instead of opening the address outside the app.
+    var getNavigationControllerImpl: (() -> NavigationController?)?
 
     let initialState = NLControllerState(hubCategory: initialCategory)
     let statePromise = ValuePromise(initialState, ignoreRepeated: true)
@@ -1925,9 +1928,13 @@ private func namelessFeaturesControllerImpl(context: AccountContext, initialCate
             presentControllerImpl?(actionSheet, ViewControllerPresentationArguments(presentationAnimation: .modalSheet))
         },
         openDisclosureLink: { link in
-            // MARK: Megram — developer links. Opened through the app's own URL
-            // handling so a t.me address resolves inside Telegram instead of
-            // bouncing out to a browser.
+            // MARK: Megram — developer links.
+            //
+            // `openExternalUrl` with `forceExternal: false` is what keeps a t.me
+            // address inside the client: it resolves the username and pushes the
+            // chat here. `applicationBindings.openUrl` would hand the address to
+            // the system, which bounces out of the app and comes back in through
+            // the deep link.
             switch link {
             case .devChannel, .devVPN, .devSupport:
                 let address: String
@@ -1936,12 +1943,20 @@ private func namelessFeaturesControllerImpl(context: AccountContext, initialCate
                 case .devVPN: address = MegramDeveloperLinks.vpn
                 default: address = MegramDeveloperLinks.support
                 }
+                let presentationData = context.sharedContext.currentPresentationData.with { $0 }
                 if address.isEmpty {
-                    let presentationData = context.sharedContext.currentPresentationData.with { $0 }
                     presentControllerImpl?(textAlertController(context: context, title: nil, text: megramText("Ссылка ещё не настроена.", "This link is not set up yet."), actions: [TextAlertAction(type: .defaultAction, title: presentationData.strings.Common_OK, action: {})]), nil)
-                } else {
-                    context.sharedContext.applicationBindings.openUrl(address)
+                    return
                 }
+                context.sharedContext.openExternalUrl(
+                    context: context,
+                    urlContext: .generic,
+                    url: address,
+                    forceExternal: false,
+                    presentationData: presentationData,
+                    navigationController: getNavigationControllerImpl?(),
+                    dismissInput: {}
+                )
                 return
             default:
                 break
@@ -2108,6 +2123,9 @@ private func namelessFeaturesControllerImpl(context: AccountContext, initialCate
     }
     presentControllerImpl = { [weak controller] c, a in
         controller?.present(c, in: .window(.root), with: a)
+    }
+    getNavigationControllerImpl = { [weak controller] in
+        return controller?.navigationController as? NavigationController
     }
     openDecorationPickerImpl = { [weak controller] slot in
         let presentationData = context.sharedContext.currentPresentationData.with { $0 }
