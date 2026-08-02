@@ -266,6 +266,21 @@ private enum NLBoolSetting: String {
     case nxAutoClearCacheOnLaunch
     case nxHapticsOnUI
     case nxThermalCalmDown
+    // Megram profile
+    case profileTrackCard
+    case profileIdChips
+    case hideProfileEmojiStatus
+    case hideProfileColorRow
+    case hideProfilePhotoRow
+    case hideProfileIdRow
+    // Megram peer menu
+    case hideMenuWallpaper
+    case hideMenuSecretChat
+    case hideMenuSendContact
+    case hideMenuAutoDelete
+    case hideMenuCopyProtection
+    case hideMenuClearHistory
+    case hideMenuBlock
 }
 
 private enum NLSliderSetting: String {
@@ -1038,6 +1053,17 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
     entries.append(.toggle(id: id.count, section: sec, settingName: .showDC, value: s.showDC, text: "Показывать DC", enabled: true))
     entries.append(.toggle(id: id.count, section: sec, settingName: .disableCompactNumbers, value: !s.disableCompactNumbers, text: "Компактные числа", enabled: true))
 
+    // MEGRAM · ПРОФИЛЬ
+    entries.append(.header(id: id.count, section: sec, text: "MEGRAM · ПРОФИЛЬ", badge: nil))
+    entries.append(.toggle(id: id.count, section: sec, settingName: .profileTrackCard, value: s.profileTrackCard, text: "Карточка трека", enabled: true))
+    entries.append(.notice(id: id.count, section: sec, text: "Прикреплённая музыка рисуется карточкой с размытой обложкой вместо плоской строки. Без обложки карточка не показывается."))
+    entries.append(.toggle(id: id.count, section: sec, settingName: .profileIdChips, value: s.profileIdChips, text: "ID и DC кнопками", enabled: true))
+    entries.append(.notice(id: id.count, section: sec, text: "Круглые кнопки под юзернеймом вместо строк списка. Нажатие копирует значение."))
+    entries.append(.toggle(id: id.count, section: sec, settingName: .hideProfileEmojiStatus, value: s.hideProfileEmojiStatus, text: "Скрыть «Установить эмодзи-статус»", enabled: true))
+    entries.append(.toggle(id: id.count, section: sec, settingName: .hideProfileColorRow, value: s.hideProfileColorRow, text: "Скрыть «Изменить цвет профиля»", enabled: true))
+    entries.append(.toggle(id: id.count, section: sec, settingName: .hideProfilePhotoRow, value: s.hideProfilePhotoRow, text: "Скрыть «Изменить фотографию»", enabled: true))
+    entries.append(.toggle(id: id.count, section: sec, settingName: .hideProfileIdRow, value: s.hideProfileIdRow, text: "Скрыть строку ID", enabled: true))
+
     }
     } // end ghost
 
@@ -1047,6 +1073,17 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
     if showOther {
     // КОНТЕКСТНОЕ МЕНЮ
     entries.append(.header(id: id.count, section: sec, text: "✦ ПРОЧИЕ ФУНКЦИИ", badge: nil))
+    // MEGRAM · МЕНЮ ПРОФИЛЯ — the three-dot menu inside a private chat.
+    entries.append(.header(id: id.count, section: sec, text: "MEGRAM · МЕНЮ ПРОФИЛЯ", badge: nil))
+    entries.append(.notice(id: id.count, section: sec, text: "Скрывает пункты меню «⋯» в профиле собеседника. Пункт Megram скрыть нельзя."))
+    entries.append(.toggle(id: id.count, section: sec, settingName: .hideMenuWallpaper, value: s.hideMenuWallpaper, text: "Скрыть «Изменить обои»", enabled: true))
+    entries.append(.toggle(id: id.count, section: sec, settingName: .hideMenuSecretChat, value: s.hideMenuSecretChat, text: "Скрыть «Начать секретный чат»", enabled: true))
+    entries.append(.toggle(id: id.count, section: sec, settingName: .hideMenuSendContact, value: s.hideMenuSendContact, text: "Скрыть «Отправить контакт»", enabled: true))
+    entries.append(.toggle(id: id.count, section: sec, settingName: .hideMenuAutoDelete, value: s.hideMenuAutoDelete, text: "Скрыть «Автоудаление»", enabled: true))
+    entries.append(.toggle(id: id.count, section: sec, settingName: .hideMenuCopyProtection, value: s.hideMenuCopyProtection, text: "Скрыть «Запретить копирование»", enabled: true))
+    entries.append(.toggle(id: id.count, section: sec, settingName: .hideMenuClearHistory, value: s.hideMenuClearHistory, text: "Скрыть «Удалить переписку»", enabled: true))
+    entries.append(.toggle(id: id.count, section: sec, settingName: .hideMenuBlock, value: s.hideMenuBlock, text: "Скрыть «Заблокировать»", enabled: true))
+
     entries.append(.header(id: id.count, section: sec, text: "КОНТЕКСТНОЕ МЕНЮ", badge: nil))
     entries.append(.toggle(id: id.count, section: sec, settingName: .contextShowSaveToCloud, value: s.contextShowSaveToCloud, text: "Сохранить в облако", enabled: true))
     entries.append(.toggle(id: id.count, section: sec, settingName: .contextShowHideForwardName, value: s.contextShowHideForwardName, text: "Скрыть имя пересылки", enabled: true))
@@ -1483,6 +1520,19 @@ private func namelessFeaturesControllerImpl(context: AccountContext, initialCate
             case .nxAutoClearCacheOnLaunch: s.nxAutoClearCacheOnLaunch = value
             case .nxHapticsOnUI: s.nxHapticsOnUI = value
             case .nxThermalCalmDown: s.nxThermalCalmDown = value
+            case .profileTrackCard: s.profileTrackCard = value; simplePromise.set(true)
+            case .profileIdChips: s.profileIdChips = value; simplePromise.set(true)
+            case .hideProfileEmojiStatus: s.hideProfileEmojiStatus = value; simplePromise.set(true)
+            case .hideProfileColorRow: s.hideProfileColorRow = value; simplePromise.set(true)
+            case .hideProfilePhotoRow: s.hideProfilePhotoRow = value; simplePromise.set(true)
+            case .hideProfileIdRow: s.hideProfileIdRow = value; simplePromise.set(true)
+            case .hideMenuWallpaper: s.hideMenuWallpaper = value
+            case .hideMenuSecretChat: s.hideMenuSecretChat = value
+            case .hideMenuSendContact: s.hideMenuSendContact = value
+            case .hideMenuAutoDelete: s.hideMenuAutoDelete = value
+            case .hideMenuCopyProtection: s.hideMenuCopyProtection = value
+            case .hideMenuClearHistory: s.hideMenuClearHistory = value
+            case .hideMenuBlock: s.hideMenuBlock = value
             case .enableVideoToCircleOrVoice: s.enableVideoToCircleOrVoice = value
             case .namelessVideoBackgroundEnabled: s.namelessVideoBackgroundEnabled = value
             case .squareAvatars: s.squareAvatars = value; simplePromise.set(true)

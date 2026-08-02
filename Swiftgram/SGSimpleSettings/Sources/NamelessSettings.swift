@@ -288,6 +288,26 @@ private enum NamelessSettingsKey {
     // When enabled, the '+' attachment picker replaces the classic horizontal tab bar with
     // a compact rounded glass sheet stacking the same buttons as a vertical list.
     static let namelessCompactAttachmentSheet = "nameless.compactAttachmentSheet"
+
+    // MARK: - Megram profile
+    /// Draws the saved track as a card with its blurred cover behind it,
+    /// instead of the flat one-line strip.
+    static let profileTrackCard = "nameless.profile.trackCard"
+    /// Replaces the Swiftgram id/dc rows with tappable chips under the username.
+    static let profileIdChips = "nameless.profile.idChips"
+    static let hideProfileEmojiStatus = "nameless.profile.hideEmojiStatus"
+    static let hideProfileColorRow = "nameless.profile.hideColorRow"
+    static let hideProfilePhotoRow = "nameless.profile.hidePhotoRow"
+    static let hideProfileIdRow = "nameless.profile.hideIdRow"
+
+    // MARK: - Megram peer menu (the three-dot menu in a private chat)
+    static let hideMenuWallpaper = "nameless.peerMenu.hideWallpaper"
+    static let hideMenuSecretChat = "nameless.peerMenu.hideSecretChat"
+    static let hideMenuSendContact = "nameless.peerMenu.hideSendContact"
+    static let hideMenuAutoDelete = "nameless.peerMenu.hideAutoDelete"
+    static let hideMenuCopyProtection = "nameless.peerMenu.hideCopyProtection"
+    static let hideMenuClearHistory = "nameless.peerMenu.hideClearHistory"
+    static let hideMenuBlock = "nameless.peerMenu.hideBlock"
 }
 
 private enum NamelessRollbackStorage {
@@ -843,6 +863,23 @@ public extension SGSimpleSettings {
     var warnBeforeCall: Bool { get { storage.namelessBool(NamelessSettingsKey.warnBeforeCall, default: true) } set { storage.set(newValue, forKey: NamelessSettingsKey.warnBeforeCall) } }
     // MARK: Notifications
     var localNotificationsEnabled: Bool { get { storage.namelessBool(NamelessSettingsKey.localNotificationsEnabled, default: true) } set { storage.set(newValue, forKey: NamelessSettingsKey.localNotificationsEnabled) } }
+
+    // MARK: Megram profile
+    var profileTrackCard: Bool { get { storage.namelessBool(NamelessSettingsKey.profileTrackCard, default: true) } set { storage.set(newValue, forKey: NamelessSettingsKey.profileTrackCard) } }
+    var profileIdChips: Bool { get { storage.namelessBool(NamelessSettingsKey.profileIdChips, default: true) } set { storage.set(newValue, forKey: NamelessSettingsKey.profileIdChips) } }
+    var hideProfileEmojiStatus: Bool { get { storage.namelessBool(NamelessSettingsKey.hideProfileEmojiStatus) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideProfileEmojiStatus) } }
+    var hideProfileColorRow: Bool { get { storage.namelessBool(NamelessSettingsKey.hideProfileColorRow) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideProfileColorRow) } }
+    var hideProfilePhotoRow: Bool { get { storage.namelessBool(NamelessSettingsKey.hideProfilePhotoRow) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideProfilePhotoRow) } }
+    var hideProfileIdRow: Bool { get { storage.namelessBool(NamelessSettingsKey.hideProfileIdRow) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideProfileIdRow) } }
+
+    // MARK: Megram peer menu
+    var hideMenuWallpaper: Bool { get { storage.namelessBool(NamelessSettingsKey.hideMenuWallpaper) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideMenuWallpaper) } }
+    var hideMenuSecretChat: Bool { get { storage.namelessBool(NamelessSettingsKey.hideMenuSecretChat) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideMenuSecretChat) } }
+    var hideMenuSendContact: Bool { get { storage.namelessBool(NamelessSettingsKey.hideMenuSendContact) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideMenuSendContact) } }
+    var hideMenuAutoDelete: Bool { get { storage.namelessBool(NamelessSettingsKey.hideMenuAutoDelete) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideMenuAutoDelete) } }
+    var hideMenuCopyProtection: Bool { get { storage.namelessBool(NamelessSettingsKey.hideMenuCopyProtection) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideMenuCopyProtection) } }
+    var hideMenuClearHistory: Bool { get { storage.namelessBool(NamelessSettingsKey.hideMenuClearHistory) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideMenuClearHistory) } }
+    var hideMenuBlock: Bool { get { storage.namelessBool(NamelessSettingsKey.hideMenuBlock) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideMenuBlock) } }
 
     func updateGatedFeatures(_ features: [(key: String, deeplinkPath: String)]) {
         storage.set(features.map(\.key), forKey: NamelessSettingsKey.gatedFeatureKeys)

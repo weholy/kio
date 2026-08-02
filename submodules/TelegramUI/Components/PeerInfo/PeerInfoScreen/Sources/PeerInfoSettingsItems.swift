@@ -12,6 +12,7 @@ import ItemListPeerItem
 import DeviceAccess
 import TelegramStringFormatting
 import PeerNameColorItem
+import SGSimpleSettings
 
 enum SettingsSection: Int, CaseIterable {
     case edit
@@ -61,19 +62,29 @@ func settingsItems(showProfileId: Bool, data: PeerInfoScreenData?, context: Acco
         displaySetStatus = false
     }
     
+    // MARK: Megram — rows the user switched off simply are not built. An empty
+    // section still occupies a gap, so nothing is appended rather than hidden.
+    let megramSettings = SGSimpleSettings.shared
+
     if displaySetStatus {
-        items[.edit]!.append(PeerInfoScreenActionItem(id: 0, text: setStatusTitle, icon: UIImage(bundleImageName: hasEmojiStatus ? "Settings/EditEmojiStatus" : "Settings/SetEmojiStatus"), action: {
-            interaction.openSettings(.emojiStatus)
-        }))
-        
-        items[.edit]!.append(PeerInfoScreenActionItem(id: 1, text: presentationData.strings.PeerInfo_ChangeProfileColor, icon: UIImage(bundleImageName: "Premium/BoostPerk/CoverColor"), action: {
-            interaction.openSettings(.profileColor)
+        if !megramSettings.hideProfileEmojiStatus {
+            items[.edit]!.append(PeerInfoScreenActionItem(id: 0, text: setStatusTitle, icon: UIImage(bundleImageName: hasEmojiStatus ? "Settings/EditEmojiStatus" : "Settings/SetEmojiStatus"), action: {
+                interaction.openSettings(.emojiStatus)
+            }))
+        }
+
+        if !megramSettings.hideProfileColorRow {
+            items[.edit]!.append(PeerInfoScreenActionItem(id: 1, text: presentationData.strings.PeerInfo_ChangeProfileColor, icon: UIImage(bundleImageName: "Premium/BoostPerk/CoverColor"), action: {
+                interaction.openSettings(.profileColor)
+            }))
+        }
+    }
+
+    if !megramSettings.hideProfilePhotoRow {
+        items[.edit]!.append(PeerInfoScreenActionItem(id: 2, text: setPhotoTitle, icon: UIImage(bundleImageName: "Settings/SetAvatar"), action: {
+            interaction.openSettings(.avatar)
         }))
     }
-    
-    items[.edit]!.append(PeerInfoScreenActionItem(id: 2, text: setPhotoTitle, icon: UIImage(bundleImageName: "Settings/SetAvatar"), action: {
-        interaction.openSettings(.avatar)
-    }))
     
     if let peer = data.peer, (peer.addressName ?? "").isEmpty {
         items[.edit]!.append(PeerInfoScreenActionItem(id: 3, text: presentationData.strings.Settings_SetUsername, icon: UIImage(bundleImageName: "Settings/SetUsername"), action: {
@@ -82,7 +93,7 @@ func settingsItems(showProfileId: Bool, data: PeerInfoScreenData?, context: Acco
     }
     
     // MARK: Swiftgram
-    if showProfileId {
+    if showProfileId && !megramSettings.hideProfileIdRow {
         var idText = ""
         
         if let peer = data.peer {

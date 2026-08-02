@@ -12,6 +12,7 @@ import NotificationExceptionsScreen
 import TranslateUI
 import TelegramNotices
 import AlertComponent
+import SGSimpleSettings
 import SGMegramFire
 
 extension PeerInfoScreenNode {
@@ -1302,7 +1303,8 @@ extension PeerInfoScreenNode {
                 
                 let sourceView = sourceNode.view
                 
-                let contextController = makeContextController(presentationData: self.presentationData, source: .reference(PeerInfoContextReferenceContentSource(controller: controller, sourceView: sourceView)), items: items |> map { ContextController.Items(content: .list($0)) }, gesture: gesture)
+                let strings = self.presentationData.strings
+                let contextController = makeContextController(presentationData: self.presentationData, source: .reference(PeerInfoContextReferenceContentSource(controller: controller, sourceView: sourceView)), items: items |> map { ContextController.Items(content: .list($0.megramFilteredPeerMenu(strings: strings))) }, gesture: gesture)
                 contextController.dismissed = { [weak self] in
                     if let strongSelf = self {
                         strongSelf.state = strongSelf.state.withHighlightedButton(nil)
@@ -1428,5 +1430,74 @@ extension PeerInfoScreenNode {
             ]).startStandalone()
         }
         controller.present(MegramFireScreen(context: self.context, peer: peer), in: .window(.root), with: ViewControllerPresentationArguments(presentationAnimation: .modalSheet))
+    }
+}
+
+extension Array where Element == ContextMenuItem {
+    /// Drops the three-dot menu rows the user switched off in Megram settings.
+    ///
+    /// Filtering the finished list beats guarding each construction site: the
+    /// rows are built across hundreds of lines under conditions of their own,
+    /// and a single pass here cannot fall out of step with them. Matching is by
+    /// title against the same string table the rows were built from, the way
+    /// the message menu's action row already does it.
+    ///
+    /// The Megram row itself is never removed — it is the way back to these
+    /// switches.
+    func megramFilteredPeerMenu(strings: PresentationStrings) -> [ContextMenuItem] {
+        let settings = SGSimpleSettings.shared
+        var hiddenTitles = Set<String>()
+
+        if settings.hideMenuWallpaper {
+            hiddenTitles.insert(strings.PeerInfo_ChangeWallpaper)
+        }
+        if settings.hideMenuSecretChat {
+            hiddenTitles.insert(strings.UserInfo_StartSecretChat)
+        }
+        if settings.hideMenuSendContact {
+            hiddenTitles.insert(strings.UserInfo_ShareContact)
+        }
+        if settings.hideMenuAutoDelete {
+            hiddenTitles.insert(strings.PeerInfo_EnableAutoDelete)
+            hiddenTitles.insert(strings.PeerInfo_AdjustAutoDelete)
+        }
+        if settings.hideMenuCopyProtection {
+            hiddenTitles.insert(strings.PeerInfo_DisableSharing)
+            hiddenTitles.insert(strings.PeerInfo_EnableSharing)
+        }
+        if settings.hideMenuClearHistory {
+            hiddenTitles.insert(strings.PeerInfo_ClearMessages)
+        }
+        if settings.hideMenuBlock {
+            hiddenTitles.insert(strings.Conversation_BlockUser)
+            hiddenTitles.insert(strings.Conversation_UnblockUser)
+        }
+
+        guard !hiddenTitles.isEmpty else {
+            return self
+        }
+
+        var result: [ContextMenuItem] = []
+        for item in self {
+            if case let .action(action) = item, hiddenTitles.contains(action.text) {
+                continue
+            }
+            result.append(item)
+        }
+        // Separators whose neighbours just left would draw stray gaps.
+        while case .separator? = result.first {
+            result.removeFirst()
+        }
+        while case .separator? = result.last {
+            result.removeLast()
+        }
+        var collapsed: [ContextMenuItem] = []
+        for item in result {
+            if case .separator = item, case .separator? = collapsed.last {
+                continue
+            }
+            collapsed.append(item)
+        }
+        return collapsed
     }
 }
