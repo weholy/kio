@@ -17,32 +17,54 @@ import TelegramUIPreferences
 
 // MARK: - Section
 
-private enum NLSectionId: Int32, SGItemListSection {
-    case search = 0
-    case hero = 1
-    case items = 2
-    case actions = 3
+/// Sections are handed out per switch, so each lands in its own rounded card
+/// with its description sitting outside it underneath. A shared section glues
+/// neighbouring switches into one block, which is what the old layout did.
+private struct NLSectionId: SGItemListSection {
+    let rawValue: Int32
+
+    static let search = NLSectionId(rawValue: 0)
+    static let hero = NLSectionId(rawValue: 1)
+    static let items = NLSectionId(rawValue: 2)
+    static let actions = NLSectionId(rawValue: 3)
+
     // Hub category pills
-    case hubPill0 = 10
-    case hubPill1 = 11
-    case hubPill2 = 12
-    case hubPill3 = 13
-    case hubPill4 = 14
-    case hubPill5 = 15
-    case hubPill6 = 16
-    case hubPill7 = 17
-    case hubPill8 = 18
-    case hubPill9 = 19
-    case hubPill10 = 20
-    case hubPill11 = 21
-    case hubPill12 = 22
-    case hubPill13 = 23
-    case hubPill14 = 24
-    case hubPill15 = 25
-    case hubPill16 = 26
-    case hubPill17 = 27
-    case hubPill18 = 28
-    case hubActions = 30
+    static let hubPill0 = NLSectionId(rawValue: 10)
+    static let hubPill1 = NLSectionId(rawValue: 11)
+    static let hubPill2 = NLSectionId(rawValue: 12)
+    static let hubPill3 = NLSectionId(rawValue: 13)
+    static let hubPill4 = NLSectionId(rawValue: 14)
+    static let hubPill5 = NLSectionId(rawValue: 15)
+    static let hubPill6 = NLSectionId(rawValue: 16)
+    static let hubPill7 = NLSectionId(rawValue: 17)
+    static let hubPill8 = NLSectionId(rawValue: 18)
+    static let hubPill9 = NLSectionId(rawValue: 19)
+    static let hubPill10 = NLSectionId(rawValue: 20)
+    static let hubPill11 = NLSectionId(rawValue: 21)
+    static let hubPill12 = NLSectionId(rawValue: 22)
+    static let hubPill13 = NLSectionId(rawValue: 23)
+    static let hubPill14 = NLSectionId(rawValue: 24)
+    static let hubPill15 = NLSectionId(rawValue: 25)
+    static let hubPill16 = NLSectionId(rawValue: 26)
+    static let hubPill17 = NLSectionId(rawValue: 27)
+    static let hubPill18 = NLSectionId(rawValue: 28)
+    static let hubActions = NLSectionId(rawValue: 30)
+
+    /// One block per feature. The range starts well past the fixed sections so
+    /// the two can never collide.
+    static func feature(_ index: Int) -> NLSectionId {
+        return NLSectionId(rawValue: 100 + Int32(index))
+    }
+}
+
+/// Hands out a fresh section for every switch.
+private final class NLFeatureSections {
+    private var next: Int = 0
+
+    func take() -> NLSectionId {
+        defer { self.next += 1 }
+        return NLSectionId.feature(self.next)
+    }
 }
 
 // MARK: - Settings
@@ -882,6 +904,15 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
 
     entries.append(.searchInput(id: id.count, section: .search, title: NSAttributedString(string: "🔍"), text: state.searchQuery ?? "", placeholder: "Поиск настроек"))
     let sec: NLSectionId = .items
+    // MARK: Megram — one rounded card per switch, description underneath.
+    let featureSections = NLFeatureSections()
+    func megramFeature(_ setting: NLBoolSetting, _ value: Bool, _ text: String, _ description: String, enabled: Bool = true) {
+        let section = featureSections.take()
+        entries.append(.toggle(id: id.count, section: section, settingName: setting, value: value, text: text, enabled: enabled))
+        if !description.isEmpty {
+            entries.append(.notice(id: id.count, section: section, text: description))
+        }
+    }
     let cat = state.hubCategory
     let appearanceCategories: Set<NLHubCategory> = [.appearance, .liquidGlass, .profiles, .tabs, .folders, .chatList, .stories, .mediaCamera, .inputEmoji, .voice, .calls, .music]
     let ghostCategories: Set<NLHubCategory> = [.ghost]
@@ -905,15 +936,27 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
     // showOriginalEdited, camera/particle/profile-blur/icons/music noise) removed.
     if showAppearance {
 
-    // СПИСОК ЧАТОВ
-    entries.append(.header(id: id.count, section: sec, text: "СПИСОК ЧАТОВ", badge: nil))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .squareAvatars, value: s.squareAvatars, text: "Квадратные аватары", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .compactChatList, value: s.compactChatList, text: "Компактный список чатов", enabled: true))
-    entries.append(.notice(id: id.count, section: sec, text: "Уменьшенные аватары и одна строка превью — больше чатов помещается на экран."))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .unlimitedPinnedChats, value: s.unlimitedPinnedChats, text: "Безлимитное закрепление", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .hidePhoneInSettings, value: s.hidePhoneInSettings, text: "Скрыть номер в настройках", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .allChatsHidden, value: s.allChatsHidden, text: "Скрыть «Все чаты»", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .hideStories, value: s.hideStories, text: "Скрыть истории", enabled: true))
+    // MARK: Megram — exactly the list the user specified, one card per switch.
+    entries.append(.header(id: id.count, section: sec, text: "ВНЕШНИЙ ВИД", badge: nil))
+    megramFeature(.squareAvatars, s.squareAvatars, "Квадратные аватары", "Аватары в списке чатов рисуются скруглённым квадратом вместо круга.")
+    megramFeature(.unlimitedPinnedChats, s.unlimitedPinnedChats, "Безлимитное закрепление", "Снимает ограничение на число закреплённых чатов.")
+    megramFeature(.showTabNames, s.showTabNames, "Подписи вкладок", "Показывает названия под значками нижней панели.")
+    megramFeature(.roundTabs, s.roundTabs, "Круглые вкладки", "Значки нижней панели получают круглую подложку.")
+    megramFeature(.sendWithReturnKey, s.sendWithReturnKey, "Отправка по Return", "Клавиша ввода отправляет сообщение, а не переносит строку.")
+    megramFeature(.disableSnapDeletionEffect, !s.disableSnapDeletionEffect, "Эффект удаления", "Сообщение рассыпается при удалении. Выключите, чтобы оно исчезало сразу.")
+    megramFeature(.forceEmojiTab, s.forceEmojiTab, "Вкладка эмодзи", "Клавиатура открывается на эмодзи, а не на стикерах.")
+    megramFeature(.hideNewChatSticker, s.hideNewChatSticker, "Скрыть приветственный эмодзи", "В пустом чате не показывается большой стикер-приветствие, чтобы случайно не отправить его тапом.")
+    megramFeature(.hideBusinessChats, s.hideBusinessChats, "Скрыть панель бизнес-бота", "Убирает баннер «бот управляет этим чатом» с кнопкой СТОП над перепиской.")
+    megramFeature(.truncateLongMessages, s.truncateLongMessages, "Сокращать длинные сообщения", "Длинное сообщение сворачивается до нескольких строк с кнопкой «Ещё».")
+    megramFeature(.charCounterInput, s.charCounterInput, "Счётчик символов при вводе", "Показывает число набранных символов над полем ввода.")
+    megramFeature(.charCounterInChat, s.charCounterInChat, "Счётчик символов в чате", "Показывает длину сообщения рядом со временем отправки.")
+    megramFeature(.disableScrollToNextChannel2, !s.disableScrollToNextChannel, "Скролл к следующему каналу", "Прокрутка за конец переписки переходит в следующий непрочитанный канал.")
+    megramFeature(.namelessLiquidGlassMessages, s.namelessLiquidGlassMessages, "Liquid Glass на сообщения", "Пузыри сообщений получают стеклянную заливку, сквозь которую виден фон чата.", enabled: s.liquidGlassEnabled)
+    megramFeature(.namelessCompactAttachmentSheet, s.namelessCompactAttachmentSheet, "Стеклянное меню вложения", "Кнопка «+» открывает компактное стеклянное меню вместо стандартной панели.")
+    // Mutually exclusive: HD on demand and HD always answer the same question,
+    // and leaving both on hides which one is in charge.
+    megramFeature(.cameraSendHDPhoto, s.cameraSendHDPhoto, "HD-фото при отправке", "Кнопка «HD» в галерее отправляет фото без сжатия.", enabled: !s.cameraAlwaysSendHD)
+    megramFeature(.cameraAlwaysSendHD, s.cameraAlwaysSendHD, "Всегда в HD", "Каждое фото уходит без сжатия. Отключает «HD-фото при отправке».")
 
     // ЧАТ И ИНТЕРФЕЙС
     entries.append(.header(id: id.count, section: sec, text: "ЧАТ И ИНТЕРФЕЙС", badge: nil))
@@ -937,49 +980,10 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
     entries.append(.toggle(id: id.count, section: sec, settingName: .disableSnapDeletionEffect, value: !s.disableSnapDeletionEffect, text: "Эффект удаления", enabled: true))
     entries.append(.toggle(id: id.count, section: sec, settingName: .forceEmojiTab, value: s.forceEmojiTab, text: "Вкладка эмодзи первой", enabled: true))
     entries.append(.toggle(id: id.count, section: sec, settingName: .defaultEmojisFirst, value: s.defaultEmojisFirst, text: "Стандартные эмодзи первыми", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .hideNewChatSticker, value: s.hideNewChatSticker, text: "Скрыть приветственный стикер", enabled: true))
-    entries.append(.notice(id: id.count, section: sec, text: "В пустом чате не показывается большой стикер-приветствие, чтобы случайно не отправить его тапом."))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .hideBusinessChats, value: s.hideBusinessChats, text: "Скрыть панель бизнес-бота", enabled: true))
-    entries.append(.notice(id: id.count, section: sec, text: "Убирает баннер «бот управляет этим чатом» с кнопкой СТОП сверху чатов, делегированных Telegram Business ассистенту."))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .settingsBigAvatar, value: s.settingsBigAvatar, text: "Большой аватар в шапке настроек", enabled: true))
-    entries.append(.notice(id: id.count, section: sec, text: "Настройки открываются с уже развёрнутой фотографией во всю ширину, имя и юзернейм — поверх снизу."))
-
-    // СООБЩЕНИЯ · ПОВЕДЕНИЕ
-    entries.append(.header(id: id.count, section: sec, text: "СООБЩЕНИЯ", badge: nil))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .truncateLongMessages, value: s.truncateLongMessages, text: "Сокращать длинные сообщения", enabled: true))
-    entries.append(.notice(id: id.count, section: sec, text: "Длинные тексты в чате обрезаются с ссылкой «Ещё», как в предпросмотрах."))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .noAutoNextVoice, value: s.noAutoNextVoice, text: "Не слушать след. голосовое", enabled: true))
-    entries.append(.notice(id: id.count, section: sec, text: "После окончания голосового следующее не запускается автоматически."))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .charCounterInput, value: s.charCounterInput, text: "Счётчик символов при вводе", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .charCounterInChat, value: s.charCounterInChat, text: "Счётчик символов в чате", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .disableScrollToNextChannel2, value: !s.disableScrollToNextChannel, text: "Скролл к следующему каналу", enabled: true))
-    entries.append(.oneFromManySelector(id: id.count, section: sec, settingName: .autoFormatMode, text: "Стиль при отправке", value: NamelessAutoFormatMode(rawValue: s.autoFormatMode)?.titleRu ?? "Обычный", enabled: true))
-
-    // LIQUID GLASS — один тумблер
-    entries.append(.header(id: id.count, section: sec, text: "LIQUID GLASS", badge: nil))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .liquidGlassEnabled, value: s.liquidGlassEnabled, text: "Liquid Glass на сообщения", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .namelessCompactAttachmentSheet, value: s.namelessCompactAttachmentSheet, text: "Стеклянное меню вложений", enabled: s.liquidGlassEnabled))
-    entries.append(.notice(id: id.count, section: sec, text: "Пузыри сообщений становятся стеклянными, преломляя фон чата (только на iOS 26)."))
-
-    // КАМЕРА · КАЧЕСТВО
-    entries.append(.header(id: id.count, section: sec, text: "КАМЕРА · КАЧЕСТВО", badge: nil))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .cameraSendHDPhoto, value: s.cameraSendHDPhoto, text: "HD-фото при отправке", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .cameraAlwaysSendHD, value: s.cameraAlwaysSendHD, text: "Всегда в HD", enabled: true))
-    entries.append(.percentageSlider(id: id.count, section: sec, settingName: .cameraJpegQuality, value: s.cameraJpegQuality))
-    entries.append(.notice(id: id.count, section: sec, text: "Качество JPEG исходящих фото. Больше — выше вес."))
-
-    // ЦВЕТА · СТИКЕРЫ
-    entries.append(.header(id: id.count, section: sec, text: "ЦВЕТА · СТИКЕРЫ", badge: nil))
-    entries.append(.percentageSlider(id: id.count, section: sec, settingName: .accountColorsSaturation, value: s.accountColorsSaturation))
-    entries.append(.notice(id: id.count, section: sec, text: "Насыщенность цветов имён и аватарок."))
-    entries.append(.percentageSlider(id: id.count, section: sec, settingName: .stickerSize, value: s.stickerSize))
-    entries.append(.notice(id: id.count, section: sec, text: "Размер стикеров в чате."))
-
-    // ФОНОВЫЕ ФУНКЦИИ
-    entries.append(.header(id: id.count, section: sec, text: "ДОП. ЭФФЕКТЫ", badge: nil))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .namelessVideoBackgroundEnabled, value: s.namelessVideoBackgroundEnabled, text: "Видео-обои чата", enabled: true))
-    entries.append(.toggle(id: id.count, section: sec, settingName: .confirmCalls, value: s.confirmCalls, text: "Подтверждение звонка", enabled: true))
-    entries.append(.notice(id: id.count, section: sec, text: "Диалог подтверждения при тапе на кнопку звонка — защита от случайных нажатий."))
+    // Стикеры — ползунок оставлен как единственный размерный параметр вкладки.
+    let stickerSection = featureSections.take()
+    entries.append(.percentageSlider(id: id.count, section: stickerSection, settingName: .stickerSize, value: s.stickerSize))
+    entries.append(.notice(id: id.count, section: stickerSection, text: "Размер стикеров и анимированных эмодзи в переписке."))
 
     } // end appearance
 
@@ -1073,6 +1077,9 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
     if showOther {
     // КОНТЕКСТНОЕ МЕНЮ
     entries.append(.header(id: id.count, section: sec, text: "✦ ПРОЧИЕ ФУНКЦИИ", badge: nil))
+    // Перенесено из «Внешнего вида»: это про воспроизведение, не про облик.
+    megramFeature(.noAutoNextVoice, s.noAutoNextVoice, "Не слушать следующее голосовое", "После окончания голосового следующее не запускается автоматически.")
+
     // MEGRAM · МЕНЮ ПРОФИЛЯ — the three-dot menu inside a private chat.
     entries.append(.header(id: id.count, section: sec, text: "MEGRAM · МЕНЮ ПРОФИЛЯ", badge: nil))
     entries.append(.notice(id: id.count, section: sec, text: "Скрывает пункты меню «⋯» в профиле собеседника. Пункт Megram скрыть нельзя."))
@@ -1586,10 +1593,18 @@ private func namelessFeaturesControllerImpl(context: AccountContext, initialCate
                     : SGSimpleSettings.MessageDoubleTapAction.default.rawValue
             case .cameraDefaultBack: s.cameraDefaultBack = value
             case .cameraUseDeviceMicrophone: s.cameraUseDeviceMicrophone = value
-            case .cameraSendHDPhoto: s.cameraSendHDPhoto = value
+            // Megram: HD on demand and HD always are two answers to the same
+            // question, so turning one on retires the other.
+            case .cameraSendHDPhoto:
+                s.cameraSendHDPhoto = value
+                if value { s.cameraAlwaysSendHD = false }
+                simplePromise.set(true)
             case .cameraRememberLast: s.cameraRememberLast = value
             case .cameraStaticZoom: s.cameraStaticZoom = value
-            case .cameraAlwaysSendHD: s.cameraAlwaysSendHD = value
+            case .cameraAlwaysSendHD:
+                s.cameraAlwaysSendHD = value
+                if value { s.cameraSendHDPhoto = false }
+                simplePromise.set(true)
             case .showIdAndDC: s.showIdAndDC = value
             case .showSeconds: s.showSeconds = value
             case .showFullViews: s.showFullViews = value

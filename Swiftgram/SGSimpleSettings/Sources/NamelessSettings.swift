@@ -547,8 +547,11 @@ public extension SGSimpleSettings {
     var nxThermalCalmDown: Bool { get { storage.namelessBool(NamelessSettingsKey.nxThermalCalmDown) } set { storage.set(newValue, forKey: NamelessSettingsKey.nxThermalCalmDown) } }
 
     /// Open Settings with the avatar already expanded (fills the top of the screen).
+    /// Megram: part of the client's look rather than a preference, so it is
+    /// always on and no longer carries a switch. The setter is kept so existing
+    /// call sites compile, but the stored value no longer decides anything.
     var settingsBigAvatar: Bool {
-        get { storage.namelessBool(NamelessSettingsKey.settingsBigAvatar) }
+        get { true }
         set { storage.set(newValue, forKey: NamelessSettingsKey.settingsBigAvatar) }
     }
 
