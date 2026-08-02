@@ -1305,6 +1305,13 @@ public class ChatTextInputPanelNode: ChatInputPanelNode, ASEditableTextNodeDeleg
                 insets.left += 40.0 + 6.0
             }
         }
+        // MARK: Megram — the right button had no inset of its own, so the input
+        // field ran on underneath it and its rounded edge showed through the
+        // button's glass. Mirrors the left inset, which the "+" already has.
+        if let customLeftAction = self.customLeftAction, case .empty = customLeftAction {
+        } else {
+            insets.right += 40.0 + 6.0
+        }
         return insets
     }
     

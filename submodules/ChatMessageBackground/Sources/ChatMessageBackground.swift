@@ -647,12 +647,15 @@ public final class ChatMessageBubbleBackdrop: ASDisplayNode, SGLiquidGlassContai
         if SGSimpleSettings.shared.megramPureClearBubbles {
             tint = .init(kind: .clear)
         } else if self.currentBubbleColor != .clear {
-            let alpha: CGFloat = zone.isTinted ? (isDark ? 0.18 : 0.15) : (isDark ? 0.12 : 0.10)
+            // MARK: Megram — halved from 0.18/0.15/0.12/0.10. The tint was
+            // dense enough to read as a coloured fill rather than glass, and
+            // the chat wallpaper barely came through it.
+            let alpha: CGFloat = zone.isTinted ? (isDark ? 0.09 : 0.08) : (isDark ? 0.06 : 0.05)
             tint = .init(kind: .custom(style: .clear, color: self.currentBubbleColor.withAlphaComponent(alpha)))
         } else {
             // No bubble colour to lean on (custom wallpaper themes): the faintest neutral wash,
             // just enough to give the glass an edge to read against.
-            tint = .init(kind: .custom(style: .clear, color: UIColor(white: 1.0, alpha: isDark ? 0.07 : 0.12)))
+            tint = .init(kind: .custom(style: .clear, color: UIColor(white: 1.0, alpha: isDark ? 0.04 : 0.06)))
         }
         if enabled {
             let state = (size: size, radii: self.currentGlassRadii, isDark: isDark, tint: tint)

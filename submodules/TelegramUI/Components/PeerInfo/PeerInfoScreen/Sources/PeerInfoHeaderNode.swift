@@ -296,7 +296,9 @@ final class PeerInfoHeaderNode: ASDisplayNode {
         self.buttonsContainerNode = SparseNode()
         self.buttonsContainerNode.clipsToBounds = true
         
-        self.buttonsBackgroundNode = NavigationBackgroundNode(color: .clear, enableBlur: true, enableSaturation: false)
+        // MARK: Megram — no blur behind the header buttons. It smeared whatever
+        // scrolled underneath into a murky band across the top of the profile.
+        self.buttonsBackgroundNode = NavigationBackgroundNode(color: .clear, enableBlur: false, enableSaturation: false)
         // nameless: enable Liquid Glass on the profile action buttons backdrop
         self.buttonsBackgroundNode.enableLiquidGlass = SGLiquidGlassZone.profile.isEnabled
         self.buttonsBackgroundNode.isUserInteractionEnabled = false

@@ -16,7 +16,19 @@ public func makeDefaultPresentationTheme(reference: PresentationBuiltinThemeRefe
         case .nightAccent:
             theme = makeDefaultDarkTintedPresentationTheme(extendingThemeReference: extendingThemeReference, preview: preview)
     }
-    return theme
+    return megramApplyingGlass(theme)
+}
+
+/// Grouped rows sit on a translucent panel rather than a solid grey slab.
+///
+/// Doing it in the theme reaches every screen at once: each list item paints
+/// itemBlocksBackgroundColor itself, there are well over thirty of them, and
+/// one missed item leaves a grey block among glass ones.
+public func megramApplyingGlass(_ theme: PresentationTheme) -> PresentationTheme {
+    let updatedList = theme.list.withUpdated(
+        itemBlocksBackgroundColor: theme.list.itemBlocksBackgroundColor.withAlphaComponent(0.55)
+    )
+    return theme.withUpdated(list: updatedList)
 }
 
 public func customizePresentationTheme(_ theme: PresentationTheme, editing: Bool, title: String? = nil, accentColor: UIColor?, outgoingAccentColor: UIColor?, backgroundColors: [UInt32], bubbleColors: [UInt32], animateBubbleColors: Bool?, wallpaper: TelegramWallpaper? = nil, baseColor: PresentationThemeBaseColor? = nil) -> PresentationTheme {

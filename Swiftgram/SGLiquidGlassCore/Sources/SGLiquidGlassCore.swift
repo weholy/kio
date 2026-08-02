@@ -26,31 +26,13 @@ public enum SGLiquidGlassZone: Int, CaseIterable {
     case media
     case chatList
 
+    /// MARK: Megram — glass is always on.
+    ///
+    /// The per-zone flags have no rows in the rebuilt settings tabs, so a
+    /// single stale value from an older build would silently drop whole
+    /// screens back to flat grey with no way to reach the switch and undo it.
     public var isEnabled: Bool {
-        let s = SGSimpleSettings.shared
-        // Master switch: if liquid glass is on — EVERYWHERE (official Apple glass)
-        guard s.liquidGlassEnabled else { return false }
-        // Optional "blur instead" kills glass intentionally
-        if s.blurInsteadGlass { return false }
-        // All zone flags default true; keep them only as fine-grained off-switches
-        switch self {
-        case .messages:          return s.namelessLiquidGlassMessages
-        case .outgoingMessages:  return s.namelessLiquidGlassOutgoingMessages
-        case .settings:          return s.namelessLiquidGlassSettings
-        case .profile:           return s.namelessLiquidGlassProfile
-        case .profileGifts:      return s.namelessLiquidGlassProfileGifts
-        case .inlineButtons:     return s.namelessLiquidGlassInlineButtons
-        case .popup:             return s.namelessLiquidGlassPopup
-        case .contextMenu:       return s.namelessLiquidGlassContextMenu
-        case .search:            return s.namelessLiquidGlassSearch
-        case .reactions:         return s.namelessLiquidGlassReactions
-        case .stickers:          return s.namelessLiquidGlassStickers
-        case .calls:             return s.namelessLiquidGlassCalls
-        case .media:             return s.namelessLiquidGlassMedia
-        case .chatList:          return s.namelessLiquidGlassChatList
-        case .tabBar, .navigationBar, .inputPanel, .buttons:
-            return true
-        }
+        return true
     }
 
     public var isTinted: Bool {
