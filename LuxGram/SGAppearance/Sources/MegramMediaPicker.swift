@@ -38,6 +38,9 @@ public final class MegramMediaPicker: NSObject {
         super.init()
     }
 
+    /// PHPicker needs iOS 14. The module has no deployment floor of its own, so
+    /// the requirement is stated here rather than assumed.
+    @available(iOS 14.0, *)
     public func present(in viewController: UIViewController) {
         self.presenter = viewController
         self.strongSelf = self
@@ -166,6 +169,7 @@ public final class MegramMediaPicker: NSObject {
     }
 }
 
+@available(iOS 14.0, *)
 extension MegramMediaPicker: PHPickerViewControllerDelegate {
     public func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
         picker.dismiss(animated: true)

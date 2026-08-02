@@ -1892,7 +1892,7 @@ private func namelessFeaturesControllerImpl(context: AccountContext, initialCate
                 })
                 // PHPicker needs a UIKit presenter; the key window's root is the
                 // only one reachable from this callback.
-                if let root = UIApplication.shared.connectedScenes
+                if #available(iOS 14.0, *), let root = UIApplication.shared.connectedScenes
                     .compactMap({ ($0 as? UIWindowScene)?.keyWindow?.rootViewController })
                     .first {
                     var presenter = root
