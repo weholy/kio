@@ -97,7 +97,7 @@ public final class ChatAvatarNavigationNode: ASDisplayNode {
             return
         }
         self.applyMegramFire(days: MegramFireStore.badgeDays(peerId: peer.id.toInt64()))
-        self.megramFireDisposable.set(MegramFireRefresh.refreshInBackground(postbox: context.account.postbox, peerId: peer.id, completion: { [weak self] state in
+        self.megramFireDisposable.set(MegramFireRefresh.refreshInBackground(postbox: context.account.postbox, peerId: peer.id, accountPeerId: context.account.peerId, completion: { [weak self] state in
             self?.applyMegramFire(days: state.days > 0 ? state.days : nil)
         }))
     }

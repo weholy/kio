@@ -11,7 +11,9 @@ import SwiftSignalKit
 /// they can never disagree.
 public struct MegramFireSnapshot {
     public let state: MegramFireState
-    /// Peers that currently have a fire, for the avatar row on the fire screen.
+    /// The two people this fire belongs to: the chat partner first, then the
+    /// account owner. A fire is always a pair — never a roster of every chat
+    /// that happens to have one burning.
     public let partners: [EnginePeer]
 
     public init(state: MegramFireState, partners: [EnginePeer]) {
@@ -22,15 +24,16 @@ public struct MegramFireSnapshot {
 
 public enum MegramFireRefresh {
     /// Recomputes and persists the state for one peer.
-    public static func refresh(postbox: Postbox, peerId: EnginePeer.Id) -> Signal<MegramFireSnapshot, NoError> {
+    public static func refresh(postbox: Postbox, peerId: EnginePeer.Id, accountPeerId: EnginePeer.Id) -> Signal<MegramFireSnapshot, NoError> {
         let rawPeerId = peerId.toInt64()
         let stored = MegramFireStore.state(peerId: rawPeerId)
         return postbox.transaction { transaction -> MegramFireSnapshot in
             var partners: [EnginePeer] = []
-            for otherId in MegramFireStore.activePeerIds().prefix(6) {
-                if let peer = transaction.getPeer(PeerId(otherId)) {
-                    partners.append(EnginePeer(peer))
-                }
+            if let peer = transaction.getPeer(peerId) {
+                partners.append(EnginePeer(peer))
+            }
+            if let accountPeer = transaction.getPeer(accountPeerId) {
+                partners.append(EnginePeer(accountPeer))
             }
 
             guard stored.isActive else {
@@ -45,11 +48,11 @@ public enum MegramFireRefresh {
 
     /// Fire-and-forget refresh used when a chat is opened, so the header badge
     /// does not go stale for people who never open the fire screen.
-    public static func refreshInBackground(postbox: Postbox, peerId: EnginePeer.Id, completion: @escaping (MegramFireState) -> Void) -> Disposable {
+    public static func refreshInBackground(postbox: Postbox, peerId: EnginePeer.Id, accountPeerId: EnginePeer.Id, completion: @escaping (MegramFireState) -> Void) -> Disposable {
         guard MegramFireStore.isActive(peerId: peerId.toInt64()) else {
             return EmptyDisposable
         }
-        return (self.refresh(postbox: postbox, peerId: peerId)
+        return (self.refresh(postbox: postbox, peerId: peerId, accountPeerId: accountPeerId)
         |> deliverOnMainQueue).start(next: { snapshot in
             completion(snapshot.state)
         })
@@ -63,15 +66,39 @@ public enum MegramFireRefresh {
         var perDayIncoming: [String: Int] = [:]
         var perDayTotal: [String: Int] = [:]
 
+        let today = MegramFireStore.dayString(Date())
+        var sentPhotoOrVideoToday = false
+        var sentRoundOrVoiceToday = false
+        var hadCallToday = false
+
         // The whole conversation counts, not just what arrived after the fire
         // was lit — a fresh fire showing zero messages next to a chat with
         // thousands of them reads as broken.
         transaction.withAllMessages(peerId: peerId, namespace: Namespaces.Message.Cloud, reversed: true, { message in
-            // Joins, pins and other service events are not conversation.
-            if message.media.contains(where: { $0 is TelegramMediaAction }) {
+            let day = MegramFireStore.dayString(Date(timeIntervalSince1970: Double(message.timestamp)))
+
+            // Service events are not conversation, but a call leaves one and
+            // that is the only trace a call has in the history.
+            if let action = message.media.first(where: { $0 is TelegramMediaAction }) as? TelegramMediaAction {
+                if day == today, case .phoneCall = action.action {
+                    hadCallToday = true
+                }
                 return true
             }
-            let day = MegramFireStore.dayString(Date(timeIntervalSince1970: Double(message.timestamp)))
+
+            if day == today {
+                for media in message.media {
+                    if media is TelegramMediaImage {
+                        sentPhotoOrVideoToday = true
+                    } else if let file = media as? TelegramMediaFile {
+                        if file.isInstantVideo || file.isVoice {
+                            sentRoundOrVoiceToday = true
+                        } else if file.isVideo {
+                            sentPhotoOrVideoToday = true
+                        }
+                    }
+                }
+            }
             total += 1
             perDayTotal[day] = (perDayTotal[day] ?? 0) + 1
             if message.flags.contains(.Incoming) {
@@ -130,6 +157,12 @@ public enum MegramFireRefresh {
         state.incomingMessages = incoming
         state.weekCounts = weekCounts
         state.mutualToday = isMutual(now)
+        // The weaker side sets the pace: "five each" is not satisfied by one
+        // person writing ten times.
+        state.mutualMessagesToday = min(perDayOutgoing[today] ?? 0, perDayIncoming[today] ?? 0)
+        state.sentPhotoOrVideoToday = sentPhotoOrVideoToday
+        state.sentRoundOrVoiceToday = sentRoundOrVoiceToday
+        state.hadCallToday = hadCallToday
         state.lastStreakDay = lastStreakDay
         state.bestStreak = max(stored.bestStreak, stored.bonusDays + earnedDays)
         return state

@@ -5,11 +5,18 @@ import AppBundle
 
 private let gradientImage = UIImage(bundleImageName: "Item List/Icons/Gradient")
 private let backdropImage = UIImage(bundleImageName: "Item List/Icons/Backdrop")
-public func renderSettingsIcon(name: String, scaleFactor: CGFloat = 1.0, backgroundColors: [UIColor]? = nil) -> UIImage? {
+/// `cornerRadius` clips the finished icon. Most settings icons ship with their
+/// rounding already drawn into the asset; pass a radius for the ones that do not.
+public func renderSettingsIcon(name: String, scaleFactor: CGFloat = 1.0, backgroundColors: [UIColor]? = nil, cornerRadius: CGFloat? = nil) -> UIImage? {
     return generateImage(CGSize(width: 30.0, height: 30.0), contextGenerator: { size, context in
         let bounds = CGRect(origin: CGPoint(), size: size)
         context.clear(bounds)
-        
+
+        if let cornerRadius {
+            context.addPath(UIBezierPath(roundedRect: bounds, cornerRadius: cornerRadius).cgPath)
+            context.clip()
+        }
+
         if let backgroundColors {
             var locations: [CGFloat] = [0.0, 1.0]
             let colors: [CGColor] = backgroundColors.map(\.cgColor)
@@ -119,7 +126,9 @@ let colorViolet = UIColor(rgb: 0x5E5CE6)
 public struct PresentationResourcesSettings {
     public static let swiftgram = renderSettingsIcon(name: "NamelessSettings", scaleFactor: 30.0 / 1280.0)
     public static let swiftgramPro = renderSettingsIcon(name: "NamelessSettings", scaleFactor: 30.0 / 1280.0)
-    public static let nameless = renderSettingsIcon(name: "NamelessSettings", scaleFactor: 40.0 / 1280.0)
+    // Megram: the artwork has square corners, unlike every other settings icon,
+    // so the rounding is applied here instead.
+    public static let nameless = renderSettingsIcon(name: "NamelessSettings", scaleFactor: 40.0 / 1280.0, cornerRadius: 7.0)
     public static let proxy = renderSettingsIcon(name: "Item List/Icons/Proxy", backgroundColors: [colorGreen])
     public static let savedMessages = renderSettingsIcon(name: "Item List/Icons/SavedMessages", backgroundColors: [colorBlue])
     public static let recentCalls = renderSettingsIcon(name: "Item List/Icons/Phone", backgroundColors: [colorGreen])

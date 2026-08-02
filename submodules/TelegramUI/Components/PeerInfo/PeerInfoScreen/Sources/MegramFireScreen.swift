@@ -405,13 +405,10 @@ private final class MegramFireScreenNode: ASDisplayNode {
         }
         self.avatarNodes.removeAll()
 
-        // Current partner first, then the other chats that have a fire.
-        var peers: [EnginePeer] = [self.peer]
-        for partner in self.partners where partner.id != self.peer.id {
-            peers.append(partner)
-        }
+        // A fire belongs to exactly two people: the partner and the owner.
+        let peers = self.partners.isEmpty ? [self.peer] : self.partners
 
-        for peer in peers.prefix(4) {
+        for peer in peers.prefix(2) {
             let node = AvatarNode(font: avatarPlaceholderFont(size: 15.0))
             node.setPeer(
                 accountPeerId: self.context.account.peerId,
@@ -488,10 +485,22 @@ private final class MegramFireScreenNode: ASDisplayNode {
         self.previousLevelButton.alpha = self.previousLevelButton.isEnabled ? 1.0 : 0.25
         self.nextLevelButton.alpha = self.nextLevelButton.isEnabled ? 1.0 : 0.25
 
-        // Goal
-        self.goalLabel.text = self.state.mutualToday ? MegramFireGoal.goal(for: Date()) : "Ответьте друг другу сегодня"
-        self.goalCheckView.backgroundColor = self.state.mutualToday ? UIColor(red: 0.2, green: 0.78, blue: 0.35, alpha: 1.0) : UIColor.white.withAlphaComponent(0.12)
-        self.goalCheckLabel.text = self.state.mutualToday ? "✓" : ""
+        // Goal — checked against what actually happened in the chat today.
+        let goal = MegramFireGoal.goal(for: Date())
+        let goalProgress = goal.progress(state: self.state)
+        let goalDone = goalProgress.done >= goalProgress.target
+        self.goalLabel.text = goal.titleRu
+        self.goalCheckView.backgroundColor = goalDone ? UIColor(red: 0.2, green: 0.78, blue: 0.35, alpha: 1.0) : UIColor.white.withAlphaComponent(0.12)
+        if goalDone {
+            self.goalCheckLabel.text = "✓"
+            self.goalCheckLabel.font = UIFont.systemFont(ofSize: 15.0, weight: .bold)
+        } else if goalProgress.target > 1 {
+            // Counted goals show how far along you are instead of an empty circle.
+            self.goalCheckLabel.text = "\(goalProgress.done)/\(goalProgress.target)"
+            self.goalCheckLabel.font = UIFont.systemFont(ofSize: 11.0, weight: .semibold)
+        } else {
+            self.goalCheckLabel.text = ""
+        }
 
         // Stats
         self.statsTotalLabel.text = "\(self.state.totalMessages)"
@@ -691,7 +700,7 @@ final class MegramFireScreen: ViewController {
     }
 
     private func reloadState() {
-        self.stateDisposable.set((MegramFireRefresh.refresh(postbox: self.context.account.postbox, peerId: self.peer.id)
+        self.stateDisposable.set((MegramFireRefresh.refresh(postbox: self.context.account.postbox, peerId: self.peer.id, accountPeerId: self.context.account.peerId)
         |> deliverOnMainQueue).start(next: { [weak self] snapshot in
             guard let self else {
                 return

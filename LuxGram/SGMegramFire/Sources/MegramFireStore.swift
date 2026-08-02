@@ -23,6 +23,13 @@ public struct MegramFireState: Equatable {
     public var weekCounts: [Int]
     /// True when both sides have written at least once today.
     public var mutualToday: Bool
+    /// Messages written today by the side that wrote least. A goal asking for
+    /// five messages means five from each, not five between you.
+    public var mutualMessagesToday: Int
+    /// Which kinds of content were exchanged today, for goal checking.
+    public var sentPhotoOrVideoToday: Bool
+    public var sentRoundOrVoiceToday: Bool
+    public var hadCallToday: Bool
     /// yyyy-MM-dd of the most recent day that counted towards the streak.
     public var lastStreakDay: String?
 
@@ -37,6 +44,10 @@ public struct MegramFireState: Equatable {
         incomingMessages: Int = 0,
         weekCounts: [Int] = Array(repeating: 0, count: 7),
         mutualToday: Bool = false,
+        mutualMessagesToday: Int = 0,
+        sentPhotoOrVideoToday: Bool = false,
+        sentRoundOrVoiceToday: Bool = false,
+        hadCallToday: Bool = false,
         lastStreakDay: String? = nil
     ) {
         self.isActive = isActive
@@ -49,6 +60,10 @@ public struct MegramFireState: Equatable {
         self.incomingMessages = incomingMessages
         self.weekCounts = weekCounts
         self.mutualToday = mutualToday
+        self.mutualMessagesToday = mutualMessagesToday
+        self.sentPhotoOrVideoToday = sentPhotoOrVideoToday
+        self.sentRoundOrVoiceToday = sentRoundOrVoiceToday
+        self.hadCallToday = hadCallToday
         self.lastStreakDay = lastStreakDay
     }
 
@@ -257,21 +272,58 @@ public enum MegramFireStore {
 
 // MARK: - Daily goals
 
-/// A small rotating task shown under the flame. The index is derived from the
-/// day itself, so both the goal and its wording stay stable for 24 hours.
-public enum MegramFireGoal {
-    public static let items: [String] = [
-        "Ответьте друг другу сегодня",
-        "Расскажите, что удивило вас за день",
-        "Отправьте фото того, что сейчас рядом",
-        "Задайте вопрос, который ещё не задавали",
-        "Скиньте трек, который слушаете",
-        "Вспомните момент, за который благодарны",
-        "Напишите первым, не дожидаясь ответа"
-    ]
+/// The day's task. Every case is checked against what actually happened in the
+/// chat today — nothing here is decorative.
+public enum MegramFireGoal: CaseIterable {
+    /// Both sides wrote at least once.
+    case reply
+    /// Both sides wrote at least three times.
+    case messages3
+    /// Both sides wrote at least five times.
+    case messages5
+    case photoOrVideo
+    case roundOrVoice
+    case call
 
-    public static func goal(for date: Date) -> String {
+    public var titleRu: String {
+        switch self {
+        case .reply: return "Ответьте друг другу сегодня"
+        case .messages3: return "Напишите друг другу по 3 сообщения"
+        case .messages5: return "Напишите друг другу по 5 сообщений"
+        case .photoOrVideo: return "Отправьте фото или видео"
+        case .roundOrVoice: return "Запишите кружок или голосовое"
+        case .call: return "Созвонитесь сегодня"
+        }
+    }
+
+    /// Progress towards the goal as (done, target). Boolean goals report 0 or 1
+    /// out of 1, so the caller can render every case the same way.
+    public func progress(state: MegramFireState) -> (done: Int, target: Int) {
+        switch self {
+        case .reply:
+            return (state.mutualToday ? 1 : 0, 1)
+        case .messages3:
+            return (min(state.mutualMessagesToday, 3), 3)
+        case .messages5:
+            return (min(state.mutualMessagesToday, 5), 5)
+        case .photoOrVideo:
+            return (state.sentPhotoOrVideoToday ? 1 : 0, 1)
+        case .roundOrVoice:
+            return (state.sentRoundOrVoiceToday ? 1 : 0, 1)
+        case .call:
+            return (state.hadCallToday ? 1 : 0, 1)
+        }
+    }
+
+    public func isComplete(state: MegramFireState) -> Bool {
+        let progress = self.progress(state: state)
+        return progress.done >= progress.target
+    }
+
+    /// Derived from the day itself, so the goal stays put for 24 hours.
+    public static func goal(for date: Date) -> MegramFireGoal {
         let day = Calendar(identifier: .gregorian).ordinality(of: .day, in: .era, for: date) ?? 0
-        return self.items[abs(day) % self.items.count]
+        let all = MegramFireGoal.allCases
+        return all[abs(day) % all.count]
     }
 }
