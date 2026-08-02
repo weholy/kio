@@ -16,8 +16,34 @@ public func makeDefaultPresentationTheme(reference: PresentationBuiltinThemeRefe
         case .nightAccent:
             theme = makeDefaultDarkTintedPresentationTheme(extendingThemeReference: extendingThemeReference, preview: preview)
     }
-    return theme
+    return megramApplyingGlobalBackground(theme)
 }
+
+/// Lets Megram's app-wide background show through the interface.
+///
+/// Every list draws an opaque fill, so a background behind the window would
+/// otherwise be invisible. Punching the alpha out of the few colours that
+/// cover the screen is one change that reaches every screen at once —
+/// the alternative is hunting down each controller's background node.
+///
+/// Text, separators and controls keep their colours: only the surfaces they
+/// sit on become translucent.
+public func megramApplyingGlobalBackground(_ theme: PresentationTheme) -> PresentationTheme {
+    guard megramGlobalBackgroundIsActive?() == true else {
+        return theme
+    }
+    let alpha: CGFloat = 0.45
+    let updatedList = theme.list.withUpdated(
+        blocksBackgroundColor: theme.list.blocksBackgroundColor.withAlphaComponent(alpha),
+        plainBackgroundColor: theme.list.plainBackgroundColor.withAlphaComponent(alpha),
+        itemBlocksBackgroundColor: theme.list.itemBlocksBackgroundColor.withAlphaComponent(alpha)
+    )
+    return theme.withUpdated(list: updatedList)
+}
+
+/// Set by the app layer, which owns the appearance store. Kept as a hook so
+/// TelegramPresentationData does not gain a dependency on it.
+public var megramGlobalBackgroundIsActive: (() -> Bool)?
 
 public func customizePresentationTheme(_ theme: PresentationTheme, editing: Bool, title: String? = nil, accentColor: UIColor?, outgoingAccentColor: UIColor?, backgroundColors: [UInt32], bubbleColors: [UInt32], animateBubbleColors: Bool?, wallpaper: TelegramWallpaper? = nil, baseColor: PresentationThemeBaseColor? = nil) -> PresentationTheme {
     if accentColor == nil && bubbleColors.isEmpty && backgroundColors.isEmpty && wallpaper == nil {

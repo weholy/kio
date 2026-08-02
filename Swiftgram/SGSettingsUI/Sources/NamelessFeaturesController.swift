@@ -14,6 +14,9 @@ import PresentationDataUtils
 import UndoUI
 import TelegramCore
 import TelegramUIPreferences
+import AlertUI
+import OverlayStatusController
+import SGAppearance
 
 // MARK: - Section
 
@@ -336,6 +339,12 @@ private enum NLBoolSetting: String {
     // enableSavingSelfDestructingMessages is declared near the top of this enum.
     case dimIncomingWhileReplying
     case saveDeletedMessagesReactions
+    // Megram decoration
+    case globalVideoBackground
+    case globalPhotoBackground
+    case profileWallpaper
+    case profileBannerPhoto
+    case profileBannerVideo
 }
 
 private enum NLSliderSetting: String {
@@ -350,6 +359,7 @@ private enum NLSliderSetting: String {
     case tabBarWidth
     case deletedMessageOpacity
     case deletedTrashSize
+    case backgroundOpacity
 }
 
 private enum NLOneFromManySetting: String {
@@ -389,6 +399,13 @@ private enum NLDisclosureLink: String {
     case accountSwitcher
     case pluginsCenter
     case localGiftsShop
+    case hubDecoration
+    // Each opens the picker for its own appearance slot.
+    case pickGlobalVideo
+    case pickGlobalPhoto
+    case pickProfileWallpaper
+    case pickProfileBannerPhoto
+    case pickProfileBannerVideo
 }
 
 private enum NLAction: Int, CaseIterable {
@@ -421,12 +438,14 @@ private enum NLHubCategory: String, CaseIterable {
     case ghost
     case other
     case plugins
+    case decoration
 
     /// The shelves shown at the hub root, in order. Everything else in this enum still exists as a
     /// destination (deep links, search results) but is deliberately absent from the root: the hub
     /// is a short list of places, not an index of every switch in the client.
     static let rootCategories: [NLHubCategory] = [
         .appearance,
+        .decoration,
         .profiles,
         .ghost,
         .tabs,
@@ -458,6 +477,7 @@ private enum NLHubCategory: String, CaseIterable {
         case .ghost: return "Режим призрака"
         case .other: return "Прочие функции"
         case .plugins: return "Плагины"
+        case .decoration: return "Оформление"
         }
     }
 
@@ -484,6 +504,7 @@ private enum NLHubCategory: String, CaseIterable {
         case .ghost: return "Онлайн, прочтение, приватность, геолокация"
         case .other: return "Контекст, сторис, медиа, экспорт"
         case .plugins: return "Установленные расширения клиента"
+        case .decoration: return "Фоны, обои и баннеры профиля"
         }
     }
 
@@ -510,6 +531,7 @@ private enum NLHubCategory: String, CaseIterable {
         case .ghost: return .hubPill18
         case .other: return .hubActions
         case .plugins: return .hubPill2
+        case .decoration: return .hubPill17
         }
     }
 
@@ -538,6 +560,7 @@ private enum NLHubCategory: String, CaseIterable {
         // Plugins is not a list of toggles, so it links straight to its own screen instead of
         // opening a hub category.
         case .plugins: return .pluginsCenter
+        case .decoration: return .hubDecoration
         }
     }
 
@@ -563,7 +586,9 @@ private enum NLHubCategory: String, CaseIterable {
         case .hubMisc: return .misc
         case .hubGhost: return .ghost
         case .hubOther: return .other
-        case .none, .onlineHistory, .ghostDetailsToggle, .deletedDetailsToggle, .deletedTrashDesigner, .fakeLocationPicker, .localStarsAmount, .deviceModelSpoof, .accountSwitcher, .pluginsCenter, .localGiftsShop: return nil
+        case .hubDecoration: return .decoration
+        case .none, .onlineHistory, .ghostDetailsToggle, .deletedDetailsToggle, .deletedTrashDesigner, .fakeLocationPicker, .localStarsAmount, .deviceModelSpoof, .accountSwitcher, .pluginsCenter, .localGiftsShop,
+             .pickGlobalVideo, .pickGlobalPhoto, .pickProfileWallpaper, .pickProfileBannerPhoto, .pickProfileBannerVideo: return nil
         }
     }
 }
@@ -966,6 +991,7 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
     let showSettingsSections = cat == .settingsSections
     let showGhost = cat == .ghost
     let showOther = cat == .other
+    let showDecoration = cat == .decoration
 
     // ═══════════════════════════════════════════
     // ВНЕШНИЙ ВИД — интерфейс + сообщения + Liquid Glass + камера + медиа + информация
@@ -1007,6 +1033,46 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
     entries.append(.notice(id: id.count, section: stickerSection, text: "Размер стикеров и анимированных эмодзи в переписке."))
 
     } // end appearance
+
+    // ═══════════════════════════════════════════
+    // ОФОРМЛЕНИЕ — фоны, обои и баннеры из своей галереи
+    // ═══════════════════════════════════════════
+    if showDecoration {
+    entries.append(.header(id: id.count, section: sec, text: "ФОН ПРИЛОЖЕНИЯ", badge: nil))
+
+    // Each row pairs a switch with a picker that only appears once the switch
+    // is on: choosing media for a feature that is off leads nowhere.
+    func decorationSlot(
+        _ setting: NLBoolSetting,
+        _ link: NLDisclosureLink,
+        _ slot: MegramAppearanceStore.Slot,
+        _ title: String,
+        _ pickTitle: String,
+        _ description: String
+    ) {
+        let section = featureSections.take()
+        let enabled = MegramAppearanceStore.isEnabled(slot)
+        entries.append(.toggle(id: id.count, section: section, settingName: setting, value: enabled, text: title, enabled: true))
+        if enabled || MegramAppearanceStore.hasMedia(for: slot) {
+            entries.append(.disclosureDetail(id: id.count, section: section, link: link, text: pickTitle, detail: MegramAppearanceStore.hasMedia(for: slot) ? "Выбрано" : "Не выбрано"))
+        } else {
+            id.increment(1)
+        }
+        entries.append(.notice(id: id.count, section: section, text: description))
+    }
+
+    decorationSlot(.globalVideoBackground, .pickGlobalVideo, .globalVideo, "Видео-фон", "Выбрать видео", "Зацикленное видео без звука за всеми экранами. При выборе видео сжимается до 720p и теряет звуковую дорожку.")
+    decorationSlot(.globalPhotoBackground, .pickGlobalPhoto, .globalPhoto, "Фото-фон", "Выбрать фото", "Неподвижное изображение за всеми экранами. Если включён видео-фон, показывается он.")
+
+    let opacitySection = featureSections.take()
+    entries.append(.percentageSlider(id: id.count, section: opacitySection, settingName: .backgroundOpacity, value: Int32(MegramAppearanceStore.backgroundOpacity * 100.0)))
+    entries.append(.notice(id: id.count, section: opacitySection, text: "Насколько фон просвечивает сквозь интерфейс. Чем выше, тем светлее фон и тем труднее читать текст."))
+
+    entries.append(.header(id: id.count, section: sec, text: "ПРОФИЛЬ", badge: nil))
+    decorationSlot(.profileWallpaper, .pickProfileWallpaper, .profileWallpaper, "Обои профиля", "Выбрать изображение", "Фон экрана профиля — своего и чужих.")
+    decorationSlot(.profileBannerPhoto, .pickProfileBannerPhoto, .profileBannerPhoto, "Фото-баннер", "Выбрать фото", "Полоса от верха экрана до карточки трека в своём профиле. Видна только вам — отправить её собеседнику нельзя.")
+    decorationSlot(.profileBannerVideo, .pickProfileBannerVideo, .profileBannerVideo, "Видео-баннер", "Выбрать видео", "То же место, но зацикленным видео. Если включены оба баннера, показывается видео.")
+    } // end decoration
 
     // ═══════════════════════════════════════════
     // РЕЖИМ ПРИЗРАКА — статусы + приватность + конфиденциальность + геолокация + информация
@@ -1571,6 +1637,13 @@ private func namelessFeaturesControllerImpl(context: AccountContext, initialCate
             case .hideMenuCopyProtection: s.hideMenuCopyProtection = value
             case .hideMenuClearHistory: s.hideMenuClearHistory = value
             case .hideMenuBlock: s.hideMenuBlock = value
+            // Turning a decoration slot off keeps its file, so switching back
+            // on does not require picking the media again.
+            case .globalVideoBackground: MegramAppearanceStore.setEnabled(.globalVideo, value); simplePromise.set(true)
+            case .globalPhotoBackground: MegramAppearanceStore.setEnabled(.globalPhoto, value); simplePromise.set(true)
+            case .profileWallpaper: MegramAppearanceStore.setEnabled(.profileWallpaper, value); simplePromise.set(true)
+            case .profileBannerPhoto: MegramAppearanceStore.setEnabled(.profileBannerPhoto, value); simplePromise.set(true)
+            case .profileBannerVideo: MegramAppearanceStore.setEnabled(.profileBannerVideo, value); simplePromise.set(true)
             case .hideBottomTabPanel: s.hideTabBar = value; simplePromise.set(true); askForRestart?()
             case .hideContactsTab: s.hideContactsTab = value; simplePromise.set(true); askForRestart?()
             case .hideCallsTab: s.hideCallsTab = value; simplePromise.set(true); askForRestart?()
@@ -1708,6 +1781,9 @@ private func namelessFeaturesControllerImpl(context: AccountContext, initialCate
             case .deletedTrashSize:
                 let clamped = max(50, min(200, value))
                 if s.deletedTrashSize != clamped { s.deletedTrashSize = clamped; simplePromise.set(true) }
+            case .backgroundOpacity:
+                MegramAppearanceStore.setBackgroundOpacity(CGFloat(max(10, min(100, value))) / 100.0)
+                simplePromise.set(true)
             case .accountColorsSaturation: if s.accountColorsSaturation != value { s.accountColorsSaturation = value; simplePromise.set(true) }
             case .liquidGlassIntensity:
                 let newIntensity = Double(value) / 100.0
@@ -1776,6 +1852,57 @@ private func namelessFeaturesControllerImpl(context: AccountContext, initialCate
             presentControllerImpl?(actionSheet, ViewControllerPresentationArguments(presentationAnimation: .modalSheet))
         },
         openDisclosureLink: { link in
+            // MARK: Megram — appearance pickers. The picker needs a live view
+            // controller to present from, which only the presentation callback
+            // can supply here.
+            let decorationSlot: MegramAppearanceStore.Slot?
+            switch link {
+            case .pickGlobalVideo: decorationSlot = .globalVideo
+            case .pickGlobalPhoto: decorationSlot = .globalPhoto
+            case .pickProfileWallpaper: decorationSlot = .profileWallpaper
+            case .pickProfileBannerPhoto: decorationSlot = .profileBannerPhoto
+            case .pickProfileBannerVideo: decorationSlot = .profileBannerVideo
+            default: decorationSlot = nil
+            }
+            if let decorationSlot {
+                let presentationData = context.sharedContext.currentPresentationData.with { $0 }
+                let progressController = OverlayStatusController(theme: presentationData.theme, type: .loading(cancelled: nil))
+                var progressShown = false
+                let picker = MegramMediaPicker(slot: decorationSlot, progress: { _ in
+                    // Compression can take a while on a long clip; the spinner
+                    // appears only once work actually starts.
+                    if !progressShown {
+                        progressShown = true
+                        presentControllerImpl?(progressController, nil)
+                    }
+                }, completion: { result in
+                    if progressShown {
+                        progressController.dismiss()
+                    }
+                    switch result {
+                    case .success:
+                        simplePromise.set(true)
+                    case let .failure(error):
+                        if case .cancelled = error {
+                            break
+                        }
+                        presentControllerImpl?(textAlertController(context: context, title: nil, text: "Не удалось обработать файл. Попробуйте другой.", actions: [TextAlertAction(type: .defaultAction, title: presentationData.strings.Common_OK, action: {})]), nil)
+                    }
+                })
+                // PHPicker needs a UIKit presenter; the key window's root is the
+                // only one reachable from this callback.
+                if let root = UIApplication.shared.connectedScenes
+                    .compactMap({ ($0 as? UIWindowScene)?.keyWindow?.rootViewController })
+                    .first {
+                    var presenter = root
+                    while let presented = presenter.presentedViewController {
+                        presenter = presented
+                    }
+                    picker.present(in: presenter)
+                }
+                return
+            }
+
             if link == .deletedDetailsToggle {
                 updateState { current in
                     var updated = current

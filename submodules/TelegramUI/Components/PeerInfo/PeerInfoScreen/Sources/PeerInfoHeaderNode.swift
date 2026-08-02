@@ -44,6 +44,7 @@ import PeerInfoRatingComponent
 import UndoUI
 import ProfileLevelInfoScreen
 import SGMegramFire
+import SGAppearance
 import PlainButtonComponent
 import BundleIconComponent
 import MarqueeComponent
@@ -172,6 +173,9 @@ final class PeerInfoHeaderNode: ASDisplayNode {
     var music: ComponentView<Empty>?
     /// Megram's card form of the saved track; mutually exclusive with `music`.
     var megramTrackCardView: MegramTrackCardView?
+    /// The banner strip behind the header, from the top of the screen down to
+    /// the track card.
+    var megramBannerView: MegramBackgroundView?
     
     var performButtonAction: ((PeerInfoHeaderButtonKey, PeerInfoHeaderButtonNode?, ContextGesture?) -> Void)?
     var requestAvatarExpansion: ((Bool, [AvatarGalleryEntry], AvatarGalleryEntry?, (ASDisplayNode, CGRect, () -> (UIView?, UIView?))?) -> Void)?
@@ -2689,6 +2693,30 @@ final class PeerInfoHeaderNode: ASDisplayNode {
             }
         }
         
+        // MARK: Megram — the profile banner. It spans from the top of the
+        // screen down past the avatar to where the track card sits, and is
+        // local to this device: there is nowhere to upload it to.
+        let bannerSlot: MegramAppearanceStore.Slot? = MegramAppearanceStore.isEnabled(.profileBannerVideo)
+            ? .profileBannerVideo
+            : (MegramAppearanceStore.isEnabled(.profileBannerPhoto) ? .profileBannerPhoto : nil)
+        if let bannerSlot, self.isSettings || self.isMyProfile {
+            let bannerView: MegramBackgroundView
+            if let current = self.megramBannerView {
+                bannerView = current
+            } else {
+                bannerView = MegramBackgroundView()
+                self.megramBannerView = bannerView
+                // Behind the avatar and the buttons, in front of the plain
+                // background the header would otherwise draw.
+                self.regularContentNode.view.insertSubview(bannerView, at: 0)
+            }
+            bannerView.setSlot(bannerSlot)
+            bannerView.frame = CGRect(origin: CGPoint(), size: CGSize(width: backgroundFrame.width, height: apparentBackgroundHeight))
+        } else if let bannerView = self.megramBannerView {
+            self.megramBannerView = nil
+            bannerView.removeFromSuperview()
+        }
+
         // MARK: Megram — the saved track as a card with its blurred cover.
         // Without a cover there is nothing to blur, so the flat strip below
         // stays in charge.
