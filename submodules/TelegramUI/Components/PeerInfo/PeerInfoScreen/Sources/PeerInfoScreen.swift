@@ -3687,7 +3687,68 @@ final class PeerInfoScreenNode: ViewControllerTracingNode, PeerInfoScreenNodePro
         self.controller?.push(SecretChatKeyController(context: self.context, fingerprint: encryptionKeyFingerprint, peer: peer))
     }
     
+    /// MARK: Megram — tapping the username opens the same chat picker used for
+    /// forwarding a message: search, folder tabs and the Chats/Contacts switch,
+    /// instead of the share sheet's grid of avatars.
     func openShareLink(url: String) {
+        let selectionController = self.context.sharedContext.makePeerSelectionController(PeerSelectionControllerParams(
+            context: self.context,
+            updatedPresentationData: self.controller?.updatedPresentationData,
+            filter: [.onlyWriteable, .excludeDisabled],
+            hasFilters: true,
+            multipleSelection: true,
+            selectForumThreads: true
+        ))
+        let context = self.context
+        selectionController.multiplePeersSelected = { [weak self, weak selectionController] peers, _, messageText, _, _, _ in
+            selectionController?.dismiss()
+            guard let self else {
+                return
+            }
+            // The link is the payload here, so an empty comment still has to
+            // send something.
+            var messages: [EnqueueMessage] = []
+            let text = messageText.string.isEmpty ? url : "\(messageText.string)\n\(url)"
+            for peer in peers {
+                messages.append(.message(text: text, attributes: [], inlineStickers: [:], mediaReference: nil, threadId: nil, replyToMessageId: nil, replyToStoryId: nil, localGroupingKey: nil, correlationId: nil, bubbleUpEmojiOrStickersets: []))
+                let _ = enqueueMessages(account: context.account, peerId: peer.id, messages: messages).startStandalone()
+                messages.removeAll()
+            }
+
+            let presentationData = context.sharedContext.currentPresentationData.with { $0 }
+            let savedMessages = peers.count == 1 && peers.first?.id == context.account.peerId
+            let text2: String
+            if savedMessages {
+                text2 = presentationData.strings.UserInfo_LinkForwardTooltip_SavedMessages_One
+            } else if peers.count == 1, let peer = peers.first {
+                text2 = presentationData.strings.UserInfo_LinkForwardTooltip_Chat_One(peer.displayTitle(strings: presentationData.strings, displayOrder: presentationData.nameDisplayOrder)).string
+            } else if let peer = peers.first {
+                text2 = presentationData.strings.UserInfo_LinkForwardTooltip_ManyChats_One(peer.displayTitle(strings: presentationData.strings, displayOrder: presentationData.nameDisplayOrder), "\(peers.count - 1)").string
+            } else {
+                text2 = ""
+            }
+            self.controller?.present(UndoOverlayController(presentationData: presentationData, content: .forward(savedMessages: savedMessages, text: text2), elevatedLayout: false, animateInAsReplacement: true, action: { _ in return false }), in: .current)
+        }
+        selectionController.peerSelected = { [weak self, weak selectionController] peer, _ in
+            selectionController?.dismiss()
+            guard let self else {
+                return
+            }
+            let _ = enqueueMessages(account: context.account, peerId: peer.id, messages: [
+                .message(text: url, attributes: [], inlineStickers: [:], mediaReference: nil, threadId: nil, replyToMessageId: nil, replyToStoryId: nil, localGroupingKey: nil, correlationId: nil, bubbleUpEmojiOrStickersets: [])
+            ]).startStandalone()
+
+            let presentationData = context.sharedContext.currentPresentationData.with { $0 }
+            let savedMessages = peer.id == context.account.peerId
+            let text = savedMessages
+                ? presentationData.strings.UserInfo_LinkForwardTooltip_SavedMessages_One
+                : presentationData.strings.UserInfo_LinkForwardTooltip_Chat_One(peer.displayTitle(strings: presentationData.strings, displayOrder: presentationData.nameDisplayOrder)).string
+            self.controller?.present(UndoOverlayController(presentationData: presentationData, content: .forward(savedMessages: savedMessages, text: text), elevatedLayout: false, animateInAsReplacement: true, action: { _ in return false }), in: .current)
+        }
+        self.controller?.push(selectionController)
+    }
+
+    func openShareLinkLegacy(url: String) {
         let shareController = self.context.sharedContext.makeShareController(context: self.context, params: ShareControllerParams(subject: .url(url), updatedPresentationData: self.controller?.updatedPresentationData, actionCompleted: { [weak self] in
             if let strongSelf = self {
                 let presentationData = strongSelf.context.sharedContext.currentPresentationData.with { $0 }
