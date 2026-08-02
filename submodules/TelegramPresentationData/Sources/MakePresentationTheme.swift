@@ -29,15 +29,23 @@ public func makeDefaultPresentationTheme(reference: PresentationBuiltinThemeRefe
 /// Text, separators and controls keep their colours: only the surfaces they
 /// sit on become translucent.
 public func megramApplyingGlobalBackground(_ theme: PresentationTheme) -> PresentationTheme {
-    guard megramGlobalBackgroundIsActive?() == true else {
-        return theme
-    }
-    let alpha: CGFloat = 0.45
-    let updatedList = theme.list.withUpdated(
-        blocksBackgroundColor: theme.list.blocksBackgroundColor.withAlphaComponent(alpha),
-        plainBackgroundColor: theme.list.plainBackgroundColor.withAlphaComponent(alpha),
-        itemBlocksBackgroundColor: theme.list.itemBlocksBackgroundColor.withAlphaComponent(alpha)
+    // Grouped rows always sit on a translucent panel rather than a solid grey
+    // slab. Doing it here reaches every screen at once — the alternative is
+    // editing dozens of list items that each paint this colour themselves,
+    // and one missed item leaves a grey block among glass ones.
+    var updatedList = theme.list.withUpdated(
+        itemBlocksBackgroundColor: theme.list.itemBlocksBackgroundColor.withAlphaComponent(0.55)
     )
+
+    // The page behind those panels only goes translucent when there is
+    // something to reveal; otherwise the panels would dissolve into it.
+    if megramGlobalBackgroundIsActive?() == true {
+        updatedList = updatedList.withUpdated(
+            blocksBackgroundColor: theme.list.blocksBackgroundColor.withAlphaComponent(0.3),
+            plainBackgroundColor: theme.list.plainBackgroundColor.withAlphaComponent(0.3)
+        )
+    }
+
     return theme.withUpdated(list: updatedList)
 }
 

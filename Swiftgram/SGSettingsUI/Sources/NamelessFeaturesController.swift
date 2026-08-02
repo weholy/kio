@@ -1020,7 +1020,8 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
     megramFeature(.charCounterInput, s.charCounterInput, "Счётчик символов при вводе", "Показывает число набранных символов над полем ввода.")
     megramFeature(.charCounterInChat, s.charCounterInChat, "Счётчик символов в чате", "Показывает длину сообщения рядом со временем отправки.")
     megramFeature(.disableScrollToNextChannel2, !s.disableScrollToNextChannel, "Скролл к следующему каналу", "Прокрутка за конец переписки переходит в следующий непрочитанный канал.")
-    megramFeature(.namelessLiquidGlassMessages, s.namelessLiquidGlassMessages, "Liquid Glass на сообщения", "Пузыри сообщений получают стеклянную заливку, сквозь которую виден фон чата.", enabled: s.liquidGlassEnabled)
+    // Liquid Glass has no switch any more: it is always on, so a row here
+    // would promise control that no longer exists.
     megramFeature(.namelessCompactAttachmentSheet, s.namelessCompactAttachmentSheet, "Стеклянное меню вложения", "Кнопка «+» открывает компактное стеклянное меню вместо стандартной панели.")
     // Mutually exclusive: HD on demand and HD always answer the same question,
     // and leaving both on hides which one is in charge.
