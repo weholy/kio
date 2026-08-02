@@ -339,7 +339,7 @@ private enum NamelessSettingsKey {
     static let hideSettingsSendGift = "nameless.settingsSection.sendGift"
 
     // MARK: - Megram deleted messages
-    static let enableSavingSelfDestructingMessages = "nameless.deleted.saveSelfDestructing"
+    // enableSavingSelfDestructingMessages is declared above and already wired.
     static let dimIncomingWhileReplying = "nameless.deleted.dimIncomingWhileReplying"
     /// Trash badge geometry, stored as a fraction of the bubble so it survives
     /// bubbles of any width.
@@ -969,7 +969,6 @@ public extension SGSimpleSettings {
     var hideSettingsSendGift: Bool { get { storage.namelessBool(NamelessSettingsKey.hideSettingsSendGift) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideSettingsSendGift) } }
 
     // MARK: Megram deleted messages
-    var enableSavingSelfDestructingMessages: Bool { get { storage.namelessBool(NamelessSettingsKey.enableSavingSelfDestructingMessages) } set { storage.set(newValue, forKey: NamelessSettingsKey.enableSavingSelfDestructingMessages) } }
     var dimIncomingWhileReplying: Bool { get { storage.namelessBool(NamelessSettingsKey.dimIncomingWhileReplying) } set { storage.set(newValue, forKey: NamelessSettingsKey.dimIncomingWhileReplying) } }
     var antiRevokeNetworkLevel: Bool { get { storage.namelessBool(NamelessSettingsKey.antiRevokeNetworkLevel) } set { storage.set(newValue, forKey: NamelessSettingsKey.antiRevokeNetworkLevel) } }
     /// Horizontal position of the trash badge, 0 = left edge of the bubble,
