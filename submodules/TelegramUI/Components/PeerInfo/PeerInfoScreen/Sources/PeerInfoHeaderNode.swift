@@ -169,6 +169,8 @@ final class PeerInfoHeaderNode: ASDisplayNode {
     
     var musicBackground: UIView?
     var music: ComponentView<Empty>?
+    /// Megram's card form of the saved track; mutually exclusive with `music`.
+    var megramTrackCardView: MegramTrackCardView?
     
     var performButtonAction: ((PeerInfoHeaderButtonKey, PeerInfoHeaderButtonNode?, ContextGesture?) -> Void)?
     var requestAvatarExpansion: ((Bool, [AvatarGalleryEntry], AvatarGalleryEntry?, (ASDisplayNode, CGRect, () -> (UIView?, UIView?))?) -> Void)?
@@ -609,7 +611,11 @@ final class PeerInfoHeaderNode: ASDisplayNode {
             }
         }
         let musicHeight: CGFloat = hasBackground || self.isAvatarExpanded ? 24.0 : 16.0
-        let bottomInset: CGFloat = currentSavedMusic != nil ? musicHeight : 0.0
+        // Megram's card is taller than the strip it replaces, so it has to
+        // reserve its own room or the buttons below it get clipped.
+        let megramTrackCardIsUsed = SGSimpleSettings.shared.profileTrackCard
+            && currentSavedMusic.flatMap({ MegramTrackCardView.hasCover(file: $0) }) == true
+        let bottomInset: CGFloat = currentSavedMusic != nil ? (megramTrackCardIsUsed ? 60.0 : musicHeight) : 0.0
         
         let isLandscape = containerInset > 16.0
         
@@ -2676,7 +2682,75 @@ final class PeerInfoHeaderNode: ASDisplayNode {
             }
         }
         
-        if let currentSavedMusic {
+        // MARK: Megram — the saved track as a card with its blurred cover.
+        // Without a cover there is nothing to blur, so the flat strip below
+        // stays in charge.
+        let megramWantsTrackCard = SGSimpleSettings.shared.profileTrackCard
+            && currentSavedMusic.flatMap({ MegramTrackCardView.hasCover(file: $0) }) == true
+
+        if let currentSavedMusic, megramWantsTrackCard {
+            var artist = presentationData.strings.MediaPlayer_UnknownArtist
+            var track: String?
+            for attribute in currentSavedMusic.attributes {
+                if case let .Audio(_, _, title, performer, _) = attribute {
+                    artist = performer ?? artist
+                    track = title
+                    break
+                }
+            }
+            if track == nil {
+                track = currentSavedMusic.fileName ?? presentationData.strings.MediaPlayer_UnknownTrack
+            }
+
+            let cardView: MegramTrackCardView
+            if let current = self.megramTrackCardView {
+                cardView = current
+            } else {
+                cardView = MegramTrackCardView(frame: CGRect())
+                cardView.pressed = { [weak self] in
+                    self?.displaySavedMusic?()
+                }
+                self.megramTrackCardView = cardView
+                self.regularContentNode.view.addSubview(cardView)
+                if transition.isAnimated {
+                    cardView.layer.animateAlpha(from: 0.0, to: 1.0, duration: 0.2)
+                }
+            }
+
+            let cardHeight: CGFloat = 54.0
+            let cardInset: CGFloat = 16.0
+            let cardSize = CGSize(width: max(0.0, backgroundFrame.width - cardInset * 2.0), height: cardHeight)
+            cardView.update(context: self.context, file: currentSavedMusic, title: track ?? "", artist: artist, size: cardSize)
+
+            let cardFrame = CGRect(
+                origin: CGPoint(x: cardInset, y: (apparentBackgroundHeight - backgroundHeight) + backgroundHeight - cardHeight - 6.0),
+                size: cardSize
+            )
+            if additive {
+                transition.updateFrameAdditiveToCenter(view: cardView, frame: cardFrame)
+            } else {
+                transition.updateFrame(view: cardView, frame: cardFrame)
+            }
+            if let _ = self.navigationTransition {
+                transition.updateAlpha(layer: cardView.layer, alpha: 1.0 - transitionFraction)
+            } else {
+                transition.updateAlpha(layer: cardView.layer, alpha: backgroundBannerAlpha)
+            }
+
+            // The flat strip and its mask must not linger under the card.
+            if let musicBackground = self.musicBackground {
+                self.musicBackground = nil
+                musicBackground.removeFromSuperview()
+            }
+            if let music = self.music {
+                self.music = nil
+                music.view?.removeFromSuperview()
+            }
+        } else if let currentSavedMusic {
+            if let cardView = self.megramTrackCardView {
+                self.megramTrackCardView = nil
+                cardView.removeFromSuperview()
+            }
             var musicTransition = transition
             var artist = presentationData.strings.MediaPlayer_UnknownArtist
             var track: String?
@@ -2772,6 +2846,10 @@ final class PeerInfoHeaderNode: ASDisplayNode {
                 }
             }
         } else {
+            if let cardView = self.megramTrackCardView {
+                self.megramTrackCardView = nil
+                cardView.removeFromSuperview()
+            }
             if let musicBackground = self.musicBackground {
                 self.musicBackground = nil
                 if transition.isAnimated {
