@@ -12,6 +12,7 @@ import SGLogging
 import SGStrings
 import SGSimpleSettings
 import SGFakeLocation
+import SGDeletedMessages
 import SGLiquidGlass
 import MGPluginKit
 import GlassBackgroundComponent
@@ -357,6 +358,16 @@ private func extractAccountManagerState(records: AccountRecordsView<TelegramAcco
         }
         MGPluginManager.shared.start(host: MGPluginHostImpl.shared)
 
+        // MARK: Megram — prune the saved-deleted archive on launch. The call
+        // throttles itself to once an hour and returns immediately when the
+        // setting is off, so it is safe to fire on every launch.
+        let _ = (self.context.get()
+        |> mapToSignal { context -> Signal<Never, NoError> in
+            guard let context else {
+                return .complete()
+            }
+            return SGGhostMaintenance.pruneSavedDeletedIfNeeded(postbox: context.context.account.postbox)
+        }).start()
 
         let _ = voipTokenPromise.get().start(next: { token in
             self.voipDeviceToken.set(.single(token))
