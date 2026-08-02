@@ -23,6 +23,7 @@ enum PeerInfoHeaderButtonKey: Hashable {
     case leave
     case stop
     case addContact
+    case megramFire
 }
 
 enum PeerInfoHeaderButtonIcon {
@@ -38,6 +39,7 @@ enum PeerInfoHeaderButtonIcon {
     case search
     case leave
     case stop
+    case megramFire
 }
 
 final class PeerInfoHeaderButtonNode: HighlightableButtonNode {
@@ -187,6 +189,15 @@ final class PeerInfoHeaderButtonNode: HighlightableButtonNode {
                     imageName = nil
                 case .stop:
                     imageName = "Peer Info/ButtonStop"
+                case .megramFire:
+                    // MARK: Megram — the flame is drawn as text: it has no
+                    // asset, and an emoji scales to the button without one.
+                    imageName = nil
+                    let flame = NSAttributedString(string: "🔥", font: Font.regular(22.0), textColor: .white)
+                    let flameSize = flame.boundingRect(with: size, options: [.usesLineFragmentOrigin], context: nil).size
+                    UIGraphicsPushContext(context)
+                    flame.draw(at: CGPoint(x: floor((size.width - flameSize.width) / 2.0), y: floor((size.height - flameSize.height) / 2.0)))
+                    UIGraphicsPopContext()
                 }
                 if let imageName = imageName, let image = generateTintedImage(image: UIImage(bundleImageName: imageName), color: .white, customSize: icon == .discussion ? CGSize(width: 26.0, height: 26.0) : nil /* MARK: Swiftgram */) {
                     let imageRect = CGRect(origin: CGPoint(x: floor((size.width - image.size.width) / 2.0), y: floor((size.height - image.size.height) / 2.0)), size: image.size)

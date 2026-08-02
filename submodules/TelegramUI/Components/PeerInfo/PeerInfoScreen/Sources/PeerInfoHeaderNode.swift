@@ -43,6 +43,7 @@ import MultilineTextComponent
 import PeerInfoRatingComponent
 import UndoUI
 import ProfileLevelInfoScreen
+import SGMegramFire
 import PlainButtonComponent
 import BundleIconComponent
 import MarqueeComponent
@@ -2474,6 +2475,12 @@ final class PeerInfoHeaderNode: ASDisplayNode {
             case .stop:
                 buttonText = presentationData.strings.PeerInfo_ButtonStop
                 buttonIcon = .stop
+            case .megramFire:
+                // MARK: Megram — the label carries the streak, so the count is
+                // readable without opening the screen.
+                let days = peer.flatMap { MegramFireStore.badgeDays(peerId: $0.id.toInt64()) } ?? 0
+                buttonText = days > 0 ? "\(days)" : "Огонёк"
+                buttonIcon = .megramFire
             case .addContact:
                 fatalError()
             }

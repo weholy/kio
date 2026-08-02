@@ -1326,6 +1326,10 @@ extension PeerInfoScreenNode {
             self.updateBlocked(block: true)
         case .addContact:
             self.openAddContact()
+        case .megramFire:
+            if let peer = self.data?.peer {
+                self.proposeMegramFire(peer: peer)
+            }
         }
     }
 
