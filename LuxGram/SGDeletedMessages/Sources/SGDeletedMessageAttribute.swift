@@ -9,23 +9,29 @@ public final class SGDeletedMessageAttribute: MessageAttribute, Equatable {
     // For SavedDeleted snapshots, keep a reference to the original message id.
     public var originalNamespace: Int32?
     public var originalId: Int32?
-    
-    public init(isDeleted: Bool = false, originalText: String? = nil, editHistory: [String] = [], originalNamespace: Int32? = nil, originalId: Int32? = nil) {
+    /// Megram: text the user substituted on this device only. The message keeps
+    /// its real text everywhere else, and clearing this restores the original —
+    /// which is why the replacement is stored beside the text rather than over it.
+    public var localText: String?
+
+    public init(isDeleted: Bool = false, originalText: String? = nil, editHistory: [String] = [], originalNamespace: Int32? = nil, originalId: Int32? = nil, localText: String? = nil) {
         self.isDeleted = isDeleted
         self.originalText = originalText
         self.editHistory = editHistory
         self.originalNamespace = originalNamespace
         self.originalId = originalId
+        self.localText = localText
     }
-    
+
     public init(decoder: PostboxDecoder) {
         self.isDeleted = decoder.decodeInt32ForKey("d", orElse: 0) != 0
         self.originalText = decoder.decodeOptionalStringForKey("ot")
         self.editHistory = decoder.decodeOptionalStringArrayForKey("eh") ?? []
         self.originalNamespace = decoder.decodeOptionalInt32ForKey("on")
         self.originalId = decoder.decodeOptionalInt32ForKey("oi")
+        self.localText = decoder.decodeOptionalStringForKey("lt")
     }
-    
+
     public func encode(_ encoder: PostboxEncoder) {
         encoder.encodeInt32(self.isDeleted ? 1 : 0, forKey: "d")
         if let originalText = self.originalText {
@@ -40,10 +46,13 @@ public final class SGDeletedMessageAttribute: MessageAttribute, Equatable {
         if let originalId = self.originalId {
             encoder.encodeInt32(originalId, forKey: "oi")
         }
+        if let localText = self.localText {
+            encoder.encodeString(localText, forKey: "lt")
+        }
     }
-    
+
     public static func ==(lhs: SGDeletedMessageAttribute, rhs: SGDeletedMessageAttribute) -> Bool {
-        return lhs.isDeleted == rhs.isDeleted && lhs.originalText == rhs.originalText && lhs.editHistory == rhs.editHistory && lhs.originalNamespace == rhs.originalNamespace && lhs.originalId == rhs.originalId
+        return lhs.isDeleted == rhs.isDeleted && lhs.originalText == rhs.originalText && lhs.editHistory == rhs.editHistory && lhs.originalNamespace == rhs.originalNamespace && lhs.originalId == rhs.originalId && lhs.localText == rhs.localText
     }
     
     /// All text versions in chronological order: [original, edit1, edit2, ..., current].

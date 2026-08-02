@@ -337,6 +337,18 @@ private enum NamelessSettingsKey {
     static let hideSettingsFaq = "nameless.settingsSection.faq"
     static let hideSettingsTips = "nameless.settingsSection.tips"
     static let hideSettingsSendGift = "nameless.settingsSection.sendGift"
+
+    // MARK: - Megram deleted messages
+    static let enableSavingSelfDestructingMessages = "nameless.deleted.saveSelfDestructing"
+    static let dimIncomingWhileReplying = "nameless.deleted.dimIncomingWhileReplying"
+    /// Trash badge geometry, stored as a fraction of the bubble so it survives
+    /// bubbles of any width.
+    static let deletedTrashOffsetX = "nameless.deleted.trashOffsetX"
+    static let deletedTrashOffsetY = "nameless.deleted.trashOffsetY"
+    static let deletedTrashSize = "nameless.deleted.trashSize"
+    /// Blocks the server's delete update outright, so the message is never
+    /// removed in the first place.
+    static let antiRevokeNetworkLevel = "nameless.deleted.antiRevokeNetwork"
 }
 
 private enum NamelessRollbackStorage {
@@ -955,6 +967,29 @@ public extension SGSimpleSettings {
     var hideSettingsFaq: Bool { get { storage.namelessBool(NamelessSettingsKey.hideSettingsFaq) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideSettingsFaq) } }
     var hideSettingsTips: Bool { get { storage.namelessBool(NamelessSettingsKey.hideSettingsTips) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideSettingsTips) } }
     var hideSettingsSendGift: Bool { get { storage.namelessBool(NamelessSettingsKey.hideSettingsSendGift) } set { storage.set(newValue, forKey: NamelessSettingsKey.hideSettingsSendGift) } }
+
+    // MARK: Megram deleted messages
+    var enableSavingSelfDestructingMessages: Bool { get { storage.namelessBool(NamelessSettingsKey.enableSavingSelfDestructingMessages) } set { storage.set(newValue, forKey: NamelessSettingsKey.enableSavingSelfDestructingMessages) } }
+    var dimIncomingWhileReplying: Bool { get { storage.namelessBool(NamelessSettingsKey.dimIncomingWhileReplying) } set { storage.set(newValue, forKey: NamelessSettingsKey.dimIncomingWhileReplying) } }
+    var antiRevokeNetworkLevel: Bool { get { storage.namelessBool(NamelessSettingsKey.antiRevokeNetworkLevel) } set { storage.set(newValue, forKey: NamelessSettingsKey.antiRevokeNetworkLevel) } }
+    /// Horizontal position of the trash badge, 0 = left edge of the bubble,
+    /// 100 = right edge. Defaults to the right, where it used to be fixed.
+    var deletedTrashOffsetX: Int32 {
+        get { storage.namelessInt32(NamelessSettingsKey.deletedTrashOffsetX, default: 100) }
+        set { storage.set(max(0, min(100, newValue)), forKey: NamelessSettingsKey.deletedTrashOffsetX) }
+    }
+    var deletedTrashOffsetY: Int32 {
+        get { storage.namelessInt32(NamelessSettingsKey.deletedTrashOffsetY, default: 100) }
+        set { storage.set(max(0, min(100, newValue)), forKey: NamelessSettingsKey.deletedTrashOffsetY) }
+    }
+    /// Percent of the standard badge size, 50...200.
+    var deletedTrashSize: Int32 {
+        get {
+            let value = storage.namelessInt32(NamelessSettingsKey.deletedTrashSize, default: 100)
+            return value == 0 ? 100 : value
+        }
+        set { storage.set(max(50, min(200, newValue)), forKey: NamelessSettingsKey.deletedTrashSize) }
+    }
 
     func updateGatedFeatures(_ features: [(key: String, deeplinkPath: String)]) {
         storage.set(features.map(\.key), forKey: NamelessSettingsKey.gatedFeatureKeys)

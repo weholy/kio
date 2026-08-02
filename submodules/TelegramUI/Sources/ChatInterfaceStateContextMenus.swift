@@ -2308,7 +2308,9 @@ func contextMenuForChatPresentationInterfaceState(chatPresentationInterfaceState
             sgActions.insert(.separator, at: 1)
             
             let swiftgramSubMenu: ContextMenuItem = .action(ContextMenuActionItem(text: "Megram", icon: { theme in
-                return generateTintedImage(image: UIImage(bundleImageName: "NamelessSettings"), color: theme.actionSheet.primaryTextColor)
+                // MARK: Megram — drawn larger than the stock 24pt menu icons so
+                // the client's own mark reads as a mark rather than a glyph.
+                return generateTintedImage(image: UIImage(bundleImageName: "MegramMenuLogo"), color: theme.actionSheet.primaryTextColor, customSize: CGSize(width: 30.0, height: 30.0))
             }, action: { c, f in
                 popSGItems = { [weak c] in
                     c?.popItems()

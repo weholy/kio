@@ -332,6 +332,10 @@ private enum NLBoolSetting: String {
     case hideSettingsFaq
     case hideSettingsTips
     case hideSettingsSendGift
+    // Megram deleted messages
+    case enableSavingSelfDestructingMessages
+    case dimIncomingWhileReplying
+    case saveDeletedMessagesReactions
 }
 
 private enum NLSliderSetting: String {
@@ -344,6 +348,7 @@ private enum NLSliderSetting: String {
     case particleEffectDensity
     case tabBarHeight
     case tabBarWidth
+    case deletedMessageOpacity
 }
 
 private enum NLOneFromManySetting: String {
@@ -375,6 +380,8 @@ private enum NLDisclosureLink: String {
     case hubMisc
     case onlineHistory
     case ghostDetailsToggle
+    case deletedDetailsToggle
+    case deletedTrashDesigner
     case fakeLocationPicker
     case localStarsAmount
     case deviceModelSpoof
@@ -555,7 +562,7 @@ private enum NLHubCategory: String, CaseIterable {
         case .hubMisc: return .misc
         case .hubGhost: return .ghost
         case .hubOther: return .other
-        case .none, .onlineHistory, .ghostDetailsToggle, .fakeLocationPicker, .localStarsAmount, .deviceModelSpoof, .accountSwitcher, .pluginsCenter, .localGiftsShop: return nil
+        case .none, .onlineHistory, .ghostDetailsToggle, .deletedDetailsToggle, .deletedTrashDesigner, .fakeLocationPicker, .localStarsAmount, .deviceModelSpoof, .accountSwitcher, .pluginsCenter, .localGiftsShop: return nil
         }
     }
 }
@@ -744,6 +751,7 @@ private struct NLControllerState: Equatable {
     /// nil = hub root shelves; non-nil = category toggles screen
     var hubCategory: NLHubCategory? = nil
     var ghostModeExpanded: Bool = false
+    var deletedMessagesExpanded: Bool = false
 }
 
 // MARK: - Entry type
@@ -1025,6 +1033,35 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
     entries.append(.header(id: id.count, section: sec, text: "👻 РЕЖИМ ПРИЗРАКА", badge: nil))
     entries.append(.toggle(id: id.count, section: sec, settingName: .ghostModeEnabled, value: s.ghostModeEnabled, text: "Режим призрака", enabled: true))
     entries.append(.disclosureDetail(id: id.count, section: sec, link: .ghostDetailsToggle, text: "Дополнительные настройки", detail: state.ghostModeExpanded ? "Скрыть настройки режима призрака" : "Показать настройки режима призрака"))
+
+    // MARK: Megram — «Удалённые сообщения» устроены так же, как призрак:
+    // переключатель и раскрывающийся блок подробностей рядом с ним.
+    let deletedSection = featureSections.take()
+    entries.append(.toggle(id: id.count, section: deletedSection, settingName: .showDeletedMessages, value: s.showDeletedMessages, text: "Удалённые сообщения", enabled: true))
+    entries.append(.disclosureDetail(id: id.count, section: deletedSection, link: .deletedDetailsToggle, text: "Дополнительные настройки", detail: state.deletedMessagesExpanded ? "Скрыть настройки удалённых" : "Показать настройки удалённых"))
+
+    if state.deletedMessagesExpanded {
+    megramFeature(.showOriginalEdited, s.showOriginalEdited, "Показывать оригинальный текст", "У изменённого сообщения показывается текст до правки.")
+    megramFeature(.hideMyDeleted, !s.hideMyDeleted, "Отображать мои удалённые", "Ваши собственные удалённые сообщения тоже остаются в переписке.")
+    megramFeature(.hideBotDeleted, !s.hideBotDeleted, "Отображать удалённые ботов", "Сообщения ботов сохраняются наравне с остальными.")
+    megramFeature(.hideMyEdited, !s.hideMyEdited, "Оригинал моих изменённых", "Хранит текст ваших сообщений до правки.")
+    megramFeature(.hideBotEdited, !s.hideBotEdited, "Оригинал изменённых ботов", "Хранит текст сообщений ботов до правки.")
+    megramFeature(.saveDeletedMessagesMedia, s.saveDeletedMessagesMedia, "Хранить медиа удалённых", "Фото и видео удалённого сообщения остаются на устройстве. Занимает место.")
+    megramFeature(.saveDeletedMessagesReactions, s.saveDeletedMessagesReactions, "Хранить реакции удалённых", "Реакции сохраняются вместе с сообщением.")
+    megramFeature(.enableSavingSelfDestructingMessages, s.enableSavingSelfDestructingMessages, "Сохранять одноразовые", "Одноразовые фото и видео сохраняются при просмотре.")
+    megramFeature(.saveEditHistory, s.saveEditHistory, "История изменений", "Хранит все редакции сообщения — доступны через меню Megram.")
+    megramFeature(.doubleTapToEdit, s.doubleTapToEdit, "Редактирование по двойному тапу", "Двойное нажатие по своему сообщению открывает правку.")
+    megramFeature(.enableLocalMessageEditing, s.enableLocalMessageEditing, "Локальное изменение сообщений", "Пункт «Локально изм.» в меню Megram правит текст только у вас, без пометки «изменено».")
+    megramFeature(.dimIncomingWhileReplying, s.dimIncomingWhileReplying, "Приглушать сообщение при ответе", "Пока вы пишете ответ, сообщение собеседника становится полупрозрачным.")
+
+    let opacitySection = featureSections.take()
+    entries.append(.percentageSlider(id: id.count, section: opacitySection, settingName: .deletedMessageOpacity, value: s.deletedMessageOpacity))
+    entries.append(.notice(id: id.count, section: opacitySection, text: "Прозрачность удалённых сообщений в переписке."))
+
+    let trashSection = featureSections.take()
+    entries.append(.disclosureDetail(id: id.count, section: trashSection, link: .deletedTrashDesigner, text: "Значок корзины", detail: "Цвет, размер и положение"))
+    entries.append(.notice(id: id.count, section: trashSection, text: "Открывает предпросмотр, где значок можно перетащить на нужное место."))
+    }
 
     if state.ghostModeExpanded {
     entries.append(.header(id: id.count, section: sec, text: "СКРЫТИЕ СТАТУСОВ", badge: nil))
@@ -1654,6 +1691,9 @@ private func namelessFeaturesControllerImpl(context: AccountContext, initialCate
             case .hideSettingsFaq: s.hideSettingsFaq = value; simplePromise.set(true)
             case .hideSettingsTips: s.hideSettingsTips = value; simplePromise.set(true)
             case .hideSettingsSendGift: s.hideSettingsSendGift = value; simplePromise.set(true)
+            case .enableSavingSelfDestructingMessages: s.enableSavingSelfDestructingMessages = value; simplePromise.set(true)
+            case .dimIncomingWhileReplying: s.dimIncomingWhileReplying = value; simplePromise.set(true)
+            case .saveDeletedMessagesReactions: s.saveDeletedMessagesReactions = value; simplePromise.set(true)
             case .enableVideoToCircleOrVoice: s.enableVideoToCircleOrVoice = value
             case .namelessVideoBackgroundEnabled: s.namelessVideoBackgroundEnabled = value
             case .squareAvatars: s.squareAvatars = value; simplePromise.set(true)
@@ -1759,6 +1799,8 @@ private func namelessFeaturesControllerImpl(context: AccountContext, initialCate
             case .tabBarWidth:
                 let clamped = max(50, min(150, value))
                 if s.tabBarWidthScale != clamped { s.tabBarWidthScale = clamped; simplePromise.set(true) }
+            case .deletedMessageOpacity:
+                if s.deletedMessageOpacity != value { s.deletedMessageOpacity = value; simplePromise.set(true) }
             case .accountColorsSaturation: if s.accountColorsSaturation != value { s.accountColorsSaturation = value; simplePromise.set(true) }
             case .liquidGlassIntensity:
                 let newIntensity = Double(value) / 100.0
@@ -1827,6 +1869,14 @@ private func namelessFeaturesControllerImpl(context: AccountContext, initialCate
             presentControllerImpl?(actionSheet, ViewControllerPresentationArguments(presentationAnimation: .modalSheet))
         },
         openDisclosureLink: { link in
+            if link == .deletedDetailsToggle {
+                updateState { current in
+                    var updated = current
+                    updated.deletedMessagesExpanded.toggle()
+                    return updated
+                }
+                return
+            }
             if link == .ghostDetailsToggle {
                 updateState { state in
                     var updated = state
