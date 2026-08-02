@@ -547,9 +547,14 @@ public class ChatMessageDateAndStatusNode: ASDisplayNode {
             let dateFont = Font.regular(floor(arguments.presentationData.fontSize.baseDisplaySize * 11.0 / 17.0))
             if arguments.deleted {
                 // nameless: trash mark with HEX color + rest of date in normal color
+                // MARK: Megram — the mark scales independently of the timestamp
+                // beside it, so it can be made prominent without enlarging the
+                // whole status line.
                 let trashColor = SGSimpleSettings.shared.deletedTrashUIColor()
+                let trashScale = CGFloat(SGSimpleSettings.shared.deletedTrashSize) / 100.0
+                let trashFont = Font.regular(floor(arguments.presentationData.fontSize.baseDisplaySize * 11.0 / 17.0 * trashScale))
                 let full = NSMutableAttributedString()
-                full.append(NSAttributedString(string: "🗑 ", font: dateFont, textColor: trashColor))
+                full.append(NSAttributedString(string: "🗑 ", font: trashFont, textColor: trashColor))
                 full.append(NSAttributedString(string: updatedDateText, font: dateFont, textColor: dateColor.withAlphaComponent(0.85)))
                 if let impressionCount = arguments.impressionCount {
                     let prefix = compactNumericCountString(impressionCount, decimalSeparator: arguments.presentationData.dateTimeFormat.decimalSeparator) + " "

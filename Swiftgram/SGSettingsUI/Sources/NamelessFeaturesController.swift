@@ -349,6 +349,7 @@ private enum NLSliderSetting: String {
     case tabBarHeight
     case tabBarWidth
     case deletedMessageOpacity
+    case deletedTrashSize
 }
 
 private enum NLOneFromManySetting: String {
@@ -1058,9 +1059,9 @@ private func nlBuildEntries(presentationData: PresentationData, state: NLControl
     entries.append(.percentageSlider(id: id.count, section: opacitySection, settingName: .deletedMessageOpacity, value: s.deletedMessageOpacity))
     entries.append(.notice(id: id.count, section: opacitySection, text: "Прозрачность удалённых сообщений в переписке."))
 
-    let trashSection = featureSections.take()
-    entries.append(.disclosureDetail(id: id.count, section: trashSection, link: .deletedTrashDesigner, text: "Значок корзины", detail: "Цвет, размер и положение"))
-    entries.append(.notice(id: id.count, section: trashSection, text: "Открывает предпросмотр, где значок можно перетащить на нужное место."))
+    let trashSizeSection = featureSections.take()
+    entries.append(.percentageSlider(id: id.count, section: trashSizeSection, settingName: .deletedTrashSize, value: s.deletedTrashSize))
+    entries.append(.notice(id: id.count, section: trashSizeSection, text: "Размер значка корзины у удалённого сообщения, в процентах от обычного."))
     }
 
     if state.ghostModeExpanded {
@@ -1802,6 +1803,9 @@ private func namelessFeaturesControllerImpl(context: AccountContext, initialCate
                 if s.tabBarWidthScale != clamped { s.tabBarWidthScale = clamped; simplePromise.set(true) }
             case .deletedMessageOpacity:
                 if s.deletedMessageOpacity != value { s.deletedMessageOpacity = value; simplePromise.set(true) }
+            case .deletedTrashSize:
+                let clamped = max(50, min(200, value))
+                if s.deletedTrashSize != clamped { s.deletedTrashSize = clamped; simplePromise.set(true) }
             case .accountColorsSaturation: if s.accountColorsSaturation != value { s.accountColorsSaturation = value; simplePromise.set(true) }
             case .liquidGlassIntensity:
                 let newIntensity = Double(value) / 100.0

@@ -4506,6 +4506,41 @@ func replayFinalState(
                     var updatedFlags = message.flags
                     var updatedLocalTags = message.localTags
                     var updatedAttributes = message.attributes
+
+                    // MARK: Megram — record what the text was before this edit.
+                    // This is the only moment the previous text still exists;
+                    // once the update is applied it is gone from the database,
+                    // which is why every "original text" and edit-history
+                    // feature depended on capturing it here.
+                    if previousMessage.text != message.text, !previousMessage.text.isEmpty {
+                        let settings = SGSimpleSettings.shared
+                        let isOutgoing = !previousMessage.flags.contains(.Incoming)
+                        let isBot = (previousMessage.author as? TelegramUser)?.botInfo != nil
+                        let shouldRecord = settings.showOriginalEdited
+                            && !(isOutgoing && settings.hideMyEdited)
+                            && !(isBot && settings.hideBotEdited)
+                        if shouldRecord {
+                            var attribute = SGDeletedMessageAttribute()
+                            for existing in previousMessage.attributes {
+                                if let existing = existing as? SGDeletedMessageAttribute {
+                                    attribute = existing
+                                    break
+                                }
+                            }
+                            if attribute.originalText == nil {
+                                attribute.originalText = previousMessage.text
+                            } else if settings.saveEditHistory {
+                                // The first text lives in originalText; every
+                                // later revision is appended, so the chain reads
+                                // original -> edit1 -> edit2 -> current.
+                                if attribute.editHistory.last != previousMessage.text {
+                                    attribute.editHistory.append(previousMessage.text)
+                                }
+                            }
+                            updatedAttributes.removeAll(where: { $0 is SGDeletedMessageAttribute })
+                            updatedAttributes.append(attribute)
+                        }
+                    }
                     if previousMessage.localTags.contains(.OutgoingLiveLocation) {
                         updatedLocalTags.insert(.OutgoingLiveLocation)
                     }
