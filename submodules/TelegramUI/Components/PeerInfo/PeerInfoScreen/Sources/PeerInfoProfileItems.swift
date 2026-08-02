@@ -907,13 +907,22 @@ func infoItems(
         }
     }
     
+    // MARK: Megram — id and dc collapse into one row of tappable chips when the
+    // switch is on; each used to take a full list row of its own.
+    let megramUsesChips = SGSimpleSettings.shared.profileIdChips
+    var megramChips: [MegramChipsItem.Chip] = []
+
     // MARK: Swiftgram
     if showProfileId {
+        if megramUsesChips {
+            megramChips.append(MegramChipsItem.Chip(title: "ID \(idText)", copyValue: idText))
+        } else {
         items[.swiftgram]!.append(PeerInfoScreenLabeledValueItem(id: sgItemId, label: "id: \(idText)", text: "", textColor: .primary, action: nil, longTapAction: { sourceNode in
             interaction.openPeerInfoContextMenu(.copy(idText), sourceNode, nil)
         }, requestLayout: { _ in
             interaction.requestLayout(false)
         }))
+        }
         sgItemId += 1
     }
     
@@ -971,15 +980,31 @@ func infoItems(
         }
 
         if !dcText.isEmpty || !dcLabel.isEmpty {
+            if megramUsesChips {
+                if let dcId {
+                    megramChips.append(MegramChipsItem.Chip(title: "DC \(dcId)", copyValue: "\(dcId)"))
+                }
+                if !phoneCountryText.isEmpty {
+                    megramChips.append(MegramChipsItem.Chip(title: phoneCountryText, copyValue: nil))
+                }
+            } else {
             items[.swiftgram]!.append(PeerInfoScreenLabeledValueItem(id: sgItemId, label: dcLabel, text: dcText, textColor: .primary, action: nil, longTapAction: { sourceNode in
                 interaction.openPeerInfoContextMenu(.aboutDC, sourceNode, nil)
             }, requestLayout: { _ in
                 interaction.requestLayout(false)
             }))
+            }
             sgItemId += 1
         }
     }
-    
+
+    if megramUsesChips, !megramChips.isEmpty {
+        items[.swiftgram]!.append(MegramChipsItem(id: sgItemId, chips: megramChips, copied: { value in
+            UIPasteboard.general.string = value
+        }))
+        sgItemId += 1
+    }
+
     if SGSimpleSettings.shared.showCreationDate {
         if let channelCreationTimestamp = data.channelCreationTimestamp {
             let creationDateString = stringForDate(timestamp: channelCreationTimestamp, strings: presentationData.strings)
