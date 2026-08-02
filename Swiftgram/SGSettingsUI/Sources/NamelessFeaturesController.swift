@@ -333,7 +333,7 @@ private enum NLBoolSetting: String {
     case hideSettingsTips
     case hideSettingsSendGift
     // Megram deleted messages
-    case enableSavingSelfDestructingMessages
+    // enableSavingSelfDestructingMessages is declared near the top of this enum.
     case dimIncomingWhileReplying
     case saveDeletedMessagesReactions
 }
@@ -1596,7 +1596,6 @@ private func namelessFeaturesControllerImpl(context: AccountContext, initialCate
             case .hideSettingsFaq: s.hideSettingsFaq = value; simplePromise.set(true)
             case .hideSettingsTips: s.hideSettingsTips = value; simplePromise.set(true)
             case .hideSettingsSendGift: s.hideSettingsSendGift = value; simplePromise.set(true)
-            case .enableSavingSelfDestructingMessages: s.enableSavingSelfDestructingMessages = value; simplePromise.set(true)
             case .dimIncomingWhileReplying: s.dimIncomingWhileReplying = value; simplePromise.set(true)
             case .saveDeletedMessagesReactions: s.saveDeletedMessagesReactions = value; simplePromise.set(true)
             case .enableVideoToCircleOrVoice: s.enableVideoToCircleOrVoice = value
