@@ -11,7 +11,6 @@ sgdeps = [
     "//Swiftgram/SGRegDateScheme:SGRegDateScheme",
     "//Swiftgram/SGDebugUI:SGDebugUI",
     "//LuxGram/SGMegramFire:SGMegramFire",
-    "//LuxGram/SGAppearance:SGAppearance",
     "//submodules/LocalizedPeerData",
 ]
 

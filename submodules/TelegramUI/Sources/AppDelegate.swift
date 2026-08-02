@@ -13,7 +13,6 @@ import SGStrings
 import SGSimpleSettings
 import SGFakeLocation
 import SGDeletedMessages
-import SGAppearance
 import SGLiquidGlass
 import MGPluginKit
 import GlassBackgroundComponent
@@ -238,9 +237,6 @@ private func extractAccountManagerState(records: AccountRecordsView<TelegramAcco
     @objc var window: UIWindow?
     var nativeWindow: (UIWindow & WindowHost)?
     var mainWindow: Window1!
-    /// Megram's app-wide background, kept at the very back of the window's
-    /// container so every controller draws over it.
-    private var megramGlobalBackgroundView: MegramBackgroundView?
     private var dataImportSplash: LegacyDataImportSplash?
     private var memoryUsageOverlayView: UILabel?
     
@@ -361,17 +357,6 @@ private func extractAccountManagerState(records: AccountRecordsView<TelegramAcco
             return self?.contextValue?.context
         }
         MGPluginManager.shared.start(host: MGPluginHostImpl.shared)
-
-        // The theme asks this before deciding whether list surfaces must be
-        // translucent; the hook keeps TelegramPresentationData free of a
-        // dependency on the appearance store.
-        megramGlobalBackgroundIsActive = {
-            return MegramAppearanceStore.hasGlobalBackground
-        }
-
-        NotificationCenter.default.addObserver(forName: MegramAppearanceStore.didChange, object: nil, queue: .main) { [weak self] _ in
-            self?.installMegramGlobalBackground()
-        }
 
         // MARK: Megram — prune the saved-deleted archive on launch. The call
         // throttles itself to once an hour and returns immediately when the
@@ -1134,13 +1119,7 @@ private func extractAccountManagerState(records: AccountRecordsView<TelegramAcco
         |> deliverOnMainQueue
         |> mapToSignal { accountManager, initialPresentationDataAndSettings -> Signal<(SharedApplicationContext, LoggingSettings), NoError> in
             self.mainWindow?.hostView.containerView.backgroundColor =  initialPresentationDataAndSettings.presentationData.theme.chatList.backgroundColor
-
-            // MARK: Megram — the global background lives in the window's own
-            // container, beneath every controller. Nothing above it needs to
-            // know it exists; screens that should let it through are made
-            // translucent by the theme instead.
-            self.installMegramGlobalBackground()
-
+            
             let legacyBasePath = appGroupUrl.path
             
             let presentationDataPromise = Promise<PresentationData>()
@@ -2097,34 +2076,6 @@ private func extractAccountManagerState(records: AccountRecordsView<TelegramAcco
                 }
             })
         })
-    }
-
-    /// Installs, updates or removes the app-wide background.
-    ///
-    /// It is pinned behind everything in the window's container and follows the
-    /// container's bounds, so rotation and split view need no extra handling.
-    private func installMegramGlobalBackground() {
-        guard let container = self.mainWindow?.hostView.containerView else {
-            return
-        }
-
-        guard MegramAppearanceStore.hasGlobalBackground else {
-            self.megramGlobalBackgroundView?.removeFromSuperview()
-            self.megramGlobalBackgroundView = nil
-            return
-        }
-
-        let backgroundView: MegramBackgroundView
-        if let current = self.megramGlobalBackgroundView {
-            backgroundView = current
-        } else {
-            backgroundView = MegramBackgroundView()
-            backgroundView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-            self.megramGlobalBackgroundView = backgroundView
-            container.insertSubview(backgroundView, at: 0)
-        }
-        backgroundView.frame = container.bounds
-        backgroundView.useActiveGlobalSlot()
     }
 
     func applicationDidBecomeActive(_ application: UIApplication) {

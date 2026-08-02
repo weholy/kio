@@ -58,7 +58,6 @@ import TelegramVoip
 import InviteLinksUI
 import UndoUI
 import MediaResources
-import SGAppearance
 import HashtagSearchUI
 import ActionSheetPeerItem
 import TelegramCallsUI
@@ -244,8 +243,6 @@ final class PeerInfoScreenNode: ViewControllerTracingNode, PeerInfoScreenNodePro
     let edgeEffectView: EdgeEffectView
     
     let headerNode: PeerInfoHeaderNode
-    /// Megram's profile wallpaper, pinned behind everything on this screen.
-    private var megramWallpaperView: MegramBackgroundView?
     var underHeaderContentsAlpha: CGFloat = 1.0
     var regularSections: [AnyHashable: PeerInfoScreenItemSectionContainerNode] = [:]
     var editingSections: [AnyHashable: PeerInfoScreenItemSectionContainerNode] = [:]
@@ -1325,17 +1322,6 @@ final class PeerInfoScreenNode: ViewControllerTracingNode, PeerInfoScreenNodePro
         })
         
         self.backgroundColor = self.presentationData.theme.list.blocksBackgroundColor
-
-        // MARK: Megram — profile wallpaper sits behind the whole screen. The
-        // node's own fill is dropped while it is on, otherwise it would cover
-        // the image it is meant to sit on.
-        if MegramAppearanceStore.isEnabled(.profileWallpaper) {
-            let wallpaperView = MegramBackgroundView(slot: .profileWallpaper)
-            wallpaperView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-            self.view.insertSubview(wallpaperView, at: 0)
-            self.megramWallpaperView = wallpaperView
-            self.backgroundColor = nil
-        }
         
         self.scrollNode.view.showsVerticalScrollIndicator = false
         if #available(iOS 11.0, *) {

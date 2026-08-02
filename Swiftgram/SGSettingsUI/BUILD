@@ -20,8 +20,6 @@ swift_library(
         "//Swiftgram/SGLogging:SGLogging",
         "//Swiftgram/SGSimpleSettings:SGSimpleSettings",
         "//LuxGram/SGFakeLocation:SGFakeLocation",
-        "//LuxGram/SGAppearance:SGAppearance",
-        "//submodules/AlertUI:AlertUI",
         "//Swiftgram/SGStrings:SGStrings",
 #        "//Swiftgram/SGAPI:SGAPI",
         "//Swiftgram/SGAPIToken:SGAPIToken",
