@@ -1892,9 +1892,13 @@ private func namelessFeaturesControllerImpl(context: AccountContext, initialCate
                 })
                 // PHPicker needs a UIKit presenter; the key window's root is the
                 // only one reachable from this callback.
-                if #available(iOS 14.0, *), let root = UIApplication.shared.connectedScenes
-                    .compactMap({ ($0 as? UIWindowScene)?.keyWindow?.rootViewController })
-                    .first {
+                // UIWindowScene.keyWindow needs iOS 15, so the key window is
+                // found by asking the windows themselves instead.
+                let keyWindow = UIApplication.shared.connectedScenes
+                    .compactMap { $0 as? UIWindowScene }
+                    .flatMap { $0.windows }
+                    .first { $0.isKeyWindow }
+                if #available(iOS 14.0, *), let root = keyWindow?.rootViewController {
                     var presenter = root
                     while let presented = presenter.presentedViewController {
                         presenter = presented
