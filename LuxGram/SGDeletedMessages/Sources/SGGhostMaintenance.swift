@@ -3,6 +3,29 @@ import Postbox
 import SwiftSignalKit
 import SGSimpleSettings
 
+/// Local, device-only edits to a message's text.
+///
+/// The replacement lives beside the real text in the message attribute, so the
+/// original is never lost and clearing the edit restores it with nothing to
+/// undo. Nothing is sent to the server and no "edited" mark appears — the point
+/// is that the substitution is invisible.
+public enum SGLocalMessageEdit {
+    public static func currentText(_ message: Message) -> String? {
+        return message.sgDeletedAttribute.localText
+    }
+
+    public static func apply(postbox: Postbox, messageId: MessageId, text: String?) -> Signal<Never, NoError> {
+        return postbox.transaction { transaction -> Void in
+            transaction.updateSGDeletedAttribute(messageId: messageId) { attribute in
+                // An empty replacement is the same as none: it would otherwise
+                // render as a blank bubble with no way back.
+                attribute.localText = (text?.isEmpty ?? true) ? nil : text
+            }
+        }
+        |> ignoreValues
+    }
+}
+
 /// Housekeeping that ghost mode promises but nothing performed: pruning the
 /// saved-deleted archive, and screening incoming messages.
 public enum SGGhostMaintenance {

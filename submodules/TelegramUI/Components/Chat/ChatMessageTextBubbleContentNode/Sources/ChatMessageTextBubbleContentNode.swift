@@ -23,6 +23,7 @@ import ChatMessageBubbleContentNode
 import ShimmeringLinkNode
 import ChatMessageItemCommon
 import TextLoadingEffect
+import SGDeletedMessages
 import ChatControllerInteraction
 import InteractiveTextComponent
 import ShimmeringMask
@@ -392,10 +393,15 @@ public class ChatMessageTextBubbleContentNode: ChatMessageBubbleContentNode {
                 } else {
                     if let updatingMedia = item.attributes.updatingMedia {
                         rawText = updatingMedia.text
+                    } else if let localText = item.message.sgDeletedAttribute.localText {
+                        // MARK: Megram — a local edit replaces the text on this
+                        // device only. It is drawn plainly, with no "edited"
+                        // mark, which is the whole point of the feature.
+                        rawText = localText
                     } else {
                         rawText = item.message.text
                     }
-                    
+
                     for attribute in item.message.attributes {
                         if let attribute = attribute as? TextEntitiesMessageAttribute {
                             messageEntities = attribute.entities

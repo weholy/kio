@@ -28,6 +28,8 @@ import AdUI
 import TelegramNotices
 import ReactionListContextMenuContent
 import TelegramUIPreferences
+import PromptUI
+import SGDeletedMessages
 import TranslateUI
 import DebugSettingsUI
 import ChatPresentationInterfaceState
@@ -2287,6 +2289,37 @@ func contextMenuForChatPresentationInterfaceState(chatPresentationInterfaceState
             }
         } else if let messageReadStatsAreHidden = infoSummaryData.messageReadStatsAreHidden, !messageReadStatsAreHidden {
             canViewStats = canViewReadStats(message: message, participantCount: infoSummaryData.participantCount, isMessageRead: isMessageRead, isPremium: isPremium, appConfig: appConfig)
+        }
+
+        // MARK: Megram — local edit. The replacement is stored beside the real
+        // text, so "Вернуть" restores the original with nothing to undo.
+        if SGSimpleSettings.shared.enableLocalMessageEditing, messages.count == 1, !messages[0].text.isEmpty {
+            let message = messages[0]
+            let existingLocalText = SGLocalMessageEdit.currentText(message)
+            let title = existingLocalText != nil ? "Вернуть оригинал" : "Локально изм."
+            sgActions.append(.action(ContextMenuActionItem(text: title, icon: { theme in
+                return generateTintedImage(image: UIImage(bundleImageName: "Chat/Context Menu/Edit"), color: theme.actionSheet.primaryTextColor)
+            }, action: { c, f in
+                f(.default)
+                if existingLocalText != nil {
+                    let _ = SGLocalMessageEdit.apply(postbox: context.account.postbox, messageId: message.id, text: nil).startStandalone()
+                } else {
+                    let promptController = promptController(
+                        context: context,
+                        text: "Локальное изменение",
+                        subtitle: "Текст поменяется только у вас. Собеседник ничего не увидит.",
+                        value: message.text,
+                        placeholder: "",
+                        characterLimit: 4096,
+                        apply: { updatedText in
+                            if let updatedText {
+                                let _ = SGLocalMessageEdit.apply(postbox: context.account.postbox, messageId: message.id, text: updatedText).startStandalone()
+                            }
+                        }
+                    )
+                    controllerInteraction.presentController(promptController, nil)
+                }
+            })))
         }
 
         // MARK: Swiftgram

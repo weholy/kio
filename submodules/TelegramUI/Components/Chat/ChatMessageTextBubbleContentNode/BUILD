@@ -40,6 +40,7 @@ swift_library(
         "//submodules/TelegramUI/Components/ShimmeringMask",
         "//submodules/TelegramUI/Components/StreamingTextReveal:StreamingTextReveal",
         "//Swiftgram/SGSimpleSettings:SGSimpleSettings",
+        "//LuxGram/SGDeletedMessages:SGDeletedMessages",
     ],
     visibility = [
         "//visibility:public",
