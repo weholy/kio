@@ -46,12 +46,37 @@ public enum MegramFireRefresh {
         }
     }
 
+    /// Throttles the background refresh. `setPeer` runs on every theme change,
+    /// presentation update and avatar reload, and a full history scan on each of
+    /// those is what made the app fall over.
+    private static var lastBackgroundRefresh: [Int64: Double] = [:]
+    private static let backgroundRefreshInterval: Double = 300.0
+    private static let backgroundRefreshLock = NSLock()
+
     /// Fire-and-forget refresh used when a chat is opened, so the header badge
     /// does not go stale for people who never open the fire screen.
+    ///
+    /// The badge already renders from the cached day count, so skipping a
+    /// refresh costs nothing but a slightly stale number.
     public static func refreshInBackground(postbox: Postbox, peerId: EnginePeer.Id, accountPeerId: EnginePeer.Id, completion: @escaping (MegramFireState) -> Void) -> Disposable {
-        guard MegramFireStore.isActive(peerId: peerId.toInt64()) else {
+        let rawPeerId = peerId.toInt64()
+        guard MegramFireStore.isActive(peerId: rawPeerId) else {
             return EmptyDisposable
         }
+
+        let now = CFAbsoluteTimeGetCurrent()
+        self.backgroundRefreshLock.lock()
+        let previous = self.lastBackgroundRefresh[rawPeerId]
+        let shouldRun = previous == nil || now - previous! > self.backgroundRefreshInterval
+        if shouldRun {
+            self.lastBackgroundRefresh[rawPeerId] = now
+        }
+        self.backgroundRefreshLock.unlock()
+
+        guard shouldRun else {
+            return EmptyDisposable
+        }
+
         return (self.refresh(postbox: postbox, peerId: peerId, accountPeerId: accountPeerId)
         |> deliverOnMainQueue).start(next: { snapshot in
             completion(snapshot.state)
@@ -71,10 +96,19 @@ public enum MegramFireRefresh {
         var sentRoundOrVoiceToday = false
         var hadCallToday = false
 
-        // The whole conversation counts, not just what arrived after the fire
-        // was lit — a fresh fire showing zero messages next to a chat with
-        // thousands of them reads as broken.
+        // Every message the scan touches is fully rendered out of the database,
+        // so an unbounded walk over a long conversation is expensive enough to
+        // matter. A year of history and 20k messages cover every figure this
+        // screen shows; the streak cannot reach further back anyway.
+        let scanLimit = 20000
+        let oldestTimestamp = Int32(Date().timeIntervalSince1970) - 400 * 24 * 60 * 60
+        var scanned = 0
+
         transaction.withAllMessages(peerId: peerId, namespace: Namespaces.Message.Cloud, reversed: true, { message in
+            scanned += 1
+            if scanned > scanLimit || message.timestamp < oldestTimestamp {
+                return false
+            }
             let day = MegramFireStore.dayString(Date(timeIntervalSince1970: Double(message.timestamp)))
 
             // Service events are not conversation, but a call leaves one and
