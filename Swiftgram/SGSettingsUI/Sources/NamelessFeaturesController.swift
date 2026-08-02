@@ -20,7 +20,9 @@ import TelegramUIPreferences
 /// Sections are handed out per switch, so each lands in its own rounded card
 /// with its description sitting outside it underneath. A shared section glues
 /// neighbouring switches into one block, which is what the old layout did.
-private struct NLSectionId: SGItemListSection {
+/// Hashable is spelled out because the enum this replaced got it for free, and
+/// the entry filter is generic over it.
+private struct NLSectionId: SGItemListSection, Hashable {
     let rawValue: Int32
 
     static let search = NLSectionId(rawValue: 0)
