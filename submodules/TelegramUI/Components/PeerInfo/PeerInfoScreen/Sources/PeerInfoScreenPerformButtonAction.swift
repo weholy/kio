@@ -1453,7 +1453,7 @@ extension Array where Element == ContextMenuItem {
         var hiddenTitles = Set<String>()
 
         if settings.hideMenuWallpaper {
-            hiddenTitles.insert(strings.PeerInfo_ChangeWallpaper)
+            hiddenTitles.insert(strings.UserInfo_ChangeWallpaper)
         }
         if settings.hideMenuSecretChat {
             hiddenTitles.insert(strings.UserInfo_StartSecretChat)
